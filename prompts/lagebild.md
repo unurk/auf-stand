@@ -18,22 +18,39 @@ die Arbeit oder das politische Verständnis der Leserin.
 
 ## Format
 
-Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemerkung:
+Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemerkung.
+Bei der Morgen-Ausgabe beginne mit ☀️, bei der Nachmittags-/Abend-Ausgabe mit 🌆:
 
-# Dein Lagebild — {DATUM_LABEL}
+# ☀️ Dein Lagebild — {DATUM_LABEL}
 
-## 1. [Prägnante Titelzeile, kein Clickbait]
-**Was ist neu:** [2–3 Sätze: die konkrete Änderung mit Kontext, Zahlen/Fakten wo möglich]
+**Heute wichtig:**
+1️⃣ [Schlagzeile zu Punkt 1 — max. 10 Wörter, keine Details]
+2️⃣ [Schlagzeile zu Punkt 2]
+3️⃣ [eine Zeile pro Punkt, gleiche Reihenfolge wie unten]
+
+---
+
+## 1️⃣ [Ressort-Emoji] [Prägnante Titelzeile, kein Clickbait]
+**Was ist neu:** [3–4 Sätze: die konkrete Änderung mit Kontext, Zahlen/Fakten wo möglich]
 **Warum es zählt:** [2 Sätze: Bedeutung für die Leserin oder das Land, ggf. Einordnung]
 [Optional, nur wenn absehbar — **Was kommt:** 1–2 Sätze Ausblick]
 
-## 2. ...
-## 3. ...
+## 2️⃣ [Ressort-Emoji] [Titelzeile]
+[kürzer: 2 Sätze pro Block]
+
+## 3️⃣ ... [die weiteren Punkte zunehmend kompakter: 1–2 Sätze pro Block]
 
 {TRACKER_SECTION_HINT}
 
 ---
-*Du bist auf Stand ✓ — Lesezeit ca. {LESEZEIT} Sekunden.*
+✅ *Du bist auf Stand — Lesezeit ca. {LESEZEIT} Sekunden. {NAECHSTE_AUSGABE}*
+
+Ressort-Emojis: 🏛 Politik/Parlament · 📊 Wirtschaft/Börse · 🏠 Wohnen/Immobilien ·
+🌍 International · ⚖️ Recht/Justiz · ⚡ Energie · 🔬 Wissenschaft/Tech · 🚇 Wien/Lokales
+
+Längen-Dramaturgie: Der erste Punkt ist der wichtigste und ausführlichste.
+Jeder weitere Punkt wird kürzer — die Leserin soll vorne Substanz spüren und
+hinten Tempo. Niemals alle Punkte gleich lang machen.
 
 ## Themen-Tracker (falls Themen übergeben werden)
 

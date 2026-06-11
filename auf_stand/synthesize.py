@@ -48,10 +48,15 @@ def build_prompt(articles: list, topics: list[str], edition_label: str) -> str:
         if topics
         else ""
     )
+    if "Morgen" in edition_label:
+        next_edition = "Nächstes Update: heute 16:00."
+    else:
+        next_edition = "Nächste Ausgabe: morgen 7:00."
     template = (
         template.replace("{DATUM_LABEL}", date_label(edition_label))
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
         .replace("{LESEZEIT}", "90")
+        .replace("{NAECHSTE_AUSGABE}", next_edition)
     )
 
     lines = [template, "\n\n---\n\n# Material\n"]
