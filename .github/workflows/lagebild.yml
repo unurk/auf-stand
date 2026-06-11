@@ -49,3 +49,12 @@ jobs:
         with:
           path: data/state.json
           key: state-${{ github.run_id }}
+
+      - name: Fehler auf Telegram melden
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id=8962080832 \
+            -d text="❌ Auf Stand: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"

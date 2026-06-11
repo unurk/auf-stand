@@ -128,19 +128,27 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    config = load_config()
-    if args.command == "feeds":
-        return cmd_feeds(config)
-    if args.command == "catchup":
-        return cmd_catchup(config, args.dry_run)
-    if args.command == "test-fulltext":
-        if not args.url:
-            print("Fehler: --url <URL> angeben.")
-            return 1
-        from . import fulltext
-        fulltext.test_url(args.url)
-        return 0
-    return run_edition(args.command, config, args.dry_run, args.keep_seen)
+    config: dict = {}
+    try:
+        config = load_config()
+        if args.command == "feeds":
+            return cmd_feeds(config)
+        if args.command == "catchup":
+            return cmd_catchup(config, args.dry_run)
+        if args.command == "test-fulltext":
+            if not args.url:
+                print("Fehler: --url <URL> angeben.")
+                return 1
+            from . import fulltext
+            fulltext.test_url(args.url)
+            return 0
+        return run_edition(args.command, config, args.dry_run, args.keep_seen)
+    except Exception as exc:
+        telegram.send_alert(
+            f"❌ Auf Stand: Lauf '{args.command}' fehlgeschlagen: {exc}",
+            config.get("telegram_chat_ids", []),
+        )
+        raise
 
 
 if __name__ == "__main__":

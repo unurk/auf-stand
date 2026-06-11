@@ -104,6 +104,17 @@ def fetch_all(config: dict) -> FetchResult:
         enriched = sum(1 for a in presse_articles if a.fulltext)
         print(f"  {enriched}/{len(presse_articles)} Volltexte geladen.")
 
+        if presse_articles and enriched == 0:
+            from . import telegram
+            telegram.send_alert(
+                "⚠️ Auf Stand: Kein einziger Volltext geladen — vermutlich ist das "
+                "Presse-Cookie abgelaufen. Neues Cookie aus dem Browser kopieren und "
+                "aktualisieren: lokal in .env (PRESSE_COOKIE), für die Cloud unter "
+                "github.com/unurk/auf-stand → Settings → Secrets → PRESSE_COOKIE. "
+                "Bis dahin laufen die Lagebilder nur mit Teasern weiter.",
+                config.get("telegram_chat_ids", []),
+            )
+
     return result
 
 

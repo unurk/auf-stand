@@ -70,6 +70,19 @@ def telegram_configured() -> bool:
     return bool(os.environ.get("TELEGRAM_BOT_TOKEN"))
 
 
+def send_alert(text: str, chat_ids: list[str]) -> None:
+    """Schickt eine Warnung als einfache Textnachricht (ohne Markdown-Formatierung)."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token or not chat_ids:
+        return
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    for chat_id in chat_ids:
+        try:
+            httpx.post(url, json={"chat_id": chat_id, "text": text}, timeout=15)
+        except Exception:
+            pass  # Eine fehlgeschlagene Warnung darf den Lauf nicht stoppen
+
+
 def send_telegram(markdown: str, chat_ids: list[str]) -> None:
     if not chat_ids:
         print("Keine Telegram-Chat-IDs in config.yaml — Versand übersprungen.")
