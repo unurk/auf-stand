@@ -89,7 +89,12 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     telegram.send_telegram(lagebild, config.get("telegram_chat_ids", []))
 
     if not keep_seen:
+        import re
+        points = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
         state.mark_seen(articles, current_state, edition)
+        state.record_stats(
+            current_state, edition, points, len(lagebild.split()), len(new_articles)
+        )
         state.save_state(current_state)
     return 0
 
@@ -119,7 +124,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext"])
+    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
@@ -135,6 +140,9 @@ def main() -> int:
             return cmd_feeds(config)
         if args.command == "catchup":
             return cmd_catchup(config, args.dry_run)
+        if args.command == "woche":
+            from . import quittung
+            return quittung.cmd_woche(config)
         if args.command == "test-fulltext":
             if not args.url:
                 print("Fehler: --url <URL> angeben.")

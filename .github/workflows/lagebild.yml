@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "0 5 * * *"   # 7:00 Uhr Wien (UTC+2 Sommer / UTC+1 Winter)
     - cron: "0 14 * * *"  # 16:00 Uhr Wien
+    - cron: "0 7 * * 6"   # Samstag 9:00 Wien: Wochen-Quittung
   workflow_dispatch:       # Manueller Start über GitHub UI
 
 jobs:
@@ -37,7 +38,9 @@ jobs:
         run: |
           mkdir -p data out
           HOUR=$(date -u +%H)
-          if [ "$HOUR" = "05" ]; then
+          if [ "$HOUR" = "07" ]; then
+            python -m auf_stand.main woche
+          elif [ "$HOUR" = "05" ]; then
             python -m auf_stand.main morgen
           else
             python -m auf_stand.main abend

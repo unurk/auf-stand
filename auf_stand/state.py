@@ -43,3 +43,23 @@ def mark_seen(articles: list, state: dict, edition: str) -> None:
     for article in articles:
         seen[article.id] = now
     state.setdefault("last_run", {})[edition] = now
+
+
+def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
+    """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
+    now = datetime.now(timezone.utc)
+    stats = state.setdefault("stats", [])
+    stats.append({
+        "date": now.date().isoformat(),
+        "ts": now.isoformat(),
+        "edition": edition,
+        "points": points,
+        "words": words,
+        "new_articles": new_articles,
+    })
+    # Nur die letzten 30 Tage behalten
+    cutoff = now.date().toordinal() - 30
+    state["stats"] = [
+        s for s in stats
+        if datetime.fromisoformat(s["date"]).toordinal() >= cutoff
+    ]
