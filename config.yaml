@@ -29,8 +29,15 @@ topics:
   - Energiepreise und Stromkosten in Österreich
 
 # Claude-Modell für die Synthese
-model: claude-sonnet-4-6
+model: claude-haiku-4-5
 max_tokens: 2500
+
+# Volltexte nur für diese Ressorts holen (spart API-Kosten).
+# Andere Ressorts gehen weiter als Teaser in die Synthese ein.
+fulltext_ressorts:
+  - Politik
+  - Wirtschaft
+  - Unternehmen
 
 # Ausgaben
 editions:

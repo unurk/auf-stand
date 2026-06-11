@@ -94,7 +94,11 @@ def fetch_all(config: dict) -> FetchResult:
 
     if os.environ.get("PRESSE_COOKIE"):
         from . import fulltext
-        presse_articles = [a for a in result.articles if "diepresse.com" in a.link]
+        ressorts = config.get("fulltext_ressorts")
+        presse_articles = [
+            a for a in result.articles
+            if "diepresse.com" in a.link and (not ressorts or a.ressort in ressorts)
+        ]
         print(f"Volltext-Fetch für {len(presse_articles)} Presse-Artikel ...")
         fulltext.enrich_articles(presse_articles)
         enriched = sum(1 for a in presse_articles if a.fulltext)
