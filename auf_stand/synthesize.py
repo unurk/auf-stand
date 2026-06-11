@@ -67,15 +67,21 @@ def build_prompt(articles: list, topics: list[str], edition_label: str) -> str:
         for title, text in fulltexts:
             lines.append(f"### {title}\n{text}\n")
 
-    lines.append(f"## Artikel-Teaser aus den RSS-Feeds ({len(articles)} Stück)\n")
+    lines.append(f"## Artikel aus den RSS-Feeds ({len(articles)} Stück)\n")
     for article in articles:
         published = (
             article.published.strftime("%d.%m. %H:%M UTC") if article.published else "ohne Datum"
         )
         link_part = f"\n  Link: {article.link}" if article.link else ""
-        lines.append(
-            f"- [{article.ressort}] {article.title} ({published})\n  {article.teaser}{link_part}"
-        )
+        if article.fulltext:
+            lines.append(
+                f"- [{article.ressort}] {article.title} ({published}){link_part}\n"
+                f"  [VOLLTEXT]\n{article.fulltext}\n  [/VOLLTEXT]"
+            )
+        else:
+            lines.append(
+                f"- [{article.ressort}] {article.title} ({published})\n  {article.teaser}{link_part}"
+            )
 
     return "\n".join(lines)
 
