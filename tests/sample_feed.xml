@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Test</title>
+<item><title>Nationalrat beschließt Mietpreisbremse für Altbau</title>
+<link>https://example.com/a1</link><guid>a1</guid>
+<description>&lt;p&gt;Die Koalition hat die Deckelung der Richtwertmieten mit 3,5 Prozent beschlossen. Betroffen sind rund 750.000 Haushalte.&lt;/p&gt;</description>
+<pubDate>Wed, 10 Jun 2026 16:16:38 GMT</pubDate></item>
+<item><title>EZB senkt Leitzins um 25 Basispunkte</title>
+<link>https://example.com/a2</link><guid>a2</guid>
+<description>Die Europäische Zentralbank reagiert auf die schwache Konjunktur im Euroraum.</description>
+<pubDate>Wed, 10 Jun 2026 16:16:38 GMT</pubDate></item>
+<item><title>Debatte über Schulreform geht weiter</title>
+<link>https://example.com/a3</link><guid>a3</guid>
+<description>Bildungsminister und Opposition tauschen bekannte Positionen aus.</description>
+<pubDate>Wed, 10 Jun 2026 16:16:38 GMT</pubDate></item>
+</channel></rss>

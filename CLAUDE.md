@@ -1,0 +1,70 @@
+# Auf Stand — Die Presse als Hintergrund-Dienst (MVP)
+
+## Was dieses Projekt ist
+
+Prototyp für ein neues Digitalprodukt der „Presse": Statt eines Artikel-Feeds bekommt
+die Nutzerin 1–2x täglich ein **Lagebild** — eine redaktionelle Synthese der maximal
+drei Entwicklungen, die sich materiell geändert haben. Lesezeit ≤ 90 Sekunden,
+am Ende das Signal „Du bist auf Stand ✓". Vorbild ist die Produktlogik von WHOOP:
+arbeitet im Hintergrund, verdichtet, meldet sich nur zu relevanten Momenten.
+
+Wichtigste Produktregel: **Wir optimieren auf Time-to-Informed (kurz!), nicht auf
+Time-on-Site.** Jedes Feature, das Scrollen, Stöbern oder längere Sessions fördert,
+widerspricht dem Produkt und wird nicht gebaut.
+
+## Architektur
+
+```
+auf_stand/
+  fetch.py       RSS-Feeds der Presse holen & normalisieren (nur öffentliche Teaser)
+  state.py       Gesehene Artikel in data/state.json -> Delta zwischen Ausgaben
+  synthesize.py  Claude API: erzeugt das Lagebild aus Artikeln + Themen-Trackern
+  render.py      Markdown- und HTML-Ausgabe nach out/
+  deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
+  main.py        CLI: morgen | abend | catchup [--dry-run]
+prompts/
+  lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts)
+manual_input/    Hier können Volltexte (Premium) als .txt/.md abgelegt werden
+config.yaml      Feeds, Themen-Tracker, Empfänger, Modell
+data/state.json  Laufzeit-Zustand (gesehene Artikel)
+out/             Erzeugte Lagebilder (md + html)
+```
+
+Ablauf einer Ausgabe: fetch -> state filtert auf „neu seit letzter Ausgabe" ->
+synthesize (Claude) -> render -> deliver -> state aktualisieren.
+
+## Konventionen
+
+- Python 3.10+, keine Frameworks. Abhängigkeiten minimal halten (requirements.txt).
+- Alle Nutzertexte und Prompts auf Deutsch (österreichisches Publikum).
+- Secrets nur über .env (siehe .env.example), niemals in Code oder config.yaml.
+- `--dry-run` muss immer funktionieren: baut den Prompt und schreibt ihn nach out/,
+  ohne API-Call. So ist die Pipeline ohne Kosten testbar.
+- Das Qualitäts-Gate im Prompt nicht aufweichen: Lieber 1 Punkt oder die ehrliche
+  Aussage „heute wenig Wesentliches" als 3 erzwungene Punkte.
+
+## Content-Zugang (wichtig)
+
+- RSS-Feeds (diepresse.com/rss/<Ressort>) sind öffentlich: Headlines + Teaser.
+  Feed-URLs beim ersten Lauf verifizieren (`python -m auf_stand.main feeds`).
+- Volltexte: Der User hat ein Premium-Abo und arbeitet bei der Presse. Für den
+  Prototyp werden Volltexte manuell in `manual_input/` abgelegt (Datei pro Artikel).
+  KEIN Login-Scraping mit persönlichen Zugangsdaten bauen — für den echten Pilot
+  soll ein offizieller interner Content-Feed/API über die IT angefragt werden.
+  Das ist auch der bessere Weg für saubere, vollständige Daten.
+
+## Roadmap (in dieser Reihenfolge sinnvoll)
+
+1. Feeds verifizieren, erste echte Lagebilder erzeugen, Prompt-Qualität iterieren
+2. Themen-Tracker schärfen: Delta-Formulierung („Was ist neu seit deinem letzten Stand")
+3. E-Mail-Versand an kleine Testgruppe (Concierge-MVP, siehe Konzeptpapier)
+4. 17-Uhr-Ausgabe als Audio: TTS-Anbindung (z. B. ElevenLabs/OpenAI TTS), mp3 nach out/
+5. Telegram-Bot als Push-Kanal (einfacher als WhatsApp Business API)
+6. Mini-Web-Ansicht mit „Auf Stand ✓"-Status (statisches HTML reicht zunächst)
+
+## Was bewusst NICHT gebaut wird
+
+- Kein Artikel-Feed, keine Endlos-Liste, kein „Mehr laden"
+- Keine Klick-Personalisierung; Themen-Tracker sind explizit gewählte Themen
+- Mehr als 2 Ausgaben/Pushes pro Tag
+- Credential-basiertes Scraping hinter der Paywall

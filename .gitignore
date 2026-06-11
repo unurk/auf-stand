@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/state.json
+out/
+manual_input/*.txt
+manual_input/*.md

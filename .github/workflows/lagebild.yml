@@ -1,0 +1,51 @@
+name: Lagebild
+
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 7:00 Uhr Wien (UTC+2 Sommer / UTC+1 Winter)
+    - cron: "0 14 * * *"  # 16:00 Uhr Wien
+  workflow_dispatch:       # Manueller Start über GitHub UI
+
+jobs:
+  lagebild:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: State wiederherstellen
+        uses: actions/cache@v4
+        with:
+          path: data/state.json
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+
+      - name: Ausgabe erzeugen
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          PRESSE_COOKIE: ${{ secrets.PRESSE_COOKIE }}
+        run: |
+          mkdir -p data out
+          HOUR=$(date -u +%H)
+          if [ "$HOUR" = "05" ]; then
+            python -m auf_stand.main morgen
+          else
+            python -m auf_stand.main abend
+          fi
+
+      - name: State sichern
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/state.json
+          key: state-${{ github.run_id }}
