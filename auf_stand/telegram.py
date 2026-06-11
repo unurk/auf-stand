@@ -70,6 +70,27 @@ def telegram_configured() -> bool:
     return bool(os.environ.get("TELEGRAM_BOT_TOKEN"))
 
 
+def send_photo(path, caption: str, chat_ids: list[str]) -> None:
+    """Schickt ein Bild mit Bildunterschrift (Klartext, kein Markdown)."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token or not chat_ids:
+        print("Telegram nicht konfiguriert — Foto-Versand übersprungen.")
+        return
+    url = f"https://api.telegram.org/bot{token}/sendPhoto"
+    for chat_id in chat_ids:
+        with open(path, "rb") as fh:
+            resp = httpx.post(
+                url,
+                data={"chat_id": chat_id, "caption": caption},
+                files={"photo": fh},
+                timeout=30,
+            )
+        if resp.status_code == 200:
+            print(f"Telegram: Foto gesendet an {chat_id}")
+        else:
+            print(f"Telegram-Fehler ({chat_id}): {resp.json().get('description', resp.text)}")
+
+
 def send_alert(text: str, chat_ids: list[str]) -> None:
     """Schickt eine Warnung als einfache Textnachricht (ohne Markdown-Formatierung)."""
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
