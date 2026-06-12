@@ -26,7 +26,9 @@ jobs:
       - name: State wiederherstellen
         uses: actions/cache@v4
         with:
-          path: data/state.json
+          path: |
+            data/state.json
+            data/rueckkanal_offset.json
           key: state-${{ github.run_id }}
           restore-keys: state-
 
@@ -54,11 +56,20 @@ jobs:
             fi
           fi
 
+      - name: Rückkanal beantworten
+        if: always()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python -m auf_stand.main rueckkanal
+
       - name: State sichern
         uses: actions/cache/save@v4
         if: always()
         with:
-          path: data/state.json
+          path: |
+            data/state.json
+            data/rueckkanal_offset.json
           key: state-${{ github.run_id }}
 
       - name: Fehler auf Telegram melden
