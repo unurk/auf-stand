@@ -42,6 +42,8 @@ Bei der Morgen-Ausgabe beginne mit ☀️, bei der Nachmittags-/Abend-Ausgabe mi
 
 {TRACKER_SECTION_HINT}
 
+{VORAUSSCHAU_SECTION}
+
 ---
 ✅ *Du bist auf Stand — Lesezeit ca. {LESEZEIT} Sekunden. {NAECHSTE_AUSGABE}*
 
