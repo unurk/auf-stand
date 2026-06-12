@@ -1,0 +1,98 @@
+"""Rückkanal: Beantwortet Telegram-Fragen auf Basis aktueller Presse-Artikel."""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+import httpx
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+OFFSET_FILE = BASE_DIR / "data" / "rueckkanal_offset.json"
+PROMPT_PATH = BASE_DIR / "prompts" / "rueckkanal.md"
+
+
+def _load_offset() -> int:
+    if OFFSET_FILE.exists():
+        return json.loads(OFFSET_FILE.read_text(encoding="utf-8")).get("offset", 0)
+    return 0
+
+
+def _save_offset(offset: int) -> None:
+    OFFSET_FILE.parent.mkdir(parents=True, exist_ok=True)
+    OFFSET_FILE.write_text(json.dumps({"offset": offset}), encoding="utf-8")
+
+
+def _get_updates(token: str, offset: int) -> list[dict]:
+    try:
+        resp = httpx.get(
+            f"https://api.telegram.org/bot{token}/getUpdates",
+            params={"offset": offset, "timeout": 0, "limit": 20},
+            timeout=12,
+        )
+        if resp.status_code == 200:
+            return resp.json().get("result", [])
+    except Exception as exc:
+        print(f"Telegram getUpdates Fehler: {exc}")
+    return []
+
+
+def _build_prompt(question: str, articles: list) -> str:
+    template = PROMPT_PATH.read_text(encoding="utf-8")
+    lines = [template.replace("{FRAGE}", question), "\n\n---\n\n# Artikel\n"]
+    for article in articles[:25]:
+        published = (
+            article.published.strftime("%d.%m. %H:%M") if article.published else "ohne Datum"
+        )
+        link = f"\n  Link: {article.link}" if article.link else ""
+        lines.append(
+            f"- [{article.ressort}] {article.title} ({published})\n  {article.teaser}{link}"
+        )
+    return "\n".join(lines)
+
+
+def cmd_rueckkanal(config: dict) -> int:
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token:
+        print("TELEGRAM_BOT_TOKEN fehlt — Rückkanal übersprungen.")
+        return 0
+
+    allowed_ids = {str(cid) for cid in config.get("telegram_chat_ids", [])}
+    offset = _load_offset()
+    updates = _get_updates(token, offset)
+
+    if not updates:
+        print("Keine neuen Nachrichten.")
+        return 0
+
+    from .fetch import fetch_all, filter_recent
+    from . import synthesize, telegram as tg
+
+    articles = filter_recent(fetch_all(config).articles, 24)
+    processed = 0
+
+    for update in updates:
+        update_id = update["update_id"]
+        offset = max(offset, update_id + 1)
+
+        msg = update.get("message", {})
+        chat_id = str(msg.get("chat", {}).get("id", ""))
+        text = msg.get("text", "").strip()
+
+        # Nur Text-Nachrichten von bekannten Chat-IDs beantworten
+        if not text or chat_id not in allowed_ids or text.startswith("/"):
+            continue
+
+        print(f"Frage ({chat_id}): {text[:100]}")
+        try:
+            prompt = _build_prompt(text, articles)
+            answer = synthesize.synthesize(prompt, config)
+            tg.send_telegram(answer, [chat_id])
+            processed += 1
+        except Exception as exc:
+            print(f"Fehler bei Antwort: {exc}")
+            tg.send_alert(f"❌ Rückkanal: Antwort fehlgeschlagen — {exc}", [chat_id])
+
+    _save_offset(offset)
+    print(f"{processed} Frage(n) beantwortet.")
+    return 0

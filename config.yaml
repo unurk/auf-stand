@@ -48,6 +48,24 @@ editions:
     label: "17-Uhr-Update"
     lookback_hours: 11      # nur was seit der Morgen-Ausgabe neu ist (Delta via state)
 
+# Vorausschau: Termine der nächsten 7 Tage, die im Morgen-Lagebild erscheinen.
+# Format: datum (YYYY-MM-DD), name, tracker (optional — muss exakt einem Themen-Tracker entsprechen).
+# EZB-Termine: https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html
+# Nationalrat: https://www.parlament.gv.at/
+termine:
+  - datum: 2026-07-23
+    name: EZB-Ratssitzung · Zinsentscheid
+    tracker: EZB-Zinsentscheidungen und Folgen für Österreich
+  - datum: 2026-09-10
+    name: EZB-Ratssitzung · Zinsentscheid
+    tracker: EZB-Zinsentscheidungen und Folgen für Österreich
+  - datum: 2026-10-29
+    name: EZB-Ratssitzung · Zinsentscheid
+    tracker: EZB-Zinsentscheidungen und Folgen für Österreich
+  - datum: 2026-12-17
+    name: EZB-Ratssitzung · Zinsentscheid
+    tracker: EZB-Zinsentscheidungen und Folgen für Österreich
+
 # E-Mail-Versand (optional). SMTP-Zugang kommt aus .env — hier nur Empfänger.
 # Leer lassen, solange nur Dateien in out/ erzeugt werden sollen.
 recipients: []

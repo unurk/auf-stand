@@ -67,7 +67,10 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
 
     prompt = synthesize.build_prompt(
-        selection, config.get("topics", []), edition_config.get("label", edition)
+        selection,
+        config.get("topics", []),
+        edition_config.get("label", edition),
+        termine=config.get("termine", []),
     )
 
     if dry_run:
@@ -124,7 +127,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche"])
+    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
@@ -143,6 +146,9 @@ def main() -> int:
         if args.command == "woche":
             from . import quittung
             return quittung.cmd_woche(config)
+        if args.command == "rueckkanal":
+            from . import rueckkanal
+            return rueckkanal.cmd_rueckkanal(config)
         if args.command == "test-fulltext":
             if not args.url:
                 print("Fehler: --url <URL> angeben.")

@@ -40,7 +40,14 @@ def load_manual_fulltexts() -> list[tuple[str, str]]:
     return texts
 
 
-def build_prompt(articles: list, topics: list[str], edition_label: str) -> str:
+def build_prompt(
+    articles: list,
+    topics: list[str],
+    edition_label: str,
+    termine: list[dict] | None = None,
+) -> str:
+    from .vorausschau import format_vorausschau
+
     template = PROMPT_PATH.read_text(encoding="utf-8")
     tracker_hint = (
         "## Deine Themen\n[Nur falls es zu verfolgten Themen materielle "
@@ -48,13 +55,13 @@ def build_prompt(articles: list, topics: list[str], edition_label: str) -> str:
         if topics
         else ""
     )
-    if "Morgen" in edition_label:
-        next_edition = "Nächstes Update: heute 16:00."
-    else:
-        next_edition = "Nächste Ausgabe: morgen 7:00."
+    is_morning = "Morgen" in edition_label
+    next_edition = "Nächstes Update: heute 16:00." if is_morning else "Nächste Ausgabe: morgen 7:00."
+    vorausschau = format_vorausschau(termine or []) if is_morning else ""
     template = (
         template.replace("{DATUM_LABEL}", date_label(edition_label))
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
+        .replace("{VORAUSSCHAU_SECTION}", vorausschau)
         .replace("{LESEZEIT}", "90")
         .replace("{NAECHSTE_AUSGABE}", next_edition)
     )
