@@ -127,7 +127,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal"])
+    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
@@ -149,6 +149,10 @@ def main() -> int:
         if args.command == "rueckkanal":
             from . import rueckkanal
             return rueckkanal.cmd_rueckkanal(config)
+        if args.command == "site":
+            from . import webview
+            webview.build_site()
+            return 0
         if args.command == "test-fulltext":
             if not args.url:
                 print("Fehler: --url <URL> angeben.")
