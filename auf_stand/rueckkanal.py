@@ -40,7 +40,7 @@ def _get_updates(token: str, offset: int) -> list[dict]:
 def _build_prompt(question: str, articles: list) -> str:
     template = PROMPT_PATH.read_text(encoding="utf-8")
     lines = [template.replace("{FRAGE}", question), "\n\n---\n\n# Artikel\n"]
-    for article in articles[:25]:
+    for article in articles[:15]:
         published = (
             article.published.strftime("%d.%m. %H:%M") if article.published else "ohne Datum"
         )
