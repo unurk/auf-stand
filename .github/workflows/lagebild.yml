@@ -10,6 +10,8 @@ on:
 jobs:
   lagebild:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +64,24 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python -m auf_stand.main rueckkanal
+
+      - name: Web-Ansicht veröffentlichen
+        if: always()
+        run: |
+          python -m auf_stand.main site
+          if [ -n "$(git status --porcelain site)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add site
+            git commit -m "site: Ausgabe vom $(date -u +%F)"
+            for i in 1 2 3 4; do
+              git push origin HEAD:master && break
+              sleep $((2 ** i))
+              git pull --rebase origin master
+            done
+          else
+            echo "Keine Änderung an site/ — kein Commit."
+          fi
 
       - name: State sichern
         uses: actions/cache/save@v4
