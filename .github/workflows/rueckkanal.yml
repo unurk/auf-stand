@@ -2,8 +2,8 @@ name: Rückkanal
 
 on:
   schedule:
-    # Alle 15 Minuten zwischen 6:00–20:00 UTC (= 8:00–22:00 Wien CEST)
-    - cron: "*/15 6-20 * * *"
+    # Alle 30 Minuten zwischen 6:00–18:00 UTC (= 8:00–20:00 Wien CEST)
+    - cron: "*/30 6-18 * * *"
   workflow_dispatch:
 
 jobs:
