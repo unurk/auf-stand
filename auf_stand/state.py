@@ -75,6 +75,72 @@ def feedback_summary(state: dict, cutoff_date: str) -> dict:
     return {"up": up, "down": down, "total": up + down}
 
 
+def _strip_markdown(text: str) -> str:
+    """Macht aus einer Delta-Zeile einen sauberen Verlauf-Eintrag (reiner Text)."""
+    import re
+    text = re.sub(r"\s*\[[^\]]*\]\([^)]*\)", "", text)      # Links ganz weg (inkl. → Artikel)
+    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)          # **bold**
+    text = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"\1", text)  # *kursiv*
+    text = text.lstrip("-• ").strip()
+    # Führende Label-Präfixe wegkürzen ("EZB:", "Seit deinem letzten Stand:") —
+    # höchstens zwei, damit kein echter Satzinhalt verloren geht.
+    for _ in range(2):
+        m = re.match(r"^[^.!?]{1,35}:\s+", text)
+        if not m:
+            break
+        text = text[m.end():]
+    return text.strip()
+
+
+def update_dossier(state: dict, lagebild_md: str, topics: list, datum: str) -> None:
+    """Hält die heutige Themen-Entwicklung je Tracker als Verlauf fest.
+
+    Liest den Abschnitt „## Deine Themen" der erzeugten Ausgabe und ordnet jede
+    Delta-Zeile per Schlagwort einem Tracker zu. Der Abschnitt erscheint laut
+    Prompt nur bei materieller Änderung — also genau dann, wenn ein Eintrag fällt.
+    """
+    from .synthesize import topic_keyword, topic_name
+
+    lines = lagebild_md.splitlines()
+    section: list[str] = []
+    in_section = False
+    for raw in lines:
+        line = raw.strip()
+        if line.startswith("## "):
+            if in_section:
+                break  # nächste Überschrift beendet den Abschnitt
+            in_section = "Deine Themen" in line
+            continue
+        if in_section:
+            if line.startswith("---"):
+                break
+            if line:
+                section.append(line)
+    if not section:
+        return
+
+    dossier = state.setdefault("dossier", {})
+    for line in section:
+        clean = _strip_markdown(line)
+        if not clean:
+            continue
+        for topic in topics:
+            kw = topic_keyword(topic)
+            # Gegen die Originalzeile matchen — das Schlagwort kann im (später
+            # entfernten) Label-Präfix „**Miet:**" stehen, nicht im Satzkörper.
+            if kw and kw.lower() in line.lower():
+                name = topic_name(topic)
+                entries = dossier.setdefault(name, [])
+                entries.append({"date": datum, "summary": clean})
+                # Pro Thema: letzte 5 Einträge / 30 Tage behalten.
+                cutoff = datetime.now(timezone.utc).date().toordinal() - 30
+                dossier[name] = [
+                    e for e in entries
+                    if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+                ][-5:]
+                break  # eine Zeile zählt nur zum ersten passenden Thema
+
+
 def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)

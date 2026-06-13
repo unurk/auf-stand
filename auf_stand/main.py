@@ -71,6 +71,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         config.get("topics", []),
         edition_config.get("label", edition),
         termine=config.get("termine", []),
+        dossier=current_state.get("dossier", {}),
     )
 
     if dry_run:
@@ -104,6 +105,9 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
             current_state, edition, points, len(lagebild.split()), len(new_articles)
+        )
+        state.update_dossier(
+            current_state, lagebild, config.get("topics", []), f"{datetime.now():%Y-%m-%d}"
         )
         state.save_state(current_state)
     return 0

@@ -16,6 +16,18 @@ MONTHS = [
 ]
 
 
+def topic_name(topic) -> str:
+    """Name eines Trackers — akzeptiert String oder {name, schlagwort}."""
+    return topic["name"] if isinstance(topic, dict) else str(topic)
+
+
+def topic_keyword(topic) -> str:
+    """Schlagwort zum Zuordnen einer Delta-Zeile; Fallback: erstes Wort des Namens."""
+    if isinstance(topic, dict) and topic.get("schlagwort"):
+        return str(topic["schlagwort"])
+    return topic_name(topic).split()[0] if topic_name(topic) else ""
+
+
 def date_label(edition_label: str) -> str:
     now = datetime.now()
     return (
@@ -40,11 +52,22 @@ def load_manual_fulltexts() -> list[tuple[str, str]]:
     return texts
 
 
+def _format_verlauf(entries: list[dict]) -> str:
+    """Kompakte Verlaufszeile aus den letzten Dossier-Einträgen."""
+    parts = []
+    for e in entries[-3:]:
+        d = e.get("date", "")
+        tag = f"[{d[8:10]}.{d[5:7]}.] " if len(d) >= 10 else ""
+        parts.append(f"{tag}{e.get('summary', '')}")
+    return " ".join(parts)
+
+
 def build_prompt(
     articles: list,
-    topics: list[str],
+    topics: list,
     edition_label: str,
     termine: list[dict] | None = None,
+    dossier: dict | None = None,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -69,8 +92,14 @@ def build_prompt(
     lines = [template, "\n\n---\n\n# Material\n"]
 
     if topics:
+        dossier = dossier or {}
         lines.append("## Verfolgte Themen\n")
-        lines.extend(f"- {topic}" for topic in topics)
+        for topic in topics:
+            name = topic_name(topic)
+            lines.append(f"- {name}")
+            verlauf = _format_verlauf(dossier.get(name, []))
+            if verlauf:
+                lines.append(f"  Verlauf: {verlauf}")
         lines.append("")
 
     fulltexts = load_manual_fulltexts()

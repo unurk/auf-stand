@@ -62,6 +62,12 @@ Artikeln eine materielle Änderung gibt. Nur dann erscheint es im Abschnitt
 Gibt es zu einem Thema nichts Neues, lasse es komplett weg — kein „keine Neuigkeiten".
 Gibt es zu keinem Thema etwas, entfällt der Abschnitt ganz.
 
+Ist zu einem Thema eine `Verlauf:`-Zeile geliefert (frühere Stände, mit Datum),
+formuliere das Delta konkret dagegen — was hat sich GEGENÜBER dem letzten Stand
+geändert. Wiederhole nichts aus dem Verlauf; zeige nur das Neue. Beginne die Zeile
+mit dem Schlagwort des Themas, damit die Zuordnung klar ist, z. B.
+„- **EZB:** Seit deinem letzten Stand …".
+
 ## Stilregeln
 
 - Ton der „Presse": präzise, nüchtern, analytisch. Keine Ausrufezeichen,

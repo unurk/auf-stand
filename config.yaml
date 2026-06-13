@@ -21,12 +21,19 @@ max_articles_per_feed: 15
 
 # Themen-Tracker: explizit verfolgte Entwicklungen (KEINE Klick-Personalisierung).
 # Erscheinen im Lagebild nur, wenn es eine materielle Änderung gibt.
+# schlagwort: kurzes Stichwort, um die Themen-Delta-Zeile dem Tracker zuzuordnen
+# (für den Verlauf/das Dossier in data/state.json). Reiner String geht auch.
 topics:
-  - US-Zölle und Folgen für die österreichische Exportwirtschaft
-  - Mietrecht und Wohnkosten in Österreich
-  - US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber
-  - EZB-Zinsentscheidungen und Folgen für Österreich
-  - Energiepreise und Stromkosten in Österreich
+  - name: US-Zölle und Folgen für die österreichische Exportwirtschaft
+    schlagwort: Zoll
+  - name: Mietrecht und Wohnkosten in Österreich
+    schlagwort: Miet
+  - name: "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"
+    schlagwort: Börse
+  - name: EZB-Zinsentscheidungen und Folgen für Österreich
+    schlagwort: EZB
+  - name: Energiepreise und Stromkosten in Österreich
+    schlagwort: Energie
 
 # Claude-Modell für die Synthese
 model: claude-haiku-4-5
