@@ -38,7 +38,6 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          PRESSE_COOKIE: ${{ secrets.PRESSE_COOKIE }}
         run: |
           mkdir -p data out
           SCHEDULE="${{ github.event.schedule }}"
