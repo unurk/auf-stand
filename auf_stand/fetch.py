@@ -77,7 +77,6 @@ def fetch_feed(name: str, url: str, max_articles: int) -> tuple[list[Article], s
 
 
 def fetch_all(config: dict) -> FetchResult:
-    import os
     result = FetchResult()
     max_articles = int(config.get("max_articles_per_feed", 15))
     seen_ids: set[str] = set()
@@ -91,29 +90,6 @@ def fetch_all(config: dict) -> FetchResult:
                 continue
             seen_ids.add(article.id)
             result.articles.append(article)
-
-    if os.environ.get("PRESSE_COOKIE"):
-        from . import fulltext
-        ressorts = config.get("fulltext_ressorts")
-        presse_articles = [
-            a for a in result.articles
-            if "diepresse.com" in a.link and (not ressorts or a.ressort in ressorts)
-        ]
-        print(f"Volltext-Fetch für {len(presse_articles)} Presse-Artikel ...")
-        fulltext.enrich_articles(presse_articles)
-        enriched = sum(1 for a in presse_articles if a.fulltext)
-        print(f"  {enriched}/{len(presse_articles)} Volltexte geladen.")
-
-        if presse_articles and enriched == 0:
-            from . import telegram
-            telegram.send_alert(
-                "⚠️ Auf Stand: Kein einziger Volltext geladen — vermutlich ist das "
-                "Presse-Cookie abgelaufen. Neues Cookie aus dem Browser kopieren und "
-                "aktualisieren: lokal in .env (PRESSE_COOKIE), für die Cloud unter "
-                "github.com/unurk/auf-stand → Settings → Secrets → PRESSE_COOKIE. "
-                "Bis dahin laufen die Lagebilder nur mit Teasern weiter.",
-                config.get("telegram_chat_ids", []),
-            )
 
     return result
 
