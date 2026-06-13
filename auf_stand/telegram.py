@@ -123,7 +123,17 @@ def send_alert(text: str, chat_ids: list[str]) -> None:
             pass  # Eine fehlgeschlagene Warnung darf den Lauf nicht stoppen
 
 
-def send_telegram(markdown: str, chat_ids: list[str]) -> None:
+def _feedback_keyboard(feedback_key: str) -> dict:
+    """Inline-Tastatur 👍/👎 für die Relevanz-Bewertung einer Ausgabe."""
+    return {
+        "inline_keyboard": [[
+            {"text": "👍 Relevant", "callback_data": f"fb|{feedback_key}|up"},
+            {"text": "👎 Nicht relevant", "callback_data": f"fb|{feedback_key}|down"},
+        ]]
+    }
+
+
+def send_telegram(markdown: str, chat_ids: list[str], feedback_key: str | None = None) -> None:
     if not chat_ids:
         print("Keine Telegram-Chat-IDs in config.yaml — Versand übersprungen.")
         return
@@ -136,18 +146,52 @@ def send_telegram(markdown: str, chat_ids: list[str]) -> None:
     url = f"https://api.telegram.org/bot{token}/sendMessage"
 
     for chat_id in chat_ids:
-        for chunk in _split(text):
-            resp = httpx.post(url, json={
+        chunks = _split(text)
+        for i, chunk in enumerate(chunks):
+            payload = {
                 "chat_id": chat_id,
                 "text": chunk,
                 "parse_mode": "MarkdownV2",
-            }, timeout=15)
+            }
+            # Bewertungs-Buttons nur an den letzten Chunk hängen.
+            if feedback_key and i == len(chunks) - 1:
+                payload["reply_markup"] = _feedback_keyboard(feedback_key)
+            resp = httpx.post(url, json=payload, timeout=15)
             if resp.status_code != 200:
                 data = resp.json()
                 print(f"Telegram-Fehler ({chat_id}): {data.get('description', resp.text)}")
                 break
         else:
             print(f"Telegram: gesendet an {chat_id}")
+
+
+def answer_callback(callback_query_id: str, text: str = "Danke ✓") -> None:
+    """Quittiert einen Button-Tap (stoppt den Lade-Spinner im Client)."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token:
+        return
+    url = f"https://api.telegram.org/bot{token}/answerCallbackQuery"
+    try:
+        httpx.post(url, json={"callback_query_id": callback_query_id, "text": text}, timeout=15)
+    except Exception:
+        pass  # Eine fehlgeschlagene Quittung darf den Lauf nicht stoppen
+
+
+def confirm_feedback(chat_id: str, message_id: int, text: str) -> None:
+    """Ersetzt die 👍/👎-Tastatur durch eine Bestätigung — Nachrichtentext bleibt."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token:
+        return
+    url = f"https://api.telegram.org/bot{token}/editMessageReplyMarkup"
+    keyboard = {"inline_keyboard": [[{"text": text, "callback_data": "fb|done"}]]}
+    try:
+        httpx.post(
+            url,
+            json={"chat_id": chat_id, "message_id": message_id, "reply_markup": keyboard},
+            timeout=15,
+        )
+    except Exception:
+        pass
 
 
 def _split(text: str, limit: int = 4000) -> list[str]:

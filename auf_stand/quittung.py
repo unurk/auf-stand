@@ -42,6 +42,7 @@ def week_stats(state: dict) -> dict | None:
         "days": days,
         "days_on_stand": len(active_dates),
         "range_label": _range_label(window[0], today),
+        "feedback": state_module.feedback_summary(state, cutoff),
     }
 
 
@@ -103,6 +104,12 @@ def build_image(stats: dict, path: Path) -> Path:
              f"Verdichtet aus {stats['articles']} Artikeln in {stats['editions']} "
              f"{'Lagebild' if stats['editions'] == 1 else 'Lagebildern'} — statt stundenlangem Scrollen.",
              ha="center", fontsize=15, color=MUTED, family="sans-serif")
+
+    fb = stats.get("feedback", {})
+    if fb.get("total"):
+        fig.text(0.5, 0.065,
+                 f"Du fandest {fb['up']} von {fb['total']} bewerteten Ausgaben relevant.",
+                 ha="center", fontsize=15, color=MUTED, family="sans-serif")
 
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, facecolor=BG, bbox_inches="tight", pad_inches=0.4)

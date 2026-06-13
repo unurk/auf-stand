@@ -75,3 +75,7 @@ mail_subject_prefix: "Auf Stand"
 # Chat-ID herausfinden: Bot starten, https://api.telegram.org/bot<TOKEN>/getUpdates aufrufen.
 telegram_chat_ids:
   - "8962080832"
+
+# Feedback-Loop: Ein-Tap-Bewertung (👍/👎) unter jeder Ausgabe.
+# Die Bewertungen landen in data/state.json -> Grundlage zum Schärfen des Prompts.
+feedback_enabled: true

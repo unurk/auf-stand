@@ -45,6 +45,36 @@ def mark_seen(articles: list, state: dict, edition: str) -> None:
     state.setdefault("last_run", {})[edition] = now
 
 
+def record_feedback(state: dict, datum: str, edition: str, rating: str, chat_id: str) -> None:
+    """Hält eine Ein-Tap-Relevanzbewertung fest (rating: 'up' oder 'down')."""
+    now = datetime.now(timezone.utc)
+    feedback = state.setdefault("feedback", [])
+    feedback.append({
+        "date": datum,
+        "edition": edition,
+        "rating": rating,
+        "chat_id": chat_id,
+        "ts": now.isoformat(),
+    })
+    # Nur die letzten 30 Tage behalten (Muster wie record_stats).
+    cutoff = now.date().toordinal() - 30
+    state["feedback"] = [
+        f for f in feedback
+        if datetime.fromisoformat(f["date"]).toordinal() >= cutoff
+    ]
+
+
+def feedback_summary(state: dict, cutoff_date: str) -> dict:
+    """Zählt 👍/👎 ab cutoff_date (ISO-Datum). Letzte Bewertung pro Ausgabe zählt."""
+    latest: dict[tuple[str, str], str] = {}
+    for f in state.get("feedback", []):
+        if f["date"] >= cutoff_date:
+            latest[(f["date"], f["edition"])] = f["rating"]
+    up = sum(1 for r in latest.values() if r == "up")
+    down = sum(1 for r in latest.values() if r == "down")
+    return {"up": up, "down": down, "total": up + down}
+
+
 def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)

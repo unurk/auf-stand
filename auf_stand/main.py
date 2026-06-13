@@ -91,7 +91,12 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     deliver.send_email(
         subject, lagebild, html_path.read_text(encoding="utf-8"), config.get("recipients", [])
     )
-    telegram.send_telegram(lagebild, config.get("telegram_chat_ids", []))
+    feedback_key = (
+        f"{datetime.now():%Y-%m-%d}|{edition}"
+        if config.get("feedback_enabled", True)
+        else None
+    )
+    telegram.send_telegram(lagebild, config.get("telegram_chat_ids", []), feedback_key=feedback_key)
 
     if not keep_seen:
         import re
