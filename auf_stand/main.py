@@ -84,7 +84,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     lagebild = synthesize.synthesize(prompt, config)
     from . import epaper as epaper_module
-    lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url())
+    lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config))
     md_path, html_path = render.write_output(lagebild, edition)
     print(f"Lagebild erzeugt:\n  {md_path}\n  {html_path}")
 

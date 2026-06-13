@@ -86,3 +86,7 @@ telegram_chat_ids:
 # Feedback-Loop: Ein-Tap-Bewertung (👍/👎) unter jeder Ausgabe.
 # Die Bewertungen landen in data/state.json -> Grundlage zum Schärfen des Prompts.
 feedback_enabled: true
+
+# E-Paper-Link am Ende jeder Ausgabe. Zeigt auf die offizielle E-Paper-Seite;
+# eingeloggte Abonnent:innen werden zur aktuellen Ausgabe geleitet.
+epaper_url: https://www.diepresse.com/epaper

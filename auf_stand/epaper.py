@@ -1,37 +1,21 @@
-"""Stellt den Link zur aktuellen E-Paper-Ausgabe bereit."""
+"""Stellt den Link zur E-Paper-Ausgabe bereit.
+
+Die direkte Ausgaben-URL (mit Issue-ID) ist auth-gated und ohne Login nicht
+zuverlässig zu ermitteln. Wir verlinken daher die offizielle E-Paper-Seite —
+Die Presse leitet eingeloggte Abonnent:innen selbst zur aktuellen Ausgabe.
+Über config.yaml (`epaper_url`) überschreibbar.
+"""
 from __future__ import annotations
 
-import urllib.parse
-
-import httpx
-
-_CCIDIST_BASE = "https://digital.diepresse.com/ccidist-ws/dp/dp_die-presse"
-_READER_BASE = "https://digital.diepresse.com/ccidist-replica-reader/"
-_FALLBACK_URL = "https://digital.diepresse.com"
+_DEFAULT_URL = "https://www.diepresse.com/epaper"
 
 
-def get_epaper_url() -> str:
-    """Gibt die Reader-URL der aktuellen Ausgabe zurück; fällt auf die Homepage zurück."""
-    for endpoint in ("issues/latest", "issues/current"):
-        try:
-            resp = httpx.get(
-                f"{_CCIDIST_BASE}/{endpoint}",
-                timeout=5,
-                follow_redirects=True,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                issue_id = data.get("id") or data.get("issueId") or data.get("issue_id")
-                if issue_id:
-                    epub = f"{_CCIDIST_BASE}/issues/{issue_id}/"
-                    return (
-                        f"{_READER_BASE}?epub={urllib.parse.quote(epub, safe='')}#/pages/1"
-                    )
-        except Exception:
-            pass
-    return _FALLBACK_URL
+def get_epaper_url(config: dict | None = None) -> str:
+    if config and config.get("epaper_url"):
+        return str(config["epaper_url"])
+    return _DEFAULT_URL
 
 
 def epaper_section(url: str) -> str:
     """Gibt den Markdown-Block für den E-Paper-Link zurück."""
-    return f"\n---\n\n📰 **Die Presse — E-Paper** · [Heutige Ausgabe öffnen →]({url})"
+    return f"\n---\n\n📰 **Die Presse — E-Paper** · [Aktuelle Ausgabe öffnen →]({url})"
