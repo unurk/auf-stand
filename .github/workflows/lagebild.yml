@@ -38,7 +38,6 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          PRESSE_COOKIE: ${{ secrets.PRESSE_COOKIE }}
         run: |
           mkdir -p data out
           SCHEDULE="${{ github.event.schedule }}"
@@ -49,9 +48,13 @@ jobs:
           elif [ "$SCHEDULE" = "0 14 * * *" ]; then
             python -m auf_stand.main abend
           else
-            # Manueller Start (workflow_dispatch): Uhrzeit bestimmt Ausgabe
+            # Externer Cron-Trigger (cron-job.org) oder manueller Start:
+            # Ausgabe anhand von Uhrzeit + Wochentag bestimmen.
             HOUR=$(date -u +%H)
-            if [ "$HOUR" -le "09" ]; then
+            DOW=$(date -u +%u)   # 1=Mo … 6=Sa, 7=So
+            if [ "$DOW" = "6" ] && [ "$HOUR" = "07" ]; then
+              python -m auf_stand.main woche
+            elif [ "$HOUR" -le "09" ]; then
               python -m auf_stand.main morgen
             else
               python -m auf_stand.main abend
