@@ -55,6 +55,7 @@ def _markdown_to_html(markdown: str) -> str:
             out.append("<hr>")
             continue
         escaped = html.escape(line)
+        escaped = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', escaped)
         escaped = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", escaped)
         escaped = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", escaped)
         if line.startswith("# "):

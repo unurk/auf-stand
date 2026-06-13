@@ -26,12 +26,31 @@ def _to_telegram_md(markdown: str) -> str:
             text = _escape(line[3:])
             lines.append(f"*{text}*")
             continue
-        # **bold** inline
-        line = re.sub(r"\*\*(.+?)\*\*", lambda m: f"*{_escape(m.group(1))}*", line)
-        # *italic* inline (nur wenn nicht schon fett verarbeitet)
+        # Links und Bold-Spans vor dem Escapen als Platzhalter sichern, damit
+        # die Italic-Regex und _escape_remaining sie nicht versehentlich verändern.
+        _placeholders: dict[str, str] = {}
+
+        def _replace_link(m: re.Match) -> str:
+            key = f"\x00L{len(_placeholders)}\x00"
+            link_text = _escape(m.group(1))
+            link_url = m.group(2).replace("\\", "\\\\").replace(")", "\\)")
+            _placeholders[key] = f"[{link_text}]({link_url})"
+            return key
+
+        def _replace_bold(m: re.Match) -> str:
+            key = f"\x00B{len(_placeholders)}\x00"
+            _placeholders[key] = f"*{_escape(m.group(1))}*"
+            return key
+
+        line = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", _replace_link, line)
+        line = re.sub(r"\*\*(.+?)\*\*", _replace_bold, line)
+        # *italic* inline (nach Bold, damit Bold-Output nicht erneut gematcht wird)
         line = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", lambda m: f"_{_escape(m.group(1))}_", line)
         # Restliche Sonderzeichen escapen (außer was schon verarbeitet)
         line = _escape_remaining(line)
+        # Platzhalter durch fertige Telegram-Tokens ersetzen
+        for key, value in _placeholders.items():
+            line = line.replace(key, value)
         lines.append(line)
     return "\n".join(lines)
 
