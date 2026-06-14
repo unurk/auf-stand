@@ -69,6 +69,7 @@ def build_prompt(
     termine: list[dict] | None = None,
     dossier: dict | None = None,
     article_feedback_hint: str = "",
+    user_topic_prefs: list[str] | None = None,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -91,6 +92,14 @@ def build_prompt(
     )
 
     lines = [template]
+    if user_topic_prefs:
+        pref_hint = (
+            "\n\n---\n\n# Nutzerpräferenzen\n"
+            f"Der Nutzer möchte bevorzugt über folgende Themen informiert werden: "
+            f"{', '.join(user_topic_prefs)}.\n"
+            "Priorisiere diese Themen im Lagebild, sofern es relevante Entwicklungen gibt.\n"
+        )
+        lines.append(pref_hint)
     if article_feedback_hint:
         lines.append(f"\n\n---\n\n# Kalibrierung\n{article_feedback_hint}")
     lines.append("\n\n---\n\n# Material\n")

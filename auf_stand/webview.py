@@ -175,6 +175,37 @@ _PAGE_TEMPLATE = """\
     .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
     .topic-article-date { font-size: 12px; color: var(--muted);
                            font-family: var(--sans); white-space: nowrap; }
+    /* ── Assessment ── */
+    .as-card { background: var(--surface); border: 1px solid var(--border);
+               border-radius: 12px; padding: 24px; margin: 20px 0; }
+    .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
+                     line-height: 1.6; margin-bottom: 20px; }
+    .as-progress { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                   margin-bottom: 12px; letter-spacing: 0.02em; }
+    .as-question { font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
+    .as-btns { display: flex; gap: 12px; }
+    .as-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 999px;
+              background: none; color: var(--fg); font-size: 15px; cursor: pointer;
+              font-family: var(--sans); transition: background 0.15s; }
+    .as-btn:hover { border-color: var(--accent); }
+    .as-btn-primary { background: var(--accent); border-color: var(--accent);
+                       color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
+                       padding: 12px 24px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; }
+    .as-rec-list { list-style: none; padding: 0; margin: 12px 0 20px; }
+    .as-rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border);
+                      font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .as-rec-list li:last-child { border-bottom: none; }
+    .tg-cmd { background: oklch(0.12 0.02 256); border: 1px solid var(--border);
+              border-radius: 8px; padding: 12px 14px; font-family: monospace;
+              font-size: 14px; color: var(--accent); margin: 16px 0;
+              display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 4px 10px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                  text-decoration: underline; cursor: pointer; margin-top: 24px;
+                  display: inline-block; background: none; border: none; padding: 0; }
   </style>
 </head>
 <body>
@@ -355,51 +386,175 @@ def _iso_to_display(iso: str) -> str:
 # Seiten-Generatoren
 # ---------------------------------------------------------------------------
 
+def _topic_card_html(topic, dossier: dict, topic_articles: dict) -> str:
+    """HTML für eine einzelne Topic-Karte (nach abgeschlossenem Assessment)."""
+    from .synthesize import topic_keyword, topic_name as get_topic_name
+    name = get_topic_name(topic)
+    kw = topic_keyword(topic)
+    badge = f'<span class="schlagwort-badge">#{kw}</span>' if kw else ""
+    dossier_entries = sorted(
+        dossier.get(name, []), key=lambda e: e.get("date", ""), reverse=True
+    )
+    stand_html = ""
+    if dossier_entries and dossier_entries[0].get("summary"):
+        stand_html = f'<p class="topic-stand">Stand: {dossier_entries[0]["summary"]}</p>'
+    arts = topic_articles.get(name, [])
+    if arts:
+        items = "\n".join(
+            f'<li class="topic-article">'
+            f'<a href="{a["link"]}" target="_blank" rel="noopener">'
+            f'<span class="topic-article-title">{a["title"]}</span>'
+            f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
+            f"</a></li>"
+            for a in arts
+            if a.get("link") and a.get("title")
+        )
+        body_html = f'<ul class="topic-articles">{items}</ul>'
+    else:
+        body_html = '<p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p>'
+    return (
+        f'<div class="dossier-topic" data-topic-name="{name}">'
+        f"<h2>{name}{badge}</h2>"
+        f"{stand_html}{body_html}"
+        f"</div>"
+    )
+
+
 def build_dossier(dossier: dict, topics: list, topic_articles: dict) -> None:
-    """Erzeugt site/dossier.html mit Die Presse-Design."""
+    """Erzeugt site/dossier.html mit Assessment-Flow und Topic-Karten."""
     from .synthesize import topic_keyword, topic_name as get_topic_name
     SITE_DIR.mkdir(parents=True, exist_ok=True)
-    sections: list[str] = []
-    for topic in topics:
-        name = get_topic_name(topic)
-        kw = topic_keyword(topic)
-        badge = f'<span class="schlagwort-badge">#{kw}</span>' if kw else ""
 
-        # Neuester Dossier-Eintrag als "Stand:"-Zeile
-        dossier_entries = sorted(
-            dossier.get(name, []), key=lambda e: e.get("date", ""), reverse=True
-        )
-        stand_html = ""
-        if dossier_entries and dossier_entries[0].get("summary"):
-            stand_html = f'<p class="topic-stand">Stand: {dossier_entries[0]["summary"]}</p>'
+    # Topic-Karten (nach Assessment)
+    topic_cards = "\n".join(_topic_card_html(t, dossier, topic_articles) for t in topics)
+    if not topic_cards:
+        topic_cards = '<p class="empty-state">Keine Themen konfiguriert.</p>'
 
-        # Artikel-Links
-        arts = topic_articles.get(name, [])
-        if arts:
-            items = "\n".join(
-                f'<li class="topic-article">'
-                f'<a href="{a["link"]}" target="_blank" rel="noopener">'
-                f'<span class="topic-article-title">{a["title"]}</span>'
-                f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
-                f"</a></li>"
-                for a in arts
-                if a.get("link") and a.get("title")
-            )
-            body_html = f'<ul class="topic-articles">{items}</ul>'
-        else:
-            body_html = '<p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p>'
+    # JS-Daten: Topics mit Assessment-Fragen
+    topics_with_q = [
+        {
+            "name": get_topic_name(t),
+            "kw": topic_keyword(t),
+            "q": t.get("assessment_question", "") if isinstance(t, dict) else "",
+        }
+        for t in topics
+        if isinstance(t, dict) and t.get("assessment_question")
+    ]
+    topics_js = json.dumps(topics_with_q, ensure_ascii=False)
 
-        sections.append(
-            f'<div class="dossier-topic">'
-            f"<h2>{name}{badge}</h2>"
-            f"{stand_html}{body_html}"
-            f"</div>"
-        )
+    assessment_html = f"""
+<div id="as-intro" class="as-card">
+  <p class="as-intro-text">Beantworte kurz {len(topics_with_q)} Fragen — die App findet heraus, welche Themen für dich wirklich relevant sind und informiert dich gezielt darüber.</p>
+  <button class="as-btn-primary" onclick="asStart()">Jetzt einrichten →</button>
+</div>
 
-    if not sections:
-        sections = ['<p class="empty-state">Keine Themen konfiguriert.</p>']
+<div id="as-step" style="display:none">
+  <div class="as-card">
+    <p class="as-progress" id="as-progress"></p>
+    <p class="as-question" id="as-q"></p>
+    <div class="as-btns">
+      <button class="as-btn" onclick="asAnswer(true)">Ja</button>
+      <button class="as-btn" onclick="asAnswer(false)">Nein</button>
+    </div>
+  </div>
+</div>
 
-    content = "<h1>Meine Themen</h1>\n" + "\n".join(sections)
+<div id="as-result" style="display:none">
+  <div class="as-card">
+    <h2 style="margin-top:0">Deine Themen</h2>
+    <ul class="as-rec-list" id="as-rec-list"></ul>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 8px">Sende diesen Befehl an deinen Telegram-Bot, damit auch deine täglichen Lagebilder angepasst werden:</p>
+    <div class="tg-cmd"><span id="tg-cmd-text"></span><button class="tg-copy-btn" onclick="asCopy()">Kopieren</button></div>
+    <button class="as-btn-primary" onclick="asConfirm()">Bestätigen &amp; speichern</button>
+  </div>
+</div>
+
+<div id="topic-list" style="display:none">
+{topic_cards}
+  <button class="reset-link" onclick="asReset()">Themen-Auswahl neu einrichten</button>
+</div>
+
+<script>
+(function(){{
+var TOPICS={topics_js};
+var answers=[],idx=0;
+var PREF_KEY='auf_stand_prefs';
+
+function show(id){{['as-intro','as-step','as-result','topic-list'].forEach(function(i){{document.getElementById(i).style.display=i===id?'':'none';}});}}
+
+function filterTopics(prefs){{
+  var list=document.getElementById('topic-list');
+  list.querySelectorAll('.dossier-topic').forEach(function(el){{
+    el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
+  }});
+}}
+
+// Beim Laden prüfen ob bereits Präferenzen vorhanden
+var saved=localStorage.getItem(PREF_KEY);
+if(saved){{
+  try{{var prefs=JSON.parse(saved);show('topic-list');filterTopics(prefs);}}
+  catch(e){{show('as-intro');}}
+}}else{{show('as-intro');}}
+
+window.asStart=function(){{answers=[];idx=0;asShowQ();}};
+
+function asShowQ(){{
+  if(idx>=TOPICS.length){{asShowResult();return;}}
+  document.getElementById('as-progress').textContent='Frage '+(idx+1)+' von '+TOPICS.length;
+  document.getElementById('as-q').textContent=TOPICS[idx].q;
+  show('as-step');
+}}
+
+window.asAnswer=function(yes){{
+  answers.push({{topic:TOPICS[idx],yes:yes}});
+  idx++;
+  asShowQ();
+}};
+
+function asShowResult(){{
+  var yes=answers.filter(function(a){{return a.yes;}});
+  var ul=document.getElementById('as-rec-list');
+  ul.innerHTML='';
+  if(yes.length===0){{
+    var li=document.createElement('li');li.textContent='Keine Themen ausgewählt — alle werden angezeigt.';ul.appendChild(li);
+  }}else{{
+    yes.forEach(function(a){{
+      var li=document.createElement('li');
+      li.innerHTML='<span style="color:var(--accent)">✓</span> '+a.topic.name;
+      ul.appendChild(li);
+    }});
+  }}
+  var cmd='/themen '+yes.map(function(a){{return a.topic.kw;}}).join(' ');
+  document.getElementById('tg-cmd-text').textContent=cmd;
+  show('as-result');
+}}
+
+window.asCopy=function(){{
+  var t=document.getElementById('tg-cmd-text').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){{
+    var b=document.querySelector('.tg-copy-btn');b.textContent='✓ Kopiert';
+    setTimeout(function(){{b.textContent='Kopieren';}},2000);
+  }});
+}};
+
+window.asConfirm=function(){{
+  var yes=answers.filter(function(a){{return a.yes;}});
+  var prefs=yes.map(function(a){{return a.topic.name;}});
+  localStorage.setItem(PREF_KEY,JSON.stringify(prefs.length?prefs:null));
+  show('topic-list');
+  filterTopics(prefs.length?prefs:null);
+}};
+
+window.asReset=function(){{
+  localStorage.removeItem(PREF_KEY);
+  answers=[];idx=0;
+  show('as-intro');
+}};
+}})();
+</script>
+"""
+
+    content = "<h1>Meine Themen</h1>\n" + assessment_html
     html = _render_page("Meine Themen", content, "dossier")
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
 

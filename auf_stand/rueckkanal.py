@@ -87,8 +87,27 @@ def cmd_rueckkanal(config: dict) -> int:
         chat_id = str(msg.get("chat", {}).get("id", ""))
         text = msg.get("text", "").strip()
 
-        # Nur Text-Nachrichten von bekannten Chat-IDs beantworten
-        if not text or chat_id not in allowed_ids or text.startswith("/"):
+        if not text or chat_id not in allowed_ids:
+            continue
+
+        # /themen EZB Miet Börse — speichert Themen-Präferenzen
+        if text.startswith("/themen"):
+            from . import synthesize as syn
+            parts = text[7:].strip().split()
+            all_topics = config.get("topics", [])
+            matched = [
+                syn.topic_name(t) for t in all_topics
+                if syn.topic_keyword(t).lower() in [p.lower() for p in parts]
+            ]
+            state_module.save_user_topic_prefs(current_state, matched)
+            state_module.save_state(current_state)
+            names = ", ".join(matched) if matched else "keine"
+            tg.send_alert(f"✅ Themen gespeichert: {names}", [chat_id])
+            print(f"Themen-Präferenzen gesetzt: {names}")
+            continue
+
+        # Andere Slash-Befehle ignorieren
+        if text.startswith("/"):
             continue
 
         if articles is None:

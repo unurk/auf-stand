@@ -76,6 +76,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         termine=config.get("termine", []),
         dossier=current_state.get("dossier", {}),
         article_feedback_hint=fb_hint,
+        user_topic_prefs=current_state.get("user_topic_prefs") or None,
     )
 
     if dry_run:

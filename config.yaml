@@ -26,14 +26,19 @@ max_articles_per_feed: 15
 topics:
   - name: US-Zölle und Folgen für die österreichische Exportwirtschaft
     schlagwort: Zoll
+    assessment_question: "Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?"
   - name: Mietrecht und Wohnkosten in Österreich
     schlagwort: Miet
+    assessment_question: "Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?"
   - name: "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"
     schlagwort: Börse
+    assessment_question: "Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?"
   - name: EZB-Zinsentscheidungen und Folgen für Österreich
     schlagwort: EZB
+    assessment_question: "Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?"
   - name: Energiepreise und Stromkosten in Österreich
     schlagwort: Energie
+    assessment_question: "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"
 
 # Claude-Modell für die Synthese
 model: claude-haiku-4-5

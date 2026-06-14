@@ -130,6 +130,37 @@
     .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
     .topic-article-date { font-size: 12px; color: var(--muted);
                            font-family: var(--sans); white-space: nowrap; }
+    /* ── Assessment ── */
+    .as-card { background: var(--surface); border: 1px solid var(--border);
+               border-radius: 12px; padding: 24px; margin: 20px 0; }
+    .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
+                     line-height: 1.6; margin-bottom: 20px; }
+    .as-progress { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                   margin-bottom: 12px; letter-spacing: 0.02em; }
+    .as-question { font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
+    .as-btns { display: flex; gap: 12px; }
+    .as-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 999px;
+              background: none; color: var(--fg); font-size: 15px; cursor: pointer;
+              font-family: var(--sans); transition: background 0.15s; }
+    .as-btn:hover { border-color: var(--accent); }
+    .as-btn-primary { background: var(--accent); border-color: var(--accent);
+                       color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
+                       padding: 12px 24px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; }
+    .as-rec-list { list-style: none; padding: 0; margin: 12px 0 20px; }
+    .as-rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border);
+                      font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .as-rec-list li:last-child { border-bottom: none; }
+    .tg-cmd { background: oklch(0.12 0.02 256); border: 1px solid var(--border);
+              border-radius: 8px; padding: 12px 14px; font-family: monospace;
+              font-size: 14px; color: var(--accent); margin: 16px 0;
+              display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 4px 10px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                  text-decoration: underline; cursor: pointer; margin-top: 24px;
+                  display: inline-block; background: none; border: none; padding: 0; }
   </style>
 </head>
 <body>
@@ -139,11 +170,121 @@
 </header>
 <div class="wrap">
 <h1>Meine Themen</h1>
-<div class="dossier-topic"><h2>US-Zölle und Folgen für die österreichische Exportwirtschaft<span class="schlagwort-badge">#Zoll</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic"><h2>Mietrecht und Wohnkosten in Österreich<span class="schlagwort-badge">#Miet</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic"><h2>US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+
+<div id="as-intro" class="as-card">
+  <p class="as-intro-text">Beantworte kurz 5 Fragen — die App findet heraus, welche Themen für dich wirklich relevant sind und informiert dich gezielt darüber.</p>
+  <button class="as-btn-primary" onclick="asStart()">Jetzt einrichten →</button>
+</div>
+
+<div id="as-step" style="display:none">
+  <div class="as-card">
+    <p class="as-progress" id="as-progress"></p>
+    <p class="as-question" id="as-q"></p>
+    <div class="as-btns">
+      <button class="as-btn" onclick="asAnswer(true)">Ja</button>
+      <button class="as-btn" onclick="asAnswer(false)">Nein</button>
+    </div>
+  </div>
+</div>
+
+<div id="as-result" style="display:none">
+  <div class="as-card">
+    <h2 style="margin-top:0">Deine Themen</h2>
+    <ul class="as-rec-list" id="as-rec-list"></ul>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 8px">Sende diesen Befehl an deinen Telegram-Bot, damit auch deine täglichen Lagebilder angepasst werden:</p>
+    <div class="tg-cmd"><span id="tg-cmd-text"></span><button class="tg-copy-btn" onclick="asCopy()">Kopieren</button></div>
+    <button class="as-btn-primary" onclick="asConfirm()">Bestätigen &amp; speichern</button>
+  </div>
+</div>
+
+<div id="topic-list" style="display:none">
+<div class="dossier-topic" data-topic-name="US-Zölle und Folgen für die österreichische Exportwirtschaft"><h2>US-Zölle und Folgen für die österreichische Exportwirtschaft<span class="schlagwort-badge">#Zoll</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Mietrecht und Wohnkosten in Österreich"><h2>Mietrecht und Wohnkosten in Österreich<span class="schlagwort-badge">#Miet</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"><h2>US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="EZB-Zinsentscheidungen und Folgen für Österreich"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Energiepreise und Stromkosten in Österreich"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+  <button class="reset-link" onclick="asReset()">Themen-Auswahl neu einrichten</button>
+</div>
+
+<script>
+(function(){
+var TOPICS=[{"name": "US-Zölle und Folgen für die österreichische Exportwirtschaft", "kw": "Zoll", "q": "Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?"}, {"name": "Mietrecht und Wohnkosten in Österreich", "kw": "Miet", "q": "Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?"}, {"name": "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber", "kw": "Börse", "q": "Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?"}, {"name": "EZB-Zinsentscheidungen und Folgen für Österreich", "kw": "EZB", "q": "Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?"}, {"name": "Energiepreise und Stromkosten in Österreich", "kw": "Energie", "q": "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"}];
+var answers=[],idx=0;
+var PREF_KEY='auf_stand_prefs';
+
+function show(id){['as-intro','as-step','as-result','topic-list'].forEach(function(i){document.getElementById(i).style.display=i===id?'':'none';});}
+
+function filterTopics(prefs){
+  var list=document.getElementById('topic-list');
+  list.querySelectorAll('.dossier-topic').forEach(function(el){
+    el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
+  });
+}
+
+// Beim Laden prüfen ob bereits Präferenzen vorhanden
+var saved=localStorage.getItem(PREF_KEY);
+if(saved){
+  try{var prefs=JSON.parse(saved);show('topic-list');filterTopics(prefs);}
+  catch(e){show('as-intro');}
+}else{show('as-intro');}
+
+window.asStart=function(){answers=[];idx=0;asShowQ();};
+
+function asShowQ(){
+  if(idx>=TOPICS.length){asShowResult();return;}
+  document.getElementById('as-progress').textContent='Frage '+(idx+1)+' von '+TOPICS.length;
+  document.getElementById('as-q').textContent=TOPICS[idx].q;
+  show('as-step');
+}
+
+window.asAnswer=function(yes){
+  answers.push({topic:TOPICS[idx],yes:yes});
+  idx++;
+  asShowQ();
+};
+
+function asShowResult(){
+  var yes=answers.filter(function(a){return a.yes;});
+  var ul=document.getElementById('as-rec-list');
+  ul.innerHTML='';
+  if(yes.length===0){
+    var li=document.createElement('li');li.textContent='Keine Themen ausgewählt — alle werden angezeigt.';ul.appendChild(li);
+  }else{
+    yes.forEach(function(a){
+      var li=document.createElement('li');
+      li.innerHTML='<span style="color:var(--accent)">✓</span> '+a.topic.name;
+      ul.appendChild(li);
+    });
+  }
+  var cmd='/themen '+yes.map(function(a){return a.topic.kw;}).join(' ');
+  document.getElementById('tg-cmd-text').textContent=cmd;
+  show('as-result');
+}
+
+window.asCopy=function(){
+  var t=document.getElementById('tg-cmd-text').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){
+    var b=document.querySelector('.tg-copy-btn');b.textContent='✓ Kopiert';
+    setTimeout(function(){b.textContent='Kopieren';},2000);
+  });
+};
+
+window.asConfirm=function(){
+  var yes=answers.filter(function(a){return a.yes;});
+  var prefs=yes.map(function(a){return a.topic.name;});
+  localStorage.setItem(PREF_KEY,JSON.stringify(prefs.length?prefs:null));
+  show('topic-list');
+  filterTopics(prefs.length?prefs:null);
+};
+
+window.asReset=function(){
+  localStorage.removeItem(PREF_KEY);
+  answers=[];idx=0;
+  show('as-intro');
+};
+})();
+</script>
+
 </div>
 <nav class="tabbar">
   <a href="index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>

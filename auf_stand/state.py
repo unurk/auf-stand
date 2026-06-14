@@ -185,6 +185,11 @@ def article_feedback_hint(state: dict, cutoff_date: str) -> str:
     return ""
 
 
+def save_user_topic_prefs(state: dict, topic_names: list[str]) -> None:
+    """Speichert vom Nutzer gewählte Themen-Präferenzen (via App-Assessment oder Telegram)."""
+    state["user_topic_prefs"] = topic_names
+
+
 def save_topic_articles(state: dict, topics: list, articles: list) -> None:
     """Speichert bis zu 3 themenrelevante Artikel pro Topic in state für die Web-App."""
     from .synthesize import topic_keyword, topic_name as _tn

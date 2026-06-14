@@ -130,6 +130,37 @@
     .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
     .topic-article-date { font-size: 12px; color: var(--muted);
                            font-family: var(--sans); white-space: nowrap; }
+    /* ── Assessment ── */
+    .as-card { background: var(--surface); border: 1px solid var(--border);
+               border-radius: 12px; padding: 24px; margin: 20px 0; }
+    .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
+                     line-height: 1.6; margin-bottom: 20px; }
+    .as-progress { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                   margin-bottom: 12px; letter-spacing: 0.02em; }
+    .as-question { font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
+    .as-btns { display: flex; gap: 12px; }
+    .as-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 999px;
+              background: none; color: var(--fg); font-size: 15px; cursor: pointer;
+              font-family: var(--sans); transition: background 0.15s; }
+    .as-btn:hover { border-color: var(--accent); }
+    .as-btn-primary { background: var(--accent); border-color: var(--accent);
+                       color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
+                       padding: 12px 24px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; }
+    .as-rec-list { list-style: none; padding: 0; margin: 12px 0 20px; }
+    .as-rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border);
+                      font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .as-rec-list li:last-child { border-bottom: none; }
+    .tg-cmd { background: oklch(0.12 0.02 256); border: 1px solid var(--border);
+              border-radius: 8px; padding: 12px 14px; font-family: monospace;
+              font-size: 14px; color: var(--accent); margin: 16px 0;
+              display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 4px 10px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                  text-decoration: underline; cursor: pointer; margin-top: 24px;
+                  display: inline-block; background: none; border: none; padding: 0; }
   </style>
 </head>
 <body>
