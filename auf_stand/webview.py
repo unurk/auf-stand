@@ -7,6 +7,8 @@ import shutil
 from datetime import date
 from pathlib import Path
 
+import yaml
+
 from .render import OUT_DIR
 from .vorausschau import MONTHS, WEEKDAYS
 
@@ -155,6 +157,19 @@ _PAGE_TEMPLATE = """\
               border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
     .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
               border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
+    /* ── Themen-Konfiguration ── */
+    .schlagwort-badge { display: inline-block; font-size: 11px; font-family: var(--sans);
+                        color: var(--accent); background: oklch(0.18 0.04 256);
+                        border: 1px solid oklch(0.28 0.06 256); border-radius: 999px;
+                        padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+                        letter-spacing: 0.03em; }
+    .edit-config-link { display: inline-flex; align-items: center; gap: 6px;
+                        font-family: var(--sans); font-size: 13px; color: var(--muted);
+                        border: 1px solid var(--border); border-radius: 999px;
+                        padding: 6px 14px; text-decoration: none; margin-bottom: 28px; }
+    .edit-config-link:hover { color: var(--fg); border-color: var(--muted); }
+    .dossier-empty { color: var(--muted); font-style: italic; font-size: 14px;
+                     font-family: var(--sans); padding: 10px 0 6px; }
   </style>
 </head>
 <body>
@@ -335,34 +350,48 @@ def _iso_to_display(iso: str) -> str:
 # Seiten-Generatoren
 # ---------------------------------------------------------------------------
 
-def build_dossier(dossier: dict) -> None:
+def build_dossier(dossier: dict, topics: list) -> None:
     """Erzeugt site/dossier.html mit Die Presse-Design."""
+    from .synthesize import topic_keyword, topic_name as get_topic_name
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     sections: list[str] = []
-    for topic_name, entries in dossier.items():
-        if not entries:
-            continue
-        sorted_entries = sorted(entries, key=lambda e: e.get("date", ""), reverse=True)
-        items = "\n".join(
-            f'<li><span class="dossier-date">{_iso_to_display(e["date"])}</span>'
-            f"<span>{e['summary']}</span></li>"
-            for e in sorted_entries
-            if e.get("summary")
+    for topic in topics:
+        name = get_topic_name(topic)
+        kw = topic_keyword(topic)
+        badge = f'<span class="schlagwort-badge">#{kw}</span>' if kw else ""
+        entries = sorted(
+            dossier.get(name, []), key=lambda e: e.get("date", ""), reverse=True
         )
+        if entries:
+            items = "\n".join(
+                f'<li><span class="dossier-date">{_iso_to_display(e["date"])}</span>'
+                f"<span>{e['summary']}</span></li>"
+                for e in entries
+                if e.get("summary")
+            )
+            body_html = f'<ul class="dossier-entries">{items}</ul>'
+        else:
+            body_html = (
+                '<p class="dossier-empty">Noch keine Einträge — '
+                "erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p>"
+            )
         sections.append(
             f'<div class="dossier-topic">'
-            f"<h2>{topic_name}</h2>"
-            f'<ul class="dossier-entries">{items}</ul>'
+            f"<h2>{name}{badge}</h2>"
+            f"{body_html}"
             f"</div>"
         )
 
-    if sections:
-        body = "\n".join(sections)
-    else:
-        body = '<p class="empty-state">Noch kein Verlauf — erscheint nach der nächsten Ausgabe.</p>'
+    if not sections:
+        sections = ['<p class="empty-state">Keine Themen konfiguriert.</p>']
 
-    content = f"<h1>Themen-Verlauf</h1>\n{body}"
-    html = _render_page("Themen-Verlauf", content, "dossier")
+    edit_url = "https://github.com/unurk/auf-stand/edit/master/config.yaml"
+    edit_link = (
+        f'<a class="edit-config-link" href="{edit_url}" target="_blank" rel="noopener">'
+        f"✏️ Themen bearbeiten</a>"
+    )
+    content = f"<h1>Meine Themen</h1>\n{edit_link}\n" + "\n".join(sections)
+    html = _render_page("Meine Themen", content, "dossier")
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
 
 
@@ -388,7 +417,9 @@ def build_site() -> Path:
         state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    build_dossier(state.get("dossier", {}))
+    config_path = BASE_DIR / "config.yaml"
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
+    build_dossier(state.get("dossier", {}), config.get("topics", []))
 
     ARCHIV_DIR.mkdir(parents=True, exist_ok=True)
     fresh_copies: set[str] = set()

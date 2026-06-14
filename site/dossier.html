@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <title>Themen-Verlauf · Die Presse · Auf Stand</title>
+  <title>Meine Themen · Die Presse · Auf Stand</title>
   <style>
     /* Die-Presse-Design-System — Farben in oklch (visual hierarchy ∝ 1/L).
        Akzent: Navy-Blau der „Interview"-Box. */
@@ -112,6 +112,19 @@
               border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
     .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
               border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
+    /* ── Themen-Konfiguration ── */
+    .schlagwort-badge { display: inline-block; font-size: 11px; font-family: var(--sans);
+                        color: var(--accent); background: oklch(0.18 0.04 256);
+                        border: 1px solid oklch(0.28 0.06 256); border-radius: 999px;
+                        padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+                        letter-spacing: 0.03em; }
+    .edit-config-link { display: inline-flex; align-items: center; gap: 6px;
+                        font-family: var(--sans); font-size: 13px; color: var(--muted);
+                        border: 1px solid var(--border); border-radius: 999px;
+                        padding: 6px 14px; text-decoration: none; margin-bottom: 28px; }
+    .edit-config-link:hover { color: var(--fg); border-color: var(--muted); }
+    .dossier-empty { color: var(--muted); font-style: italic; font-size: 14px;
+                     font-family: var(--sans); padding: 10px 0 6px; }
   </style>
 </head>
 <body>
@@ -120,9 +133,13 @@
   <div class="sublabel">Auf Stand</div>
 </header>
 <div class="wrap">
-<h1>Themen-Verlauf</h1>
-<div class="dossier-topic"><h2>EZB-Zinsen</h2><ul class="dossier-entries"><li><span class="dossier-date">13.06.2026</span><span>Inflation auf 2,0 gesunken.</span></li>
-<li><span class="dossier-date">10.06.2026</span><span>EZB senkt Leitzins um 25 BP.</span></li></ul></div>
+<h1>Meine Themen</h1>
+<a class="edit-config-link" href="https://github.com/unurk/auf-stand/edit/master/config.yaml" target="_blank" rel="noopener">✏️ Themen bearbeiten</a>
+<div class="dossier-topic"><h2>US-Zölle und Folgen für die österreichische Exportwirtschaft<span class="schlagwort-badge">#Zoll</span></h2><p class="dossier-empty">Noch keine Einträge — erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p></div>
+<div class="dossier-topic"><h2>Mietrecht und Wohnkosten in Österreich<span class="schlagwort-badge">#Miet</span></h2><p class="dossier-empty">Noch keine Einträge — erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p></div>
+<div class="dossier-topic"><h2>US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="dossier-empty">Noch keine Einträge — erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p></div>
+<div class="dossier-topic"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="dossier-empty">Noch keine Einträge — erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p></div>
+<div class="dossier-topic"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="dossier-empty">Noch keine Einträge — erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p></div>
 </div>
 <nav class="tabbar">
   <a href="index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
