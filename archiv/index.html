@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0d0d0d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <title>Archiv · Die Presse · Auf Stand</title>
+  <style>
+    :root { --bg: oklch(0.16 0 0); --surface: oklch(0.21 0 0);
+            --border: oklch(0.31 0 0); --text: oklch(0.97 0 0);
+            --muted: oklch(0.72 0 0); --accent: oklch(0.40 0.07 256);
+            --accent-bright: oklch(0.72 0.12 252);
+            --serif: 'GFS Didot', 'Playfair Display', Georgia, 'Times New Roman', serif;
+            --sans: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: Georgia, serif;
+           font-size: 17px; line-height: 1.6; padding-bottom: 76px;
+           -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent-bright); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .masthead { text-align: center; padding: 30px 20px 18px;
+                border-bottom: 2px solid var(--accent); }
+    .wordmark { font-family: var(--serif); font-weight: 400; font-size: 40px;
+                letter-spacing: -0.01em; color: var(--text); line-height: 1; }
+    .sublabel { font-family: var(--sans); font-size: 10px; letter-spacing: 0.42em;
+                text-transform: uppercase; color: var(--muted); margin-top: 12px;
+                font-weight: 600; padding-left: 0.42em; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 34px 20px 48px; }
+    h1 { font-family: var(--serif); font-size: 2.4rem; line-height: 1.14;
+         margin: 0 0 14px; font-weight: 400; color: var(--text);
+         letter-spacing: -0.01em; }
+    .archiv-grid { display: grid;
+                   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                   gap: 12px; margin-top: 28px; }
+    .archiv-card { display: block; border: 1px solid var(--border); border-radius: 10px;
+                   padding: 16px 18px; background: var(--surface); }
+    .archiv-card:hover { border-color: var(--accent); text-decoration: none; }
+    .archiv-date { display: block; font-family: -apple-system, 'Segoe UI', sans-serif;
+                   font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+    .archiv-label { display: block; font-family: -apple-system, 'Segoe UI', sans-serif;
+                    font-size: 12px; color: var(--muted); }
+    .tabbar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+              background: var(--surface); border-top: 1px solid var(--border);
+              display: flex; z-index: 10; }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; gap: 3px; color: var(--muted);
+           font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 10px;
+           letter-spacing: 0.04em; text-transform: uppercase; border-top: 2px solid transparent; }
+    .tab:hover { color: var(--text); text-decoration: none; }
+    .tab svg { width: 23px; height: 23px; }
+    .tab.active { color: var(--text); border-top-color: var(--accent); }
+  </style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wordmark">Die Presse</div>
+  <div class="sublabel">Auf Stand</div>
+</header>
+<div class="wrap">
+<h1>Archiv</h1>
+<div class="archiv-grid">
+<a class="archiv-card" href="2026-06-13-abend.html"><span class="archiv-date">Sa 13. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-13-morgen.html"><span class="archiv-date">Sa 13. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-12-abend.html"><span class="archiv-date">Fr 12. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+</div>
+</div>
+<nav class="tabbar">
+  <a href="../index.html" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
+  <a href="../dossier.html" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
+  <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
+</nav>
+</body>
+</html>
