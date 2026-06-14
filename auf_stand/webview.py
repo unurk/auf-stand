@@ -175,34 +175,46 @@ _PAGE_TEMPLATE = """\
     .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
     .topic-article-date { font-size: 12px; color: var(--muted);
                            font-family: var(--sans); white-space: nowrap; }
-    /* ── Assessment ── */
-    .as-card { background: var(--surface); border: 1px solid var(--border);
-               border-radius: 12px; padding: 24px; margin: 20px 0; }
+    /* ── Assessment v2 (Toggle-Karten) ── */
     .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
                      line-height: 1.6; margin-bottom: 20px; }
-    .as-progress { font-size: 12px; color: var(--muted); font-family: var(--sans);
-                   margin-bottom: 12px; letter-spacing: 0.02em; }
-    .as-question { font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
-    .as-btns { display: flex; gap: 12px; }
-    .as-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 999px;
-              background: none; color: var(--fg); font-size: 15px; cursor: pointer;
-              font-family: var(--sans); transition: background 0.15s; }
-    .as-btn:hover { border-color: var(--accent); }
     .as-btn-primary { background: var(--accent); border-color: var(--accent);
                        color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
-                       padding: 12px 24px; font-size: 15px; cursor: pointer;
-                       font-family: var(--sans); border: none; }
-    .as-rec-list { list-style: none; padding: 0; margin: 12px 0 20px; }
-    .as-rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border);
-                      font-size: 15px; display: flex; align-items: center; gap: 8px; }
-    .as-rec-list li:last-child { border-bottom: none; }
-    .tg-cmd { background: oklch(0.12 0.02 256); border: 1px solid var(--border);
-              border-radius: 8px; padding: 12px 14px; font-family: monospace;
-              font-size: 14px; color: var(--accent); margin: 16px 0;
-              display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
-                   padding: 4px 10px; font-size: 12px; color: var(--muted);
+                       padding: 13px 28px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; display: inline-block; }
+    .as-toggle-card { display: flex; gap: 14px; align-items: flex-start;
+                       padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+                       margin: 8px 0; cursor: pointer; transition: border-color 0.15s,background 0.15s;
+                       user-select: none; }
+    .as-toggle-card.selected { border-color: var(--accent); background: oklch(0.15 0.03 256); }
+    .as-card-check { width: 22px; height: 22px; border-radius: 50%;
+                      border: 1.5px solid var(--border); display: flex; align-items: center;
+                      justify-content: center; flex-shrink: 0; font-size: 12px;
+                      color: transparent; margin-top: 1px; transition: all 0.15s; }
+    .as-toggle-card.selected .as-card-check { background: var(--accent);
+      border-color: var(--accent); color: oklch(0.10 0.02 256); }
+    .as-card-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+    .as-card-q { font-size: 13px; color: var(--muted); font-family: var(--sans); line-height: 1.4; }
+    .as-custom-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 12px; }
+    .as-custom-inputs { display: flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
+    .as-custom-input { flex: 1; min-width: 130px; background: oklch(0.10 0.01 256);
+                        border: 1px solid var(--border); border-radius: 8px;
+                        padding: 10px 12px; color: var(--fg); font-size: 14px;
+                        font-family: var(--sans); outline: none; }
+    .as-custom-input:focus { border-color: var(--accent); }
+    .as-add-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+                   padding: 10px 18px; color: var(--fg); font-size: 14px;
                    cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .as-add-btn:hover { border-color: var(--accent); }
+    .as-confirm-row { display: flex; justify-content: space-between; align-items: center;
+                       margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .as-cmd-box { background: oklch(0.10 0.02 256); border: 1px solid var(--border);
+                   border-radius: 8px; padding: 14px; margin: 10px 0 16px;
+                   font-family: monospace; font-size: 13px; color: var(--accent);
+                   white-space: pre-wrap; line-height: 1.7; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 5px 12px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); margin-left: 8px; }
     .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
                   text-decoration: underline; cursor: pointer; margin-top: 24px;
                   display: inline-block; background: none; border: none; padding: 0; }
@@ -420,8 +432,13 @@ def _topic_card_html(topic, dossier: dict, topic_articles: dict) -> str:
     )
 
 
-def build_dossier(dossier: dict, topics: list, topic_articles: dict) -> None:
-    """Erzeugt site/dossier.html mit Assessment-Flow und Topic-Karten."""
+def build_dossier(
+    dossier: dict,
+    topics: list,
+    topic_articles: dict,
+    assessment_questions: list | None = None,
+) -> None:
+    """Erzeugt site/dossier.html mit Toggle-Karten-Assessment und Topic-Karten."""
     from .synthesize import topic_keyword, topic_name as get_topic_name
     SITE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -430,125 +447,178 @@ def build_dossier(dossier: dict, topics: list, topic_articles: dict) -> None:
     if not topic_cards:
         topic_cards = '<p class="empty-state">Keine Themen konfiguriert.</p>'
 
-    # JS-Daten: Topics mit Assessment-Fragen
-    topics_with_q = [
+    # Fragen-Mapping: bevorzuge dynamische (artikel-basierte) Fragen, Fallback auf statische
+    dyn_q = {q["name"]: q["question"] for q in (assessment_questions or [])}
+    topics_data = [
         {
             "name": get_topic_name(t),
             "kw": topic_keyword(t),
-            "q": t.get("assessment_question", "") if isinstance(t, dict) else "",
+            "q": dyn_q.get(get_topic_name(t)) or (
+                t.get("assessment_question", "") if isinstance(t, dict) else ""
+            ),
         }
         for t in topics
-        if isinstance(t, dict) and t.get("assessment_question")
+        if isinstance(t, dict) and (t.get("assessment_question") or dyn_q.get(get_topic_name(t)))
     ]
-    topics_js = json.dumps(topics_with_q, ensure_ascii=False)
+    topics_js = json.dumps(topics_data, ensure_ascii=False)
+
+    # Toggle-Karten für das Assessment (eine pro Topic)
+    toggle_cards_html = "\n".join(
+        f'<div class="as-toggle-card" data-name="{td["name"]}" onclick="asToggle(this)">'
+        f'<div class="as-card-check">✓</div>'
+        f'<div><div class="as-card-name">{td["name"]}</div>'
+        f'<div class="as-card-q">{td["q"]}</div></div>'
+        f"</div>"
+        for td in topics_data
+    )
 
     assessment_html = f"""
-<div id="as-intro" class="as-card">
-  <p class="as-intro-text">Beantworte kurz {len(topics_with_q)} Fragen — die App findet heraus, welche Themen für dich wirklich relevant sind und informiert dich gezielt darüber.</p>
-  <button class="as-btn-primary" onclick="asStart()">Jetzt einrichten →</button>
+<div id="as-intro">
+  <p class="as-intro-text">Wähle die Themen aus, über die du regelmäßig auf Stand gehalten werden möchtest. Die Fragen helfen dir einzuschätzen, was für dich relevant ist.</p>
+  <button class="as-btn-primary" onclick="asOpen()">Themen auswählen →</button>
 </div>
 
-<div id="as-step" style="display:none">
-  <div class="as-card">
-    <p class="as-progress" id="as-progress"></p>
-    <p class="as-question" id="as-q"></p>
-    <div class="as-btns">
-      <button class="as-btn" onclick="asAnswer(true)">Ja</button>
-      <button class="as-btn" onclick="asAnswer(false)">Nein</button>
+<div id="as-cards" style="display:none">
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">
+    Tippe auf ein Thema, um es auszuwählen oder abzuwählen.
+  </p>
+  {toggle_cards_html}
+
+  <div class="as-custom-section">
+    <p style="font-size:14px;font-family:var(--sans);margin:0 0 4px;font-weight:600">Eigenes Thema hinzufügen</p>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 10px">Trage ein Thema und ein kurzes Erkennungswort ein:</p>
+    <div class="as-custom-inputs">
+      <input id="custom-name" class="as-custom-input" placeholder="Thema (z.B. Pensionsreform)" type="text">
+      <input id="custom-kw" class="as-custom-input" placeholder="Kürzel (z.B. Pension)" type="text">
     </div>
+    <button class="as-add-btn" onclick="asAddCustom()">+ Hinzufügen</button>
+  </div>
+
+  <div class="as-confirm-row">
+    <span id="as-count" style="font-size:13px;color:var(--muted);font-family:var(--sans)">0 ausgewählt</span>
+    <button class="as-btn-primary" onclick="asConfirm()">Speichern</button>
   </div>
 </div>
 
-<div id="as-result" style="display:none">
-  <div class="as-card">
-    <h2 style="margin-top:0">Deine Themen</h2>
-    <ul class="as-rec-list" id="as-rec-list"></ul>
-    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 8px">Sende diesen Befehl an deinen Telegram-Bot, damit auch deine täglichen Lagebilder angepasst werden:</p>
-    <div class="tg-cmd"><span id="tg-cmd-text"></span><button class="tg-copy-btn" onclick="asCopy()">Kopieren</button></div>
-    <button class="as-btn-primary" onclick="asConfirm()">Bestätigen &amp; speichern</button>
+<div id="as-sync" style="display:none">
+  <p style="font-size:14px;font-family:var(--sans);margin:0 0 8px;font-weight:600">Telegram-Bot synchronisieren</p>
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 6px">Sende diese Befehle an deinen Bot, damit auch die täglichen Lagebilder angepasst werden:</p>
+  <div class="as-cmd-box" id="as-cmd-text"></div>
+  <button class="tg-copy-btn" onclick="asCopyCmd()">Kopieren</button>
+  <div style="margin-top:20px">
+    <button class="as-btn-primary" onclick="asDone()">Fertig →</button>
   </div>
 </div>
 
 <div id="topic-list" style="display:none">
 {topic_cards}
-  <button class="reset-link" onclick="asReset()">Themen-Auswahl neu einrichten</button>
+  <button class="reset-link" onclick="asReset()">Themen-Auswahl bearbeiten</button>
 </div>
 
 <script>
 (function(){{
 var TOPICS={topics_js};
-var answers=[],idx=0;
 var PREF_KEY='auf_stand_prefs';
+var CUSTOM_KEY='auf_stand_custom';
+var selected=new Set();
+var customTopics=[];
 
-function show(id){{['as-intro','as-step','as-result','topic-list'].forEach(function(i){{document.getElementById(i).style.display=i===id?'':'none';}});}}
+function show(id){{['as-intro','as-cards','as-sync','topic-list'].forEach(function(i){{
+  document.getElementById(i).style.display=i===id?'':'none';
+}});}}
 
 function filterTopics(prefs){{
-  var list=document.getElementById('topic-list');
-  list.querySelectorAll('.dossier-topic').forEach(function(el){{
+  document.getElementById('topic-list').querySelectorAll('.dossier-topic').forEach(function(el){{
     el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
   }});
 }}
 
-// Beim Laden prüfen ob bereits Präferenzen vorhanden
-var saved=localStorage.getItem(PREF_KEY);
-if(saved){{
-  try{{var prefs=JSON.parse(saved);show('topic-list');filterTopics(prefs);}}
-  catch(e){{show('as-intro');}}
-}}else{{show('as-intro');}}
-
-window.asStart=function(){{answers=[];idx=0;asShowQ();}};
-
-function asShowQ(){{
-  if(idx>=TOPICS.length){{asShowResult();return;}}
-  document.getElementById('as-progress').textContent='Frage '+(idx+1)+' von '+TOPICS.length;
-  document.getElementById('as-q').textContent=TOPICS[idx].q;
-  show('as-step');
+function updateCount(){{
+  document.getElementById('as-count').textContent=selected.size+customTopics.length+' ausgewählt';
 }}
 
-window.asAnswer=function(yes){{
-  answers.push({{topic:TOPICS[idx],yes:yes}});
-  idx++;
-  asShowQ();
+// Init: Lade gespeicherte Präferenzen
+try{{
+  var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
+  customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
+  if(saved&&saved.length){{show('topic-list');filterTopics(saved);}}
+  else{{show('as-intro');}}
+}}catch(e){{show('as-intro');}}
+
+window.asOpen=function(){{
+  // Lade bisherige Auswahl in Set
+  try{{
+    var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
+    selected=new Set(saved||[]);
+  }}catch(e){{selected=new Set();}}
+  // Karten-Zustand setzen
+  document.querySelectorAll('.as-toggle-card').forEach(function(el){{
+    if(selected.has(el.dataset.name))el.classList.add('selected');
+    else el.classList.remove('selected');
+  }});
+  customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
+  updateCount();
+  show('as-cards');
 }};
 
-function asShowResult(){{
-  var yes=answers.filter(function(a){{return a.yes;}});
-  var ul=document.getElementById('as-rec-list');
-  ul.innerHTML='';
-  if(yes.length===0){{
-    var li=document.createElement('li');li.textContent='Keine Themen ausgewählt — alle werden angezeigt.';ul.appendChild(li);
-  }}else{{
-    yes.forEach(function(a){{
-      var li=document.createElement('li');
-      li.innerHTML='<span style="color:var(--accent)">✓</span> '+a.topic.name;
-      ul.appendChild(li);
-    }});
-  }}
-  var cmd='/themen '+yes.map(function(a){{return a.topic.kw;}}).join(' ');
-  document.getElementById('tg-cmd-text').textContent=cmd;
-  show('as-result');
-}}
+window.asToggle=function(el){{
+  var name=el.dataset.name;
+  if(selected.has(name)){{selected.delete(name);el.classList.remove('selected');}}
+  else{{selected.add(name);el.classList.add('selected');}}
+  updateCount();
+}};
 
-window.asCopy=function(){{
-  var t=document.getElementById('tg-cmd-text').textContent;
-  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){{
-    var b=document.querySelector('.tg-copy-btn');b.textContent='✓ Kopiert';
-    setTimeout(function(){{b.textContent='Kopieren';}},2000);
-  }});
+window.asAddCustom=function(){{
+  var name=document.getElementById('custom-name').value.trim();
+  var kw=document.getElementById('custom-kw').value.trim();
+  if(!name||!kw)return;
+  customTopics.push({{name:name,kw:kw}});
+  localStorage.setItem(CUSTOM_KEY,JSON.stringify(customTopics));
+  selected.add(name);
+  // Neue Toggle-Karte einfügen
+  var cards=document.getElementById('as-cards');
+  var section=cards.querySelector('.as-custom-section');
+  var div=document.createElement('div');
+  div.className='as-toggle-card selected';
+  div.dataset.name=name;
+  div.onclick=function(){{window.asToggle(div);}};
+  div.innerHTML='<div class="as-card-check">✓</div><div><div class="as-card-name">'+name+'</div><div class="as-card-q">#'+kw+'</div></div>';
+  cards.insertBefore(div,section);
+  document.getElementById('custom-name').value='';
+  document.getElementById('custom-kw').value='';
+  updateCount();
 }};
 
 window.asConfirm=function(){{
-  var yes=answers.filter(function(a){{return a.yes;}});
-  var prefs=yes.map(function(a){{return a.topic.name;}});
-  localStorage.setItem(PREF_KEY,JSON.stringify(prefs.length?prefs:null));
+  var prefs=Array.from(selected);
+  localStorage.setItem(PREF_KEY,JSON.stringify(prefs));
+  // Telegram-Befehle zusammenstellen
+  var kws=prefs.map(function(n){{
+    var t=TOPICS.find(function(t){{return t.name===n;}});
+    return t?t.kw:null;
+  }}).filter(Boolean);
+  var lines=['/themen '+kws.join(' ')];
+  customTopics.forEach(function(c){{lines.push('/thema-neu '+c.name+'|'+c.kw);}});
+  document.getElementById('as-cmd-text').textContent=lines.join('\n');
+  show('as-sync');
+}};
+
+window.asCopyCmd=function(){{
+  var t=document.getElementById('as-cmd-text').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){{
+    var b=document.querySelector('.tg-copy-btn');
+    b.textContent='✓ Kopiert';setTimeout(function(){{b.textContent='Kopieren';}},2000);
+  }});
+}};
+
+window.asDone=function(){{
+  var prefs=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
   show('topic-list');
   filterTopics(prefs.length?prefs:null);
 }};
 
 window.asReset=function(){{
-  localStorage.removeItem(PREF_KEY);
-  answers=[];idx=0;
-  show('as-intro');
+  window.asOpen();
 }};
 }})();
 </script>
@@ -583,7 +653,13 @@ def build_site() -> Path:
         pass
     config_path = BASE_DIR / "config.yaml"
     config = yaml.safe_load(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
-    build_dossier(state.get("dossier", {}), config.get("topics", []), state.get("topic_articles", {}))
+    all_topics = config.get("topics", []) + state.get("custom_topics", [])
+    build_dossier(
+        state.get("dossier", {}),
+        all_topics,
+        state.get("topic_articles", {}),
+        assessment_questions=state.get("assessment_questions"),
+    )
 
     ARCHIV_DIR.mkdir(parents=True, exist_ok=True)
     fresh_copies: set[str] = set()

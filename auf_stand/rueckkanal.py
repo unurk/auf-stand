@@ -106,6 +106,24 @@ def cmd_rueckkanal(config: dict) -> int:
             print(f"Themen-Präferenzen gesetzt: {names}")
             continue
 
+        # /thema-neu Name|Schlagwort — eigenes Thema hinzufügen
+        if text.startswith("/thema-neu"):
+            payload = text[10:].strip()
+            if "|" in payload:
+                name, kw = payload.split("|", 1)
+                name, kw = name.strip(), kw.strip()
+                custom = current_state.setdefault("custom_topics", [])
+                if not any(c.get("schlagwort", "").lower() == kw.lower() for c in custom):
+                    custom.append({"name": name, "schlagwort": kw})
+                    state_module.save_state(current_state)
+                    tg.send_alert(f"✅ Thema hinzugefügt: {name} (#{kw})", [chat_id])
+                    print(f"Eigenes Thema hinzugefügt: {name}|{kw}")
+                else:
+                    tg.send_alert(f"ℹ️ Schlagwort #{kw} existiert bereits.", [chat_id])
+            else:
+                tg.send_alert("Format: /thema-neu Name|Schlagwort", [chat_id])
+            continue
+
         # Andere Slash-Befehle ignorieren
         if text.startswith("/"):
             continue

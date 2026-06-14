@@ -67,11 +67,12 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
 
     from datetime import timedelta
+    all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
     cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
     fb_hint = state.article_feedback_hint(current_state, cutoff)
     prompt = synthesize.build_prompt(
         selection,
-        config.get("topics", []),
+        all_topics,
         edition_config.get("label", edition),
         termine=config.get("termine", []),
         dossier=current_state.get("dossier", {}),
@@ -117,14 +118,17 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     if not keep_seen:
         points = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
-        state.save_topic_articles(current_state, config.get("topics", []), result.articles)
+        state.save_topic_articles(current_state, all_topics, result.articles)
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
             current_state, edition, points, len(lagebild.split()), len(new_articles)
         )
         state.update_dossier(
-            current_state, lagebild, config.get("topics", []), f"{datetime.now():%Y-%m-%d}"
+            current_state, lagebild, all_topics, f"{datetime.now():%Y-%m-%d}"
         )
+        questions = synthesize.generate_assessment_questions(result.articles, all_topics, config)
+        if questions:
+            current_state["assessment_questions"] = questions
         state.save_state(current_state)
     return 0
 

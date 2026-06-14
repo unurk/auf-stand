@@ -39,6 +39,36 @@ topics:
   - name: Energiepreise und Stromkosten in Österreich
     schlagwort: Energie
     assessment_question: "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"
+  - name: Inflation und Kaufkraft in Österreich
+    schlagwort: Inflation
+    assessment_question: "Merkst du, dass dein Geld weniger weit reicht — beim Einkauf, Restaurant oder Urlaub?"
+  - name: Österreichische Innenpolitik
+    schlagwort: Koalition
+    assessment_question: "Interessierst du dich für die Arbeit der Bundesregierung und aktuelle Politikentscheidungen?"
+  - name: EU-Politik und Österreich
+    schlagwort: EU
+    assessment_question: "Berühren EU-Entscheidungen (Regulierungen, Förderprogramme, Binnenmarkt) deinen Alltag oder Beruf?"
+  - name: Arbeitsmarkt und Beschäftigung
+    schlagwort: Arbeitsmarkt
+    assessment_question: "Interessiert dich, wie sich der Arbeitsmarkt entwickelt — z.B. wegen Job, Mitarbeitersuche oder Pensionierung?"
+  - name: Klimapolitik und Umwelt Österreich
+    schlagwort: Klima
+    assessment_question: "Ist dir Klimapolitik und Umweltschutz wichtig — privat oder beruflich?"
+  - name: Künstliche Intelligenz und Digitalisierung
+    schlagwort: KI
+    assessment_question: "Betrifft dich KI — als Anwender, im Job, oder weil du die Entwicklung verfolgst?"
+  - name: Ukraine-Krieg und Sicherheitspolitik
+    schlagwort: Ukraine
+    assessment_question: "Verfolgst du den Ukraine-Krieg und seine Folgen für Europa und Österreich?"
+  - name: Österreichische Unternehmen und Wirtschaft
+    schlagwort: Wirtschaft
+    assessment_question: "Interessierst du dich für die Lage österreichischer Betriebe — als Unternehmer, Mitarbeiter oder Investor?"
+  - name: Migration und Integration in Österreich
+    schlagwort: Migration
+    assessment_question: "Ist das Thema Migration und Integration für dich beruflich oder gesellschaftlich relevant?"
+  - name: Gesundheitssystem und Medizin Österreich
+    schlagwort: Gesundheit
+    assessment_question: "Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?"
 
 # Claude-Modell für die Synthese
 model: claude-haiku-4-5

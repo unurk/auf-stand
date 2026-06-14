@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -138,6 +139,49 @@ def build_prompt(
             )
 
     return "\n".join(lines)
+
+
+def generate_assessment_questions(articles: list, topics: list, config: dict) -> list[dict]:
+    """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage via Claude."""
+    import json as _json
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key or not articles or not topics:
+        return []
+    import anthropic
+    topic_lines = "\n".join(
+        f"- {topic_name(t)} (Schlagwort: {topic_keyword(t)})" for t in topics
+    )
+    article_lines = "\n".join(
+        f"- [{a.ressort}] {a.title}: {(a.teaser or '')[:100]}"
+        for a in articles[:30]
+    )
+    prompt = (
+        "Du generierst Assessment-Fragen für eine Nachrichten-App.\n\n"
+        f"Verfügbare Themen:\n{topic_lines}\n\n"
+        f"Aktuelle Presse-Artikel (heute):\n{article_lines}\n\n"
+        "Aufgabe: Generiere für JEDES Thema exakt eine Assessment-Frage.\n"
+        "Die Frage soll:\n"
+        "- Konkret auf aktuelle Artikel Bezug nehmen, wenn möglich\n"
+        "- Persönlich formuliert sein (\"betrifft dich\", \"interessiert dich\")\n"
+        "- Kurz sein (1 Satz, max. 120 Zeichen)\n"
+        "- Mit Ja oder Nein beantwortbar sein\n\n"
+        "Antworte NUR mit einem JSON-Array:\n"
+        '[{"name": "<exakter Themenname>", "question": "<Frage>"}]\n'
+        "Keine anderen Ausgaben."
+    )
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        m = re.search(r"\[.*\]", text, re.DOTALL)
+        return _json.loads(m.group()) if m else []
+    except Exception as exc:
+        print(f"generate_assessment_questions Fehler: {exc}")
+        return []
 
 
 def synthesize(prompt: str, config: dict) -> str:

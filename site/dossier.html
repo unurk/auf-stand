@@ -130,34 +130,46 @@
     .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
     .topic-article-date { font-size: 12px; color: var(--muted);
                            font-family: var(--sans); white-space: nowrap; }
-    /* ── Assessment ── */
-    .as-card { background: var(--surface); border: 1px solid var(--border);
-               border-radius: 12px; padding: 24px; margin: 20px 0; }
+    /* ── Assessment v2 (Toggle-Karten) ── */
     .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
                      line-height: 1.6; margin-bottom: 20px; }
-    .as-progress { font-size: 12px; color: var(--muted); font-family: var(--sans);
-                   margin-bottom: 12px; letter-spacing: 0.02em; }
-    .as-question { font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
-    .as-btns { display: flex; gap: 12px; }
-    .as-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 999px;
-              background: none; color: var(--fg); font-size: 15px; cursor: pointer;
-              font-family: var(--sans); transition: background 0.15s; }
-    .as-btn:hover { border-color: var(--accent); }
     .as-btn-primary { background: var(--accent); border-color: var(--accent);
                        color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
-                       padding: 12px 24px; font-size: 15px; cursor: pointer;
-                       font-family: var(--sans); border: none; }
-    .as-rec-list { list-style: none; padding: 0; margin: 12px 0 20px; }
-    .as-rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border);
-                      font-size: 15px; display: flex; align-items: center; gap: 8px; }
-    .as-rec-list li:last-child { border-bottom: none; }
-    .tg-cmd { background: oklch(0.12 0.02 256); border: 1px solid var(--border);
-              border-radius: 8px; padding: 12px 14px; font-family: monospace;
-              font-size: 14px; color: var(--accent); margin: 16px 0;
-              display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
-                   padding: 4px 10px; font-size: 12px; color: var(--muted);
+                       padding: 13px 28px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; display: inline-block; }
+    .as-toggle-card { display: flex; gap: 14px; align-items: flex-start;
+                       padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+                       margin: 8px 0; cursor: pointer; transition: border-color 0.15s,background 0.15s;
+                       user-select: none; }
+    .as-toggle-card.selected { border-color: var(--accent); background: oklch(0.15 0.03 256); }
+    .as-card-check { width: 22px; height: 22px; border-radius: 50%;
+                      border: 1.5px solid var(--border); display: flex; align-items: center;
+                      justify-content: center; flex-shrink: 0; font-size: 12px;
+                      color: transparent; margin-top: 1px; transition: all 0.15s; }
+    .as-toggle-card.selected .as-card-check { background: var(--accent);
+      border-color: var(--accent); color: oklch(0.10 0.02 256); }
+    .as-card-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+    .as-card-q { font-size: 13px; color: var(--muted); font-family: var(--sans); line-height: 1.4; }
+    .as-custom-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 12px; }
+    .as-custom-inputs { display: flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
+    .as-custom-input { flex: 1; min-width: 130px; background: oklch(0.10 0.01 256);
+                        border: 1px solid var(--border); border-radius: 8px;
+                        padding: 10px 12px; color: var(--fg); font-size: 14px;
+                        font-family: var(--sans); outline: none; }
+    .as-custom-input:focus { border-color: var(--accent); }
+    .as-add-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+                   padding: 10px 18px; color: var(--fg); font-size: 14px;
                    cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .as-add-btn:hover { border-color: var(--accent); }
+    .as-confirm-row { display: flex; justify-content: space-between; align-items: center;
+                       margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .as-cmd-box { background: oklch(0.10 0.02 256); border: 1px solid var(--border);
+                   border-radius: 8px; padding: 14px; margin: 10px 0 16px;
+                   font-family: monospace; font-size: 13px; color: var(--accent);
+                   white-space: pre-wrap; line-height: 1.7; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 5px 12px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); margin-left: 8px; }
     .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
                   text-decoration: underline; cursor: pointer; margin-top: 24px;
                   display: inline-block; background: none; border: none; padding: 0; }
@@ -171,29 +183,54 @@
 <div class="wrap">
 <h1>Meine Themen</h1>
 
-<div id="as-intro" class="as-card">
-  <p class="as-intro-text">Beantworte kurz 5 Fragen — die App findet heraus, welche Themen für dich wirklich relevant sind und informiert dich gezielt darüber.</p>
-  <button class="as-btn-primary" onclick="asStart()">Jetzt einrichten →</button>
+<div id="as-intro">
+  <p class="as-intro-text">Wähle die Themen aus, über die du regelmäßig auf Stand gehalten werden möchtest. Die Fragen helfen dir einzuschätzen, was für dich relevant ist.</p>
+  <button class="as-btn-primary" onclick="asOpen()">Themen auswählen →</button>
 </div>
 
-<div id="as-step" style="display:none">
-  <div class="as-card">
-    <p class="as-progress" id="as-progress"></p>
-    <p class="as-question" id="as-q"></p>
-    <div class="as-btns">
-      <button class="as-btn" onclick="asAnswer(true)">Ja</button>
-      <button class="as-btn" onclick="asAnswer(false)">Nein</button>
+<div id="as-cards" style="display:none">
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">
+    Tippe auf ein Thema, um es auszuwählen oder abzuwählen.
+  </p>
+  <div class="as-toggle-card" data-name="US-Zölle und Folgen für die österreichische Exportwirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Zölle und Folgen für die österreichische Exportwirtschaft</div><div class="as-card-q">Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?</div></div></div>
+<div class="as-toggle-card" data-name="Mietrecht und Wohnkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Mietrecht und Wohnkosten in Österreich</div><div class="as-card-q">Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?</div></div></div>
+<div class="as-toggle-card" data-name="US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber</div><div class="as-card-q">Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?</div></div></div>
+<div class="as-toggle-card" data-name="EZB-Zinsentscheidungen und Folgen für Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EZB-Zinsentscheidungen und Folgen für Österreich</div><div class="as-card-q">Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?</div></div></div>
+<div class="as-toggle-card" data-name="Energiepreise und Stromkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Energiepreise und Stromkosten in Österreich</div><div class="as-card-q">Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?</div></div></div>
+<div class="as-toggle-card" data-name="Inflation und Kaufkraft in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Inflation und Kaufkraft in Österreich</div><div class="as-card-q">Merkst du, dass dein Geld weniger weit reicht — beim Einkauf, Restaurant oder Urlaub?</div></div></div>
+<div class="as-toggle-card" data-name="Österreichische Innenpolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Innenpolitik</div><div class="as-card-q">Interessierst du dich für die Arbeit der Bundesregierung und aktuelle Politikentscheidungen?</div></div></div>
+<div class="as-toggle-card" data-name="EU-Politik und Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EU-Politik und Österreich</div><div class="as-card-q">Berühren EU-Entscheidungen (Regulierungen, Förderprogramme, Binnenmarkt) deinen Alltag oder Beruf?</div></div></div>
+<div class="as-toggle-card" data-name="Arbeitsmarkt und Beschäftigung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Arbeitsmarkt und Beschäftigung</div><div class="as-card-q">Interessiert dich, wie sich der Arbeitsmarkt entwickelt — z.B. wegen Job, Mitarbeitersuche oder Pensionierung?</div></div></div>
+<div class="as-toggle-card" data-name="Klimapolitik und Umwelt Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Klimapolitik und Umwelt Österreich</div><div class="as-card-q">Ist dir Klimapolitik und Umweltschutz wichtig — privat oder beruflich?</div></div></div>
+<div class="as-toggle-card" data-name="Künstliche Intelligenz und Digitalisierung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Künstliche Intelligenz und Digitalisierung</div><div class="as-card-q">Betrifft dich KI — als Anwender, im Job, oder weil du die Entwicklung verfolgst?</div></div></div>
+<div class="as-toggle-card" data-name="Ukraine-Krieg und Sicherheitspolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Ukraine-Krieg und Sicherheitspolitik</div><div class="as-card-q">Verfolgst du den Ukraine-Krieg und seine Folgen für Europa und Österreich?</div></div></div>
+<div class="as-toggle-card" data-name="Österreichische Unternehmen und Wirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Unternehmen und Wirtschaft</div><div class="as-card-q">Interessierst du dich für die Lage österreichischer Betriebe — als Unternehmer, Mitarbeiter oder Investor?</div></div></div>
+<div class="as-toggle-card" data-name="Migration und Integration in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Migration und Integration in Österreich</div><div class="as-card-q">Ist das Thema Migration und Integration für dich beruflich oder gesellschaftlich relevant?</div></div></div>
+<div class="as-toggle-card" data-name="Gesundheitssystem und Medizin Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Gesundheitssystem und Medizin Österreich</div><div class="as-card-q">Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?</div></div></div>
+
+  <div class="as-custom-section">
+    <p style="font-size:14px;font-family:var(--sans);margin:0 0 4px;font-weight:600">Eigenes Thema hinzufügen</p>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 10px">Trage ein Thema und ein kurzes Erkennungswort ein:</p>
+    <div class="as-custom-inputs">
+      <input id="custom-name" class="as-custom-input" placeholder="Thema (z.B. Pensionsreform)" type="text">
+      <input id="custom-kw" class="as-custom-input" placeholder="Kürzel (z.B. Pension)" type="text">
     </div>
+    <button class="as-add-btn" onclick="asAddCustom()">+ Hinzufügen</button>
+  </div>
+
+  <div class="as-confirm-row">
+    <span id="as-count" style="font-size:13px;color:var(--muted);font-family:var(--sans)">0 ausgewählt</span>
+    <button class="as-btn-primary" onclick="asConfirm()">Speichern</button>
   </div>
 </div>
 
-<div id="as-result" style="display:none">
-  <div class="as-card">
-    <h2 style="margin-top:0">Deine Themen</h2>
-    <ul class="as-rec-list" id="as-rec-list"></ul>
-    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 8px">Sende diesen Befehl an deinen Telegram-Bot, damit auch deine täglichen Lagebilder angepasst werden:</p>
-    <div class="tg-cmd"><span id="tg-cmd-text"></span><button class="tg-copy-btn" onclick="asCopy()">Kopieren</button></div>
-    <button class="as-btn-primary" onclick="asConfirm()">Bestätigen &amp; speichern</button>
+<div id="as-sync" style="display:none">
+  <p style="font-size:14px;font-family:var(--sans);margin:0 0 8px;font-weight:600">Telegram-Bot synchronisieren</p>
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 6px">Sende diese Befehle an deinen Bot, damit auch die täglichen Lagebilder angepasst werden:</p>
+  <div class="as-cmd-box" id="as-cmd-text"></div>
+  <button class="tg-copy-btn" onclick="asCopyCmd()">Kopieren</button>
+  <div style="margin-top:20px">
+    <button class="as-btn-primary" onclick="asDone()">Fertig →</button>
   </div>
 </div>
 
@@ -203,84 +240,124 @@
 <div class="dossier-topic" data-topic-name="US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"><h2>US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="EZB-Zinsentscheidungen und Folgen für Österreich"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Energiepreise und Stromkosten in Österreich"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-  <button class="reset-link" onclick="asReset()">Themen-Auswahl neu einrichten</button>
+<div class="dossier-topic" data-topic-name="Inflation und Kaufkraft in Österreich"><h2>Inflation und Kaufkraft in Österreich<span class="schlagwort-badge">#Inflation</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Österreichische Innenpolitik"><h2>Österreichische Innenpolitik<span class="schlagwort-badge">#Koalition</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="EU-Politik und Österreich"><h2>EU-Politik und Österreich<span class="schlagwort-badge">#EU</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Arbeitsmarkt und Beschäftigung"><h2>Arbeitsmarkt und Beschäftigung<span class="schlagwort-badge">#Arbeitsmarkt</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Klimapolitik und Umwelt Österreich"><h2>Klimapolitik und Umwelt Österreich<span class="schlagwort-badge">#Klima</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Künstliche Intelligenz und Digitalisierung"><h2>Künstliche Intelligenz und Digitalisierung<span class="schlagwort-badge">#KI</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Ukraine-Krieg und Sicherheitspolitik"><h2>Ukraine-Krieg und Sicherheitspolitik<span class="schlagwort-badge">#Ukraine</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Österreichische Unternehmen und Wirtschaft"><h2>Österreichische Unternehmen und Wirtschaft<span class="schlagwort-badge">#Wirtschaft</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Migration und Integration in Österreich"><h2>Migration und Integration in Österreich<span class="schlagwort-badge">#Migration</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Gesundheitssystem und Medizin Österreich"><h2>Gesundheitssystem und Medizin Österreich<span class="schlagwort-badge">#Gesundheit</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+  <button class="reset-link" onclick="asReset()">Themen-Auswahl bearbeiten</button>
 </div>
 
 <script>
 (function(){
-var TOPICS=[{"name": "US-Zölle und Folgen für die österreichische Exportwirtschaft", "kw": "Zoll", "q": "Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?"}, {"name": "Mietrecht und Wohnkosten in Österreich", "kw": "Miet", "q": "Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?"}, {"name": "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber", "kw": "Börse", "q": "Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?"}, {"name": "EZB-Zinsentscheidungen und Folgen für Österreich", "kw": "EZB", "q": "Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?"}, {"name": "Energiepreise und Stromkosten in Österreich", "kw": "Energie", "q": "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"}];
-var answers=[],idx=0;
+var TOPICS=[{"name": "US-Zölle und Folgen für die österreichische Exportwirtschaft", "kw": "Zoll", "q": "Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?"}, {"name": "Mietrecht und Wohnkosten in Österreich", "kw": "Miet", "q": "Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?"}, {"name": "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber", "kw": "Börse", "q": "Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?"}, {"name": "EZB-Zinsentscheidungen und Folgen für Österreich", "kw": "EZB", "q": "Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?"}, {"name": "Energiepreise und Stromkosten in Österreich", "kw": "Energie", "q": "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"}, {"name": "Inflation und Kaufkraft in Österreich", "kw": "Inflation", "q": "Merkst du, dass dein Geld weniger weit reicht — beim Einkauf, Restaurant oder Urlaub?"}, {"name": "Österreichische Innenpolitik", "kw": "Koalition", "q": "Interessierst du dich für die Arbeit der Bundesregierung und aktuelle Politikentscheidungen?"}, {"name": "EU-Politik und Österreich", "kw": "EU", "q": "Berühren EU-Entscheidungen (Regulierungen, Förderprogramme, Binnenmarkt) deinen Alltag oder Beruf?"}, {"name": "Arbeitsmarkt und Beschäftigung", "kw": "Arbeitsmarkt", "q": "Interessiert dich, wie sich der Arbeitsmarkt entwickelt — z.B. wegen Job, Mitarbeitersuche oder Pensionierung?"}, {"name": "Klimapolitik und Umwelt Österreich", "kw": "Klima", "q": "Ist dir Klimapolitik und Umweltschutz wichtig — privat oder beruflich?"}, {"name": "Künstliche Intelligenz und Digitalisierung", "kw": "KI", "q": "Betrifft dich KI — als Anwender, im Job, oder weil du die Entwicklung verfolgst?"}, {"name": "Ukraine-Krieg und Sicherheitspolitik", "kw": "Ukraine", "q": "Verfolgst du den Ukraine-Krieg und seine Folgen für Europa und Österreich?"}, {"name": "Österreichische Unternehmen und Wirtschaft", "kw": "Wirtschaft", "q": "Interessierst du dich für die Lage österreichischer Betriebe — als Unternehmer, Mitarbeiter oder Investor?"}, {"name": "Migration und Integration in Österreich", "kw": "Migration", "q": "Ist das Thema Migration und Integration für dich beruflich oder gesellschaftlich relevant?"}, {"name": "Gesundheitssystem und Medizin Österreich", "kw": "Gesundheit", "q": "Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?"}];
 var PREF_KEY='auf_stand_prefs';
+var CUSTOM_KEY='auf_stand_custom';
+var selected=new Set();
+var customTopics=[];
 
-function show(id){['as-intro','as-step','as-result','topic-list'].forEach(function(i){document.getElementById(i).style.display=i===id?'':'none';});}
+function show(id){['as-intro','as-cards','as-sync','topic-list'].forEach(function(i){
+  document.getElementById(i).style.display=i===id?'':'none';
+});}
 
 function filterTopics(prefs){
-  var list=document.getElementById('topic-list');
-  list.querySelectorAll('.dossier-topic').forEach(function(el){
+  document.getElementById('topic-list').querySelectorAll('.dossier-topic').forEach(function(el){
     el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
   });
 }
 
-// Beim Laden prüfen ob bereits Präferenzen vorhanden
-var saved=localStorage.getItem(PREF_KEY);
-if(saved){
-  try{var prefs=JSON.parse(saved);show('topic-list');filterTopics(prefs);}
-  catch(e){show('as-intro');}
-}else{show('as-intro');}
-
-window.asStart=function(){answers=[];idx=0;asShowQ();};
-
-function asShowQ(){
-  if(idx>=TOPICS.length){asShowResult();return;}
-  document.getElementById('as-progress').textContent='Frage '+(idx+1)+' von '+TOPICS.length;
-  document.getElementById('as-q').textContent=TOPICS[idx].q;
-  show('as-step');
+function updateCount(){
+  document.getElementById('as-count').textContent=selected.size+customTopics.length+' ausgewählt';
 }
 
-window.asAnswer=function(yes){
-  answers.push({topic:TOPICS[idx],yes:yes});
-  idx++;
-  asShowQ();
+// Init: Lade gespeicherte Präferenzen
+try{
+  var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
+  customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
+  if(saved&&saved.length){show('topic-list');filterTopics(saved);}
+  else{show('as-intro');}
+}catch(e){show('as-intro');}
+
+window.asOpen=function(){
+  // Lade bisherige Auswahl in Set
+  try{
+    var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
+    selected=new Set(saved||[]);
+  }catch(e){selected=new Set();}
+  // Karten-Zustand setzen
+  document.querySelectorAll('.as-toggle-card').forEach(function(el){
+    if(selected.has(el.dataset.name))el.classList.add('selected');
+    else el.classList.remove('selected');
+  });
+  customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
+  updateCount();
+  show('as-cards');
 };
 
-function asShowResult(){
-  var yes=answers.filter(function(a){return a.yes;});
-  var ul=document.getElementById('as-rec-list');
-  ul.innerHTML='';
-  if(yes.length===0){
-    var li=document.createElement('li');li.textContent='Keine Themen ausgewählt — alle werden angezeigt.';ul.appendChild(li);
-  }else{
-    yes.forEach(function(a){
-      var li=document.createElement('li');
-      li.innerHTML='<span style="color:var(--accent)">✓</span> '+a.topic.name;
-      ul.appendChild(li);
-    });
-  }
-  var cmd='/themen '+yes.map(function(a){return a.topic.kw;}).join(' ');
-  document.getElementById('tg-cmd-text').textContent=cmd;
-  show('as-result');
-}
+window.asToggle=function(el){
+  var name=el.dataset.name;
+  if(selected.has(name)){selected.delete(name);el.classList.remove('selected');}
+  else{selected.add(name);el.classList.add('selected');}
+  updateCount();
+};
 
-window.asCopy=function(){
-  var t=document.getElementById('tg-cmd-text').textContent;
-  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){
-    var b=document.querySelector('.tg-copy-btn');b.textContent='✓ Kopiert';
-    setTimeout(function(){b.textContent='Kopieren';},2000);
-  });
+window.asAddCustom=function(){
+  var name=document.getElementById('custom-name').value.trim();
+  var kw=document.getElementById('custom-kw').value.trim();
+  if(!name||!kw)return;
+  customTopics.push({name:name,kw:kw});
+  localStorage.setItem(CUSTOM_KEY,JSON.stringify(customTopics));
+  selected.add(name);
+  // Neue Toggle-Karte einfügen
+  var cards=document.getElementById('as-cards');
+  var section=cards.querySelector('.as-custom-section');
+  var div=document.createElement('div');
+  div.className='as-toggle-card selected';
+  div.dataset.name=name;
+  div.onclick=function(){window.asToggle(div);};
+  div.innerHTML='<div class="as-card-check">✓</div><div><div class="as-card-name">'+name+'</div><div class="as-card-q">#'+kw+'</div></div>';
+  cards.insertBefore(div,section);
+  document.getElementById('custom-name').value='';
+  document.getElementById('custom-kw').value='';
+  updateCount();
 };
 
 window.asConfirm=function(){
-  var yes=answers.filter(function(a){return a.yes;});
-  var prefs=yes.map(function(a){return a.topic.name;});
-  localStorage.setItem(PREF_KEY,JSON.stringify(prefs.length?prefs:null));
+  var prefs=Array.from(selected);
+  localStorage.setItem(PREF_KEY,JSON.stringify(prefs));
+  // Telegram-Befehle zusammenstellen
+  var kws=prefs.map(function(n){
+    var t=TOPICS.find(function(t){return t.name===n;});
+    return t?t.kw:null;
+  }).filter(Boolean);
+  var lines=['/themen '+kws.join(' ')];
+  customTopics.forEach(function(c){lines.push('/thema-neu '+c.name+'|'+c.kw);});
+  document.getElementById('as-cmd-text').textContent=lines.join('
+');
+  show('as-sync');
+};
+
+window.asCopyCmd=function(){
+  var t=document.getElementById('as-cmd-text').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){
+    var b=document.querySelector('.tg-copy-btn');
+    b.textContent='✓ Kopiert';setTimeout(function(){b.textContent='Kopieren';},2000);
+  });
+};
+
+window.asDone=function(){
+  var prefs=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
   show('topic-list');
   filterTopics(prefs.length?prefs:null);
 };
 
 window.asReset=function(){
-  localStorage.removeItem(PREF_KEY);
-  answers=[];idx=0;
-  show('as-intro');
+  window.asOpen();
 };
 })();
 </script>
