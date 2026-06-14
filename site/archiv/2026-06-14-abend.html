@@ -103,6 +103,76 @@
     .tab:hover { color: var(--text); text-decoration: none; }
     .tab svg { width: 23px; height: 23px; }
     .tab.active { color: var(--text); border-top-color: var(--accent); }
+    /* ── Artikel-Feedback ── */
+    .article-fb { display: flex; gap: 8px; margin: 14px 0 4px; }
+    .fb-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+              padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--muted);
+              font-family: var(--sans); line-height: 1; }
+    .fb-btn.active[data-vote="up"] { background: oklch(0.22 0.06 150);
+              border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
+    .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
+              border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
+    /* ── Themen-Reiter ── */
+    .schlagwort-badge { display: inline-block; font-size: 11px; font-family: var(--sans);
+                        color: var(--accent); background: oklch(0.18 0.04 256);
+                        border: 1px solid oklch(0.28 0.06 256); border-radius: 999px;
+                        padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+                        letter-spacing: 0.03em; }
+    .dossier-empty { color: var(--muted); font-style: italic; font-size: 14px;
+                     font-family: var(--sans); padding: 10px 0 6px; }
+    .topic-stand { font-size: 13px; color: var(--muted); font-style: italic;
+                   font-family: var(--sans); margin: 6px 0 10px; }
+    .topic-articles { list-style: none; padding: 0; margin: 0; }
+    .topic-article { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .topic-article:last-child { border-bottom: none; }
+    .topic-article a { color: var(--fg); text-decoration: none; display: flex;
+                        justify-content: space-between; align-items: baseline; gap: 10px; }
+    .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
+    .topic-article-date { font-size: 12px; color: var(--muted);
+                           font-family: var(--sans); white-space: nowrap; }
+    /* ── Assessment v2 (Toggle-Karten) ── */
+    .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
+                     line-height: 1.6; margin-bottom: 20px; }
+    .as-btn-primary { background: var(--accent); border-color: var(--accent);
+                       color: oklch(0.10 0.02 256); font-weight: 600; border-radius: 999px;
+                       padding: 13px 28px; font-size: 15px; cursor: pointer;
+                       font-family: var(--sans); border: none; display: inline-block; }
+    .as-toggle-card { display: flex; gap: 14px; align-items: flex-start;
+                       padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+                       margin: 8px 0; cursor: pointer; transition: border-color 0.15s,background 0.15s;
+                       user-select: none; }
+    .as-toggle-card.selected { border-color: var(--accent); background: oklch(0.15 0.03 256); }
+    .as-card-check { width: 22px; height: 22px; border-radius: 50%;
+                      border: 1.5px solid var(--border); display: flex; align-items: center;
+                      justify-content: center; flex-shrink: 0; font-size: 12px;
+                      color: transparent; margin-top: 1px; transition: all 0.15s; }
+    .as-toggle-card.selected .as-card-check { background: var(--accent);
+      border-color: var(--accent); color: oklch(0.10 0.02 256); }
+    .as-card-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+    .as-card-q { font-size: 13px; color: var(--muted); font-family: var(--sans); line-height: 1.4; }
+    .as-custom-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 12px; }
+    .as-custom-inputs { display: flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
+    .as-custom-input { flex: 1; min-width: 130px; background: oklch(0.10 0.01 256);
+                        border: 1px solid var(--border); border-radius: 8px;
+                        padding: 10px 12px; color: var(--fg); font-size: 14px;
+                        font-family: var(--sans); outline: none; }
+    .as-custom-input:focus { border-color: var(--accent); }
+    .as-add-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+                   padding: 10px 18px; color: var(--fg); font-size: 14px;
+                   cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .as-add-btn:hover { border-color: var(--accent); }
+    .as-confirm-row { display: flex; justify-content: space-between; align-items: center;
+                       margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .as-cmd-box { background: oklch(0.10 0.02 256); border: 1px solid var(--border);
+                   border-radius: 8px; padding: 14px; margin: 10px 0 16px;
+                   font-family: monospace; font-size: 13px; color: var(--accent);
+                   white-space: pre-wrap; line-height: 1.7; }
+    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 5px 12px; font-size: 12px; color: var(--muted);
+                   cursor: pointer; font-family: var(--sans); margin-left: 8px; }
+    .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
+                  text-decoration: underline; cursor: pointer; margin-top: 24px;
+                  display: inline-block; background: none; border: none; padding: 0; }
   </style>
 </head>
 <body>
@@ -113,29 +183,17 @@
 <div class="wrap">
 <h1>🌆 Dein Lagebild — Sonntag, 14. Juni 2026 · 16-Uhr-Update</h1>
   <div class="highlights"><p><strong>Heute wichtig:</strong></p>
-  <p>1️⃣ Finanzminister verteidigt umstrittenes Doppelbudget gegen Kritik</p>
-  <p>2️⃣ Italienischer Hochgeschwindigkeitszug Frecciarossa kommt nach Österreich</p>
-  <p>3️⃣ Hitzewelle mit bis zu 35 Grad erreicht Österreich Mitte der Woche</p>
+  <p>1️⃣ Schweiz lehnt strikte Bevölkerungsobergrenze ab</p>
+  <p>2️⃣ Schulbibliothek nach Femizid in Oberösterreich wird umgebaut</p>
   </div><hr>
-  <h2>1️⃣ 🏛 Marterbauer verteidigt Doppelbudget – trotz negativer Verteilungswirkung bei einzelnen Maßnahmen</h2>
-  <p><strong>Was ist neu:</strong> Der Finanzminister hat sich in der „Pressestunde&quot; gegen Kritik am geplanten Doppelbudget verteidigt. Während einzelne Maßnahmen negative Auswirkungen auf die Einkommensverteilung haben, beteuerte er, dass die Gesamtverteilungswirkung „durchaus in Ordnung&quot; sei. Das Doppelbudget ist ein zentrales Vorhaben der Regierung zur Stabilisierung der öffentlichen Finanzen.</p>
-  <p><strong>Warum es zählt:</strong> Die Debatte um die Verteilungsgerechtigkeit des Budgets ist für dein Portemonnaie relevant – ob Steuern, Sozialleistungen oder öffentliche Ausgaben in deinem Interesse gestaltet werden. Dass einzelne Maßnahmen Verlierer schaffen, wird offenbar akzeptiert, wenn die Gesamtbilanz stimmt. Die kommenden Wochen zeigen, ob dieses Argument verfängt oder ob Opposition und Öffentlichkeit mehr Nachbesserungen fordern. (Politik) <a class="source-link" href="https://www.diepresse.com/30237238/marterbauer-verteidigt-doppelbudget-gegen-kritik">Weiterlesen bei der Presse →</a></p>
-  <hr>
-  <h2>2️⃣ 🚇 Frecciarossa fährt ab 2027 durch Österreich – direkter Zug Mailand–Rom–München</h2>
-  <p><strong>Was ist neu:</strong> Der italienische Hochgeschwindigkeitszug Frecciarossa wird ab 2027 eine neue Route bedienen: Mailand und Rom werden direkt mit München verbunden. Das bedeutet erstmals regelmäßige Hochgeschwindigkeitsverbindungen durch österreichisches Territorium im Süd-Nord-Verkehr.</p>
-  <p><strong>Warum es zählt:</strong> Schnellere Reiseverbindungen nach Italien und Bayern machen Pendeln und Dienstreisen attraktiver und kürzer. Das ist konkret spürbar für dich, wenn du beruflich mobil bist oder regelmäßig zwischen Österreich und Südeuropa reist. (Infrastruktur) <a class="source-link" href="https://www.diepresse.com/30234506/frecciarossa-faehrt-ab-2027-auch-durch-oesterreich">Weiterlesen bei der Presse →</a></p>
-  <hr>
-  <h2>3️⃣ ⚡ Hitzewelle kommt Mitte der Woche – bis zu 35 Grad am Freitag erwartet</h2>
-  <p><strong>Was ist neu:</strong> Ein Temperatursturm zieht über Österreich auf. Am Mittwoch werden 30 Grad erwartet, am Freitag sogar 35 Grad. Damit beginnt eine intensive Hitzeperiode in der kommenden Woche.</p>
-  <p><strong>Warum es zählt:</strong> Das beeinflusst deine Wochenplanung, Arbeitsschutz und Energiekosten (Klimaanlage, Stromverbrauch). Auch Verkehr und öffentliche Dienste fahren oft reduziert. (Wetter) <a class="source-link" href="https://www.diepresse.com/30232187/hitzewelle-erreicht-oesterreich-mitte-der-woche">Weiterlesen bei der Presse →</a></p>
-  <hr>
-  <h2>Deine Themen</h2>
-  <p>- <strong>US-Zölle:</strong> Keine materielle Änderung seit gestern.</p>
-  <p>- <strong>Mietrecht:</strong> Keine materielle Änderung seit gestern.</p>
-  <p>- <strong>US-Börsen:</strong> Keine materielle Änderung seit gestern.</p>
-  <p>- <strong>EZB-Zinsen:</strong> Keine materielle Änderung seit gestern.</p>
-  <p>- <strong>Energiepreise:</strong> Keine materielle Änderung seit gestern.</p>
-  <hr>
+  <h2>1️⃣ 🌍 Schweiz lehnt Bevölkerungsobergrenze deutlich ab</h2>
+  <p><strong>Was ist neu:</strong> Die Schweiz hat sich beim Referendum gegen eine vom nationalpopulistischen Milieu vorangetriebene strikte Obergrenze für die Einwohnerzahl ausgesprochen. Die Befürworter einer maximalen Bevölkerung zeichneten sich am Sonntag als klare Verlierer ab. Das Votum ist weltweit einzigartig — kein anderes Land hat seine Bevölkerungsgröße per Verfassungsreferendum festschreiben wollen. Hintergrund ist ein vieldiskutierter Begriff des „Dichtestress&quot;, der auf verhaltensbiologischen Experimenten aus amerikanischen Laboren basiert und in der Schweizer Politikdebatte zentrales Argument der Gegner von Migration und Wachstum war.</p>
+  <p><strong>Warum es zählt:</strong> Das Ergebnis zeigt, dass Schweizer Wähler trotz wachsender Migrations- und Integrationsdiskurse rechtsnationale Bevölkerungspolitik ablehnen. Für Österreich relevant: Die Schweiz ist Referenzland für konservative Migrationspolitik — dieses Votum signalisiert, dass auch dort eine Grenze für restriktive Maßnahmen besteht. Es schwächt zugleich die wissenschaftliche Legitimation von „Überbevölkerungs&quot;-Argumenten. <a class="source-link" href="https://www.diepresse.com/30228134/schweiz-darf-mehr-als-zehn-millionen-einwohner-haben">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-14|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+  <h2>2️⃣ ⚖️ Schulbibliothek wird nach tödlicher Attacke auf Lehrerin umgebaut</h2>
+  <p><strong>Was ist neu:</strong> Nach dem Femizid an einer Lehrerin, der sich am Freitag in einer oberösterreichischen Schulbibliothek ereignet haben soll, wird der Raum umgebaut. Der Ort ist zentral gelegen und Schüler müssten ihn regelmäßig passieren. Die betroffene Volks- und Mittelschule bleiben nächste Woche noch mit reduziertem Betrieb geöffnet.</p>
+  <p><strong>Warum es zählt:</strong> Die Entscheidung der Schule zeigt, wie ein Schultrauma durch räumliche Umgestaltung adressiert werden soll — ein Ansatz, der die Rückkehr zur Normalität für Schüler und Lehrkörper ermöglichen soll. Gleichzeitig dokumentiert der Fall erneut geschlechtsspezifische Gewalt im Arbeitsumfeld. <a class="source-link" href="https://www.diepresse.com/30227031/schulbibliothek-wird-nach-femizid-in-oberoesterreich-umgebaut">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-14|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
@@ -146,5 +204,25 @@
   <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
+<script>
+(function(){
+  function castVote(btn){
+    var bar=btn.closest('.article-fb');
+    var key='afb_'+bar.dataset.key;
+    var vote=btn.dataset.vote;
+    var prev=localStorage.getItem(key);
+    bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    else{localStorage.removeItem(key);}
+  }
+  document.querySelectorAll('.article-fb').forEach(function(bar){
+    var saved=localStorage.getItem('afb_'+bar.dataset.key);
+    if(saved){var b=bar.querySelector('[data-vote="'+saved+'"]');if(b)b.classList.add('active');}
+    bar.querySelectorAll('.fb-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){castVote(btn);});
+    });
+  });
+})();
+</script>
 </body>
 </html>
