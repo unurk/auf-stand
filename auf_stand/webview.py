@@ -157,19 +157,24 @@ _PAGE_TEMPLATE = """\
               border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
     .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
               border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
-    /* ── Themen-Konfiguration ── */
+    /* ── Themen-Reiter ── */
     .schlagwort-badge { display: inline-block; font-size: 11px; font-family: var(--sans);
                         color: var(--accent); background: oklch(0.18 0.04 256);
                         border: 1px solid oklch(0.28 0.06 256); border-radius: 999px;
                         padding: 2px 8px; margin-left: 8px; vertical-align: middle;
                         letter-spacing: 0.03em; }
-    .edit-config-link { display: inline-flex; align-items: center; gap: 6px;
-                        font-family: var(--sans); font-size: 13px; color: var(--muted);
-                        border: 1px solid var(--border); border-radius: 999px;
-                        padding: 6px 14px; text-decoration: none; margin-bottom: 28px; }
-    .edit-config-link:hover { color: var(--fg); border-color: var(--muted); }
     .dossier-empty { color: var(--muted); font-style: italic; font-size: 14px;
                      font-family: var(--sans); padding: 10px 0 6px; }
+    .topic-stand { font-size: 13px; color: var(--muted); font-style: italic;
+                   font-family: var(--sans); margin: 6px 0 10px; }
+    .topic-articles { list-style: none; padding: 0; margin: 0; }
+    .topic-article { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .topic-article:last-child { border-bottom: none; }
+    .topic-article a { color: var(--fg); text-decoration: none; display: flex;
+                        justify-content: space-between; align-items: baseline; gap: 10px; }
+    .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
+    .topic-article-date { font-size: 12px; color: var(--muted);
+                           font-family: var(--sans); white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -350,7 +355,7 @@ def _iso_to_display(iso: str) -> str:
 # Seiten-Generatoren
 # ---------------------------------------------------------------------------
 
-def build_dossier(dossier: dict, topics: list) -> None:
+def build_dossier(dossier: dict, topics: list, topic_articles: dict) -> None:
     """Erzeugt site/dossier.html mit Die Presse-Design."""
     from .synthesize import topic_keyword, topic_name as get_topic_name
     SITE_DIR.mkdir(parents=True, exist_ok=True)
@@ -359,38 +364,42 @@ def build_dossier(dossier: dict, topics: list) -> None:
         name = get_topic_name(topic)
         kw = topic_keyword(topic)
         badge = f'<span class="schlagwort-badge">#{kw}</span>' if kw else ""
-        entries = sorted(
+
+        # Neuester Dossier-Eintrag als "Stand:"-Zeile
+        dossier_entries = sorted(
             dossier.get(name, []), key=lambda e: e.get("date", ""), reverse=True
         )
-        if entries:
+        stand_html = ""
+        if dossier_entries and dossier_entries[0].get("summary"):
+            stand_html = f'<p class="topic-stand">Stand: {dossier_entries[0]["summary"]}</p>'
+
+        # Artikel-Links
+        arts = topic_articles.get(name, [])
+        if arts:
             items = "\n".join(
-                f'<li><span class="dossier-date">{_iso_to_display(e["date"])}</span>'
-                f"<span>{e['summary']}</span></li>"
-                for e in entries
-                if e.get("summary")
+                f'<li class="topic-article">'
+                f'<a href="{a["link"]}" target="_blank" rel="noopener">'
+                f'<span class="topic-article-title">{a["title"]}</span>'
+                f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
+                f"</a></li>"
+                for a in arts
+                if a.get("link") and a.get("title")
             )
-            body_html = f'<ul class="dossier-entries">{items}</ul>'
+            body_html = f'<ul class="topic-articles">{items}</ul>'
         else:
-            body_html = (
-                '<p class="dossier-empty">Noch keine Einträge — '
-                "erscheint, wenn Claude dieses Thema im Lagebild aufgreift.</p>"
-            )
+            body_html = '<p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p>'
+
         sections.append(
             f'<div class="dossier-topic">'
             f"<h2>{name}{badge}</h2>"
-            f"{body_html}"
+            f"{stand_html}{body_html}"
             f"</div>"
         )
 
     if not sections:
         sections = ['<p class="empty-state">Keine Themen konfiguriert.</p>']
 
-    edit_url = "https://github.com/unurk/auf-stand/edit/master/config.yaml"
-    edit_link = (
-        f'<a class="edit-config-link" href="{edit_url}" target="_blank" rel="noopener">'
-        f"✏️ Themen bearbeiten</a>"
-    )
-    content = f"<h1>Meine Themen</h1>\n{edit_link}\n" + "\n".join(sections)
+    content = "<h1>Meine Themen</h1>\n" + "\n".join(sections)
     html = _render_page("Meine Themen", content, "dossier")
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
 
@@ -419,7 +428,7 @@ def build_site() -> Path:
         pass
     config_path = BASE_DIR / "config.yaml"
     config = yaml.safe_load(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
-    build_dossier(state.get("dossier", {}), config.get("topics", []))
+    build_dossier(state.get("dossier", {}), config.get("topics", []), state.get("topic_articles", {}))
 
     ARCHIV_DIR.mkdir(parents=True, exist_ok=True)
     fresh_copies: set[str] = set()

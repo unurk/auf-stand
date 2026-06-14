@@ -185,6 +185,31 @@ def article_feedback_hint(state: dict, cutoff_date: str) -> str:
     return ""
 
 
+def save_topic_articles(state: dict, topics: list, articles: list) -> None:
+    """Speichert bis zu 3 themenrelevante Artikel pro Topic in state für die Web-App."""
+    from .synthesize import topic_keyword, topic_name as _tn
+    result: dict[str, list[dict]] = {}
+    for topic in topics:
+        name = _tn(topic)
+        kw = topic_keyword(topic).lower()
+        if not kw:
+            continue
+        matched = sorted(
+            [a for a in articles if kw in a.title.lower() or kw in (a.teaser or "").lower()],
+            key=lambda a: a.published or datetime.min.replace(tzinfo=timezone.utc),
+            reverse=True,
+        )
+        result[name] = [
+            {
+                "title": a.title,
+                "link": a.link,
+                "date": a.published.strftime("%Y-%m-%d") if a.published else "",
+            }
+            for a in matched[:3]
+        ]
+    state["topic_articles"] = result
+
+
 def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)

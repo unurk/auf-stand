@@ -116,6 +116,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     if not keep_seen:
         points = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
+        state.save_topic_articles(current_state, config.get("topics", []), result.articles)
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
             current_state, edition, points, len(lagebild.split()), len(new_articles)
