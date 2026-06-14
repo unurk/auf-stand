@@ -146,6 +146,15 @@ _PAGE_TEMPLATE = """\
     .tab:hover { color: var(--text); text-decoration: none; }
     .tab svg { width: 23px; height: 23px; }
     .tab.active { color: var(--text); border-top-color: var(--accent); }
+    /* ── Artikel-Feedback ── */
+    .article-fb { display: flex; gap: 8px; margin: 14px 0 4px; }
+    .fb-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+              padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--muted);
+              font-family: var(--sans); line-height: 1; }
+    .fb-btn.active[data-vote="up"] { background: oklch(0.22 0.06 150);
+              border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
+    .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
+              border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
   </style>
 </head>
 <body>
@@ -162,6 +171,26 @@ __CONTENT__
   <a href="__ROOT__archiv/index.html" class="tab __NAV_ARCHIV__">__ICON_ARCHIV__<span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener">__ICON_EPAPER__<span>E-Paper</span></a>
 </nav>
+<script>
+(function(){
+  function castVote(btn){
+    var bar=btn.closest('.article-fb');
+    var key='afb_'+bar.dataset.key;
+    var vote=btn.dataset.vote;
+    var prev=localStorage.getItem(key);
+    bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    else{localStorage.removeItem(key);}
+  }
+  document.querySelectorAll('.article-fb').forEach(function(bar){
+    var saved=localStorage.getItem('afb_'+bar.dataset.key);
+    if(saved){var b=bar.querySelector('[data-vote="'+saved+'"]');if(b)b.classList.add('active');}
+    bar.querySelectorAll('.fb-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){castVote(btn);});
+    });
+  });
+})();
+</script>
 </body>
 </html>
 """
@@ -203,7 +232,28 @@ def _ressort_tag(match: re.Match) -> str:
     return f' <span class="ressort" style="--h:{hue}">{name}</span>'
 
 
-def _enhance_content(content: str) -> str:
+def _add_article_feedback(content: str, datum: str, edition: str) -> str:
+    """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel (vor dem <hr>) ein."""
+    if 'class="article-fb"' in content:
+        return content
+    blocks = content.split("<hr>")
+    result = []
+    idx = 0
+    for block in blocks:
+        if re.search(r"<h2>[1-9]", block):
+            key = f"{datum}|{edition}|{idx}"
+            block = block.rstrip() + (
+                f'\n<div class="article-fb" data-key="{key}">'
+                f'<button class="fb-btn" data-vote="up">👍 Relevant</button>'
+                f'<button class="fb-btn" data-vote="down">👎</button>'
+                f"</div>"
+            )
+            idx += 1
+        result.append(block)
+    return "<hr>".join(result)
+
+
+def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     """Verleiht dem Roh-Inhalt Die-Presse-Charakter (Pills, Kicker, Highlight-Box)."""
     # Marken-Zeile entfernen (steht jetzt im Masthead) — als <p> oder <div>.
     content = re.sub(
@@ -228,10 +278,12 @@ def _enhance_content(content: str) -> str:
             count=1,
             flags=re.DOTALL,
         )
+    if datum:
+        content = _add_article_feedback(content, datum, edition)
     return content.strip()
 
 
-def _extract_body(html: str) -> str:
+def _extract_body(html: str, datum: str = "", edition: str = "") -> str:
     """Extrahiert Inhalt der .wrap-Div — korrekt bei verschachtelten Divs."""
     marker = '<div class="wrap">'
     start = html.find(marker)
@@ -251,7 +303,7 @@ def _extract_body(html: str) -> str:
         else:
             depth -= 1
             if depth == 0:
-                return _enhance_content(html[content_start:c].strip())
+                return _enhance_content(html[content_start:c].strip(), datum, edition)
             i = c + 6
     return "<p>Kein Inhalt verfügbar.</p>"
 
@@ -364,7 +416,7 @@ def build_site() -> Path:
     for (d, _rank, edition), path in editions:
         raw = path.read_text(encoding="utf-8")
         if path.name in fresh_copies or 'class="tabbar"' not in raw:
-            content = _extract_body(raw)
+            content = _extract_body(raw, d.isoformat(), edition)
             branded = _render_page(_label(d, edition), content, "archiv", root="../")
             path.write_text(branded, encoding="utf-8")
 
@@ -372,8 +424,8 @@ def build_site() -> Path:
 
     # Hauptseite: neueste Ausgabe
     latest_html = editions[0][1].read_text(encoding="utf-8")
-    latest_content = _extract_body(latest_html)
     latest_d, _, latest_edition = editions[0][0]
+    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition)
     title = _label(latest_d, latest_edition)
     index_html = _render_page(title, latest_content, "lagebild")
     index.write_text(index_html, encoding="utf-8")

@@ -103,6 +103,15 @@
     .tab:hover { color: var(--text); text-decoration: none; }
     .tab svg { width: 23px; height: 23px; }
     .tab.active { color: var(--text); border-top-color: var(--accent); }
+    /* ── Artikel-Feedback ── */
+    .article-fb { display: flex; gap: 8px; margin: 14px 0 4px; }
+    .fb-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+              padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--muted);
+              font-family: var(--sans); line-height: 1; }
+    .fb-btn.active[data-vote="up"] { background: oklch(0.22 0.06 150);
+              border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
+    .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
+              border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
   </style>
 </head>
 <body>
@@ -120,15 +129,15 @@
   <h2>1️⃣ 🏛 Marterbauer verteidigt Doppelbudget – trotz negativer Verteilungswirkung bei einzelnen Maßnahmen</h2>
   <p><strong>Was ist neu:</strong> Der Finanzminister hat sich in der „Pressestunde&quot; gegen Kritik am geplanten Doppelbudget verteidigt. Während einzelne Maßnahmen negative Auswirkungen auf die Einkommensverteilung haben, beteuerte er, dass die Gesamtverteilungswirkung „durchaus in Ordnung&quot; sei. Das Doppelbudget ist ein zentrales Vorhaben der Regierung zur Stabilisierung der öffentlichen Finanzen.</p>
   <p><strong>Warum es zählt:</strong> Die Debatte um die Verteilungsgerechtigkeit des Budgets ist für dein Portemonnaie relevant – ob Steuern, Sozialleistungen oder öffentliche Ausgaben in deinem Interesse gestaltet werden. Dass einzelne Maßnahmen Verlierer schaffen, wird offenbar akzeptiert, wenn die Gesamtbilanz stimmt. Die kommenden Wochen zeigen, ob dieses Argument verfängt oder ob Opposition und Öffentlichkeit mehr Nachbesserungen fordern. (Politik) <a class="source-link" href="https://www.diepresse.com/30237238/marterbauer-verteidigt-doppelbudget-gegen-kritik">Weiterlesen bei der Presse →</a></p>
-  <hr>
+<div class="article-fb" data-key="2026-06-14|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
   <h2>2️⃣ 🚇 Frecciarossa fährt ab 2027 durch Österreich – direkter Zug Mailand–Rom–München</h2>
   <p><strong>Was ist neu:</strong> Der italienische Hochgeschwindigkeitszug Frecciarossa wird ab 2027 eine neue Route bedienen: Mailand und Rom werden direkt mit München verbunden. Das bedeutet erstmals regelmäßige Hochgeschwindigkeitsverbindungen durch österreichisches Territorium im Süd-Nord-Verkehr.</p>
   <p><strong>Warum es zählt:</strong> Schnellere Reiseverbindungen nach Italien und Bayern machen Pendeln und Dienstreisen attraktiver und kürzer. Das ist konkret spürbar für dich, wenn du beruflich mobil bist oder regelmäßig zwischen Österreich und Südeuropa reist. (Infrastruktur) <a class="source-link" href="https://www.diepresse.com/30234506/frecciarossa-faehrt-ab-2027-auch-durch-oesterreich">Weiterlesen bei der Presse →</a></p>
-  <hr>
+<div class="article-fb" data-key="2026-06-14|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
   <h2>3️⃣ ⚡ Hitzewelle kommt Mitte der Woche – bis zu 35 Grad am Freitag erwartet</h2>
   <p><strong>Was ist neu:</strong> Ein Temperatursturm zieht über Österreich auf. Am Mittwoch werden 30 Grad erwartet, am Freitag sogar 35 Grad. Damit beginnt eine intensive Hitzeperiode in der kommenden Woche.</p>
   <p><strong>Warum es zählt:</strong> Das beeinflusst deine Wochenplanung, Arbeitsschutz und Energiekosten (Klimaanlage, Stromverbrauch). Auch Verkehr und öffentliche Dienste fahren oft reduziert. (Wetter) <a class="source-link" href="https://www.diepresse.com/30232187/hitzewelle-erreicht-oesterreich-mitte-der-woche">Weiterlesen bei der Presse →</a></p>
-  <hr>
+<div class="article-fb" data-key="2026-06-14|abend|2"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
   <h2>Deine Themen</h2>
   <p>- <strong>US-Zölle:</strong> Keine materielle Änderung seit gestern.</p>
   <p>- <strong>Mietrecht:</strong> Keine materielle Änderung seit gestern.</p>
@@ -146,5 +155,25 @@
   <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
+<script>
+(function(){
+  function castVote(btn){
+    var bar=btn.closest('.article-fb');
+    var key='afb_'+bar.dataset.key;
+    var vote=btn.dataset.vote;
+    var prev=localStorage.getItem(key);
+    bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    else{localStorage.removeItem(key);}
+  }
+  document.querySelectorAll('.article-fb').forEach(function(bar){
+    var saved=localStorage.getItem('afb_'+bar.dataset.key);
+    if(saved){var b=bar.querySelector('[data-vote="'+saved+'"]');if(b)b.classList.add('active');}
+    bar.querySelectorAll('.fb-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){castVote(btn);});
+    });
+  });
+})();
+</script>
 </body>
 </html>

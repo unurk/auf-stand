@@ -66,12 +66,16 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
     print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
 
+    from datetime import timedelta
+    cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
+    fb_hint = state.article_feedback_hint(current_state, cutoff)
     prompt = synthesize.build_prompt(
         selection,
         config.get("topics", []),
         edition_config.get("label", edition),
         termine=config.get("termine", []),
         dossier=current_state.get("dossier", {}),
+        article_feedback_hint=fb_hint,
     )
 
     if dry_run:
@@ -97,10 +101,20 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         if config.get("feedback_enabled", True)
         else None
     )
-    telegram.send_telegram(lagebild, config.get("telegram_chat_ids", []), feedback_key=feedback_key)
+    import re
+    article_headings = [
+        re.sub(r"^[1-9]\S*\s+", "", line[3:]).strip()
+        for line in lagebild.splitlines()
+        if line.startswith("## ") and re.match(r"## [1-9]", line)
+    ]
+    telegram.send_telegram(
+        lagebild,
+        config.get("telegram_chat_ids", []),
+        feedback_key=feedback_key,
+        article_headings=article_headings or None,
+    )
 
     if not keep_seen:
-        import re
         points = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
         state.mark_seen(articles, current_state, edition)
         state.record_stats(

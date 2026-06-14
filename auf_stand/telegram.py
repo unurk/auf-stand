@@ -123,17 +123,30 @@ def send_alert(text: str, chat_ids: list[str]) -> None:
             pass  # Eine fehlgeschlagene Warnung darf den Lauf nicht stoppen
 
 
-def _feedback_keyboard(feedback_key: str) -> dict:
-    """Inline-Tastatur 👍/👎 für die Relevanz-Bewertung einer Ausgabe."""
-    return {
-        "inline_keyboard": [[
-            {"text": "👍 Relevant", "callback_data": f"fb|{feedback_key}|up"},
-            {"text": "👎 Nicht relevant", "callback_data": f"fb|{feedback_key}|down"},
-        ]]
-    }
+def _feedback_keyboard(feedback_key: str, article_headings: list[str] | None = None) -> dict:
+    """Inline-Tastatur: optional 👍/👎 pro Artikel, danach Ausgaben-Gesamtbewertung."""
+    rows = []
+    if article_headings:
+        datum_edition = feedback_key  # Format: "YYYY-MM-DD|edition"
+        for i, heading in enumerate(article_headings):
+            label = heading[:22] + "…" if len(heading) > 22 else heading
+            rows.append([
+                {"text": f"👍 {label}", "callback_data": f"artfb|{datum_edition}|{i}|up"},
+                {"text": "👎", "callback_data": f"artfb|{datum_edition}|{i}|down"},
+            ])
+    rows.append([
+        {"text": "👍 Ausgabe", "callback_data": f"fb|{feedback_key}|up"},
+        {"text": "👎 Ausgabe", "callback_data": f"fb|{feedback_key}|down"},
+    ])
+    return {"inline_keyboard": rows}
 
 
-def send_telegram(markdown: str, chat_ids: list[str], feedback_key: str | None = None) -> None:
+def send_telegram(
+    markdown: str,
+    chat_ids: list[str],
+    feedback_key: str | None = None,
+    article_headings: list[str] | None = None,
+) -> None:
     if not chat_ids:
         print("Keine Telegram-Chat-IDs in config.yaml — Versand übersprungen.")
         return
@@ -155,7 +168,7 @@ def send_telegram(markdown: str, chat_ids: list[str], feedback_key: str | None =
             }
             # Bewertungs-Buttons nur an den letzten Chunk hängen.
             if feedback_key and i == len(chunks) - 1:
-                payload["reply_markup"] = _feedback_keyboard(feedback_key)
+                payload["reply_markup"] = _feedback_keyboard(feedback_key, article_headings)
             resp = httpx.post(url, json=payload, timeout=15)
             if resp.status_code != 200:
                 data = resp.json()

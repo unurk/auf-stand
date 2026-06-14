@@ -119,8 +119,26 @@ def _handle_callback(cq: dict, allowed_ids: set[str], current_state: dict, tg) -
     msg = cq.get("message", {})
     chat_id = str(msg.get("chat", {}).get("id", ""))
     parts = data.split("|")
-    # Erwartet: fb|<datum>|<edition>|<up|down>
-    if chat_id not in allowed_ids or len(parts) != 4 or parts[0] != "fb":
+
+    if chat_id not in allowed_ids:
+        tg.answer_callback(cq.get("id", ""))
+        return 0
+
+    # Per-Artikel-Feedback: artfb|datum|edition|idx|rating
+    if parts[0] == "artfb" and len(parts) == 5:
+        _, datum, edition, idx_str, rating = parts
+        try:
+            article_idx = int(idx_str)
+        except ValueError:
+            tg.answer_callback(cq.get("id", ""))
+            return 0
+        state_module.record_article_feedback(current_state, datum, edition, article_idx, rating, chat_id)
+        tg.answer_callback(cq.get("id", ""), "Notiert ✓")
+        print(f"Artikel-Feedback: {edition} Artikel {article_idx} {'👍' if rating == 'up' else '👎'}")
+        return 1
+
+    # Ausgaben-Feedback: fb|datum|edition|rating
+    if len(parts) != 4 or parts[0] != "fb":
         tg.answer_callback(cq.get("id", ""))
         return 0
 

@@ -141,6 +141,50 @@ def update_dossier(state: dict, lagebild_md: str, topics: list, datum: str) -> N
                 break  # eine Zeile zählt nur zum ersten passenden Thema
 
 
+def record_article_feedback(
+    state: dict, datum: str, edition: str, article_idx: int, rating: str, chat_id: str
+) -> None:
+    """Hält Artikel-Relevanz-Bewertung fest (rating: 'up' oder 'down')."""
+    now = datetime.now(timezone.utc)
+    entries = state.setdefault("article_feedback", [])
+    entries.append({
+        "date": datum,
+        "edition": edition,
+        "article_idx": article_idx,
+        "rating": rating,
+        "chat_id": chat_id,
+        "ts": now.isoformat(),
+    })
+    cutoff = now.date().toordinal() - 30
+    state["article_feedback"] = [
+        e for e in entries
+        if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+    ]
+
+
+def article_feedback_hint(state: dict, cutoff_date: str) -> str:
+    """Kalibrierungshinweis aus Artikel-Bewertungen für den Synthese-Prompt."""
+    entries = [
+        e for e in state.get("article_feedback", [])
+        if e.get("date", "") >= cutoff_date
+    ]
+    if len(entries) < 3:
+        return ""
+    up = sum(1 for e in entries if e["rating"] == "up")
+    down = len(entries) - up
+    if down / len(entries) > 0.5:
+        return (
+            f"⚠️ Artikel-Feedback: {down}/{len(entries)} Artikel wurden als "
+            "nicht relevant markiert — schärfere Themenauswahl, weniger Randthemen.\n"
+        )
+    if up / len(entries) > 0.7:
+        return (
+            f"✅ Artikel-Feedback: {up}/{len(entries)} Artikel als relevant bewertet — "
+            "Kurs halten.\n"
+        )
+    return ""
+
+
 def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)

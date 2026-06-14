@@ -103,6 +103,15 @@
     .tab:hover { color: var(--text); text-decoration: none; }
     .tab svg { width: 23px; height: 23px; }
     .tab.active { color: var(--text); border-top-color: var(--accent); }
+    /* ── Artikel-Feedback ── */
+    .article-fb { display: flex; gap: 8px; margin: 14px 0 4px; }
+    .fb-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
+              padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--muted);
+              font-family: var(--sans); line-height: 1; }
+    .fb-btn.active[data-vote="up"] { background: oklch(0.22 0.06 150);
+              border-color: oklch(0.50 0.15 150); color: oklch(0.75 0.15 150); }
+    .fb-btn.active[data-vote="down"] { background: oklch(0.22 0.04 24);
+              border-color: oklch(0.42 0.10 24); color: oklch(0.68 0.10 24); }
   </style>
 </head>
 <body>
@@ -126,5 +135,25 @@
   <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
+<script>
+(function(){
+  function castVote(btn){
+    var bar=btn.closest('.article-fb');
+    var key='afb_'+bar.dataset.key;
+    var vote=btn.dataset.vote;
+    var prev=localStorage.getItem(key);
+    bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    else{localStorage.removeItem(key);}
+  }
+  document.querySelectorAll('.article-fb').forEach(function(bar){
+    var saved=localStorage.getItem('afb_'+bar.dataset.key);
+    if(saved){var b=bar.querySelector('[data-vote="'+saved+'"]');if(b)b.classList.add('active');}
+    bar.querySelectorAll('.fb-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){castVote(btn);});
+    });
+  });
+})();
+</script>
 </body>
 </html>

@@ -68,6 +68,7 @@ def build_prompt(
     edition_label: str,
     termine: list[dict] | None = None,
     dossier: dict | None = None,
+    article_feedback_hint: str = "",
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -89,7 +90,10 @@ def build_prompt(
         .replace("{NAECHSTE_AUSGABE}", next_edition)
     )
 
-    lines = [template, "\n\n---\n\n# Material\n"]
+    lines = [template]
+    if article_feedback_hint:
+        lines.append(f"\n\n---\n\n# Kalibrierung\n{article_feedback_hint}")
+    lines.append("\n\n---\n\n# Material\n")
 
     if topics:
         dossier = dossier or {}
