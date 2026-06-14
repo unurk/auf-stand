@@ -600,7 +600,7 @@ window.asConfirm=function(){{
   }}).filter(Boolean);
   var lines=['/themen '+kws.join(' ')];
   customTopics.forEach(function(c){{lines.push('/thema-neu '+c.name+'|'+c.kw);}});
-  document.getElementById('as-cmd-text').textContent=lines.join('\n');
+  document.getElementById('as-cmd-text').textContent=lines.join('\\n');
   show('as-sync');
 }};
 
