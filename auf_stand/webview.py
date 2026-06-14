@@ -1,6 +1,7 @@
 """Baut die statische Web-App (site/) aus den erzeugten Lagebildern."""
 from __future__ import annotations
 
+import html as _html
 import json
 import re
 import shutil
@@ -425,8 +426,8 @@ def _topic_card_html(topic, dossier: dict, topic_articles: dict) -> str:
     else:
         body_html = '<p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p>'
     return (
-        f'<div class="dossier-topic" data-topic-name="{name}">'
-        f"<h2>{name}{badge}</h2>"
+        f'<div class="dossier-topic" data-topic-name="{_html.escape(name)}">'
+        f"<h2>{_html.escape(name)}{badge}</h2>"
         f"{stand_html}{body_html}"
         f"</div>"
     )
@@ -464,10 +465,10 @@ def build_dossier(
 
     # Toggle-Karten für das Assessment (eine pro Topic)
     toggle_cards_html = "\n".join(
-        f'<div class="as-toggle-card" data-name="{td["name"]}" onclick="asToggle(this)">'
+        f'<div class="as-toggle-card" data-name="{_html.escape(td["name"])}" onclick="asToggle(this)">'
         f'<div class="as-card-check">✓</div>'
-        f'<div><div class="as-card-name">{td["name"]}</div>'
-        f'<div class="as-card-q">{td["q"]}</div></div>'
+        f'<div><div class="as-card-name">{_html.escape(td["name"])}</div>'
+        f'<div class="as-card-q">{_html.escape(td["q"])}</div></div>'
         f"</div>"
         for td in topics_data
     )
