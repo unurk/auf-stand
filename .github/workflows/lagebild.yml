@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages-deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +73,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python -m auf_stand.main rueckkanal
 
-      - name: Web-Ansicht veröffentlichen
+      - name: Web-Ansicht bauen und committen
         if: always() && github.ref == 'refs/heads/master'
         run: |
           python -m auf_stand.main site
@@ -85,6 +90,17 @@ jobs:
           else
             echo "Keine Änderung an site/ — kein Commit."
           fi
+
+      - name: GitHub Pages hochladen
+        uses: actions/upload-pages-artifact@v3
+        if: always() && github.ref == 'refs/heads/master'
+        with:
+          path: site
+
+      - name: GitHub Pages deployen
+        id: pages-deployment
+        uses: actions/deploy-pages@v4
+        if: always() && github.ref == 'refs/heads/master'
 
       - name: State sichern
         uses: actions/cache/save@v4
