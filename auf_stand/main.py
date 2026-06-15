@@ -89,6 +89,13 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
 
     lagebild = synthesize.synthesize(prompt, config)
+    # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
+    import re
+    words = len(re.findall(r"\w+", lagebild))
+    secs = max(60, round(words / 3.2 / 15) * 15)  # ~3.2 Wörter/Sek (Deutsch), auf 15s gerundet
+    lagebild = re.sub(
+        r"Lesezeit ca\.\s*\d+\s*Sekunden", f"Lesezeit ca. {secs} Sekunden", lagebild
+    )
     from . import epaper as epaper_module
     lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config))
     md_path, html_path = render.write_output(lagebild, edition)

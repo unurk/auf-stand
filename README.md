@@ -1,8 +1,8 @@
 # Auf Stand — MVP
 
 Prototyp für das Konzept „Die Presse als Hintergrund-Dienst": 1–2x täglich ein
-**Lagebild** (max. 3 materielle Entwicklungen, ≤ 90 Sekunden Lesezeit) statt
-eines Artikel-Feeds. Hintergrund siehe `CLAUDE.md` und das Konzeptpapier.
+**Lagebild** (3–5 materielle Entwicklungen je nach Nachrichtenlage, rund 90 Sekunden
+Lesezeit) statt eines Artikel-Feeds. Hintergrund siehe `CLAUDE.md` und das Konzeptpapier.
 
 ## Setup (einmalig, ~5 Minuten)
 

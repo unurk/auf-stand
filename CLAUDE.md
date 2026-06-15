@@ -3,8 +3,9 @@
 ## Was dieses Projekt ist
 
 Prototyp für ein neues Digitalprodukt der „Presse": Statt eines Artikel-Feeds bekommt
-die Nutzerin 1–2x täglich ein **Lagebild** — eine redaktionelle Synthese der maximal
-drei Entwicklungen, die sich materiell geändert haben. Lesezeit ≤ 90 Sekunden,
+die Nutzerin 1–2x täglich ein **Lagebild** — eine redaktionelle Synthese von 3–5
+Entwicklungen je nach Nachrichtenlage (an ruhigen Tagen weniger), die sich materiell
+geändert haben. Lesezeit rund 90 Sekunden (an dichten Tagen etwas mehr),
 am Ende das Signal „Du bist auf Stand ✓". Vorbild ist die Produktlogik von WHOOP:
 arbeitet im Hintergrund, verdichtet, meldet sich nur zu relevanten Momenten.
 
