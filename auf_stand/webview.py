@@ -51,6 +51,13 @@ _PAGE_TEMPLATE = """\
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="__ROOT__manifest.webmanifest">
+  <link rel="icon" href="__ROOT__favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="__ROOT__apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Auf Stand">
+  <meta name="application-name" content="Auf Stand">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -264,6 +271,12 @@ __CONTENT__
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // PWA: Service Worker registrieren (Offline-Cache, „Auf Home Screen").
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('__ROOT__sw.js').catch(function(){});
+    });
+  }
 })();
 </script>
 </body>
@@ -664,6 +677,89 @@ def build_archiv_index(editions: list) -> None:
     (ARCHIV_DIR / "index.html").write_text(html, encoding="utf-8")
 
 
+_MANIFEST = {
+    "name": "Auf Stand · Die Presse",
+    "short_name": "Auf Stand",
+    "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden auf Stand.",
+    "lang": "de-AT",
+    "dir": "ltr",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "categories": ["news"],
+    "icons": [
+        {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+        {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+        {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    ],
+}
+
+# Service Worker: Seiten network-first (frisches Lagebild zuerst, Cache als
+# Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
+# damit ein Deploy alte Caches verdrängt.
+_SERVICE_WORKER = """\
+const CACHE = 'auf-stand-v1';
+const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+
+self.addEventListener('install', function(e){
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(function(c){
+    return Promise.all(SHELL.map(function(u){ return c.add(u).catch(function(){}); }));
+  }));
+});
+
+self.addEventListener('activate', function(e){
+  e.waitUntil(caches.keys().then(function(keys){
+    return Promise.all(keys.filter(function(k){ return k !== CACHE; })
+      .map(function(k){ return caches.delete(k); }));
+  }).then(function(){ return self.clients.claim(); }));
+});
+
+self.addEventListener('fetch', function(e){
+  var req = e.request;
+  if(req.method !== 'GET') return;
+  var url = new URL(req.url);
+  if(url.origin !== self.location.origin){
+    // Fremd-Assets (Google Fonts): cache-first, lange haltbar.
+    e.respondWith(caches.open(CACHE).then(function(c){
+      return c.match(req).then(function(hit){
+        return hit || fetch(req).then(function(res){
+          try { c.put(req, res.clone()); } catch(err){}
+          return res;
+        }).catch(function(){ return hit; });
+      });
+    }));
+    return;
+  }
+  // Eigene Seiten: network-first, Cache als Offline-Fallback.
+  e.respondWith(fetch(req).then(function(res){
+    if(res && res.ok){
+      var copy = res.clone();
+      caches.open(CACHE).then(function(c){ c.put(req, copy); });
+    }
+    return res;
+  }).catch(function(){
+    return caches.match(req).then(function(hit){
+      return hit || caches.match('./index.html');
+    });
+  }));
+});
+"""
+
+
+def _write_pwa_assets() -> None:
+    """Schreibt Web-App-Manifest und Service Worker (Icons liegen als statische Dateien)."""
+    SITE_DIR.mkdir(parents=True, exist_ok=True)
+    (SITE_DIR / "manifest.webmanifest").write_text(
+        json.dumps(_MANIFEST, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (SITE_DIR / "sw.js").write_text(_SERVICE_WORKER, encoding="utf-8")
+
+
 def build_site() -> Path:
     """Kopiert neue Ausgaben ins Archiv und baut alle Site-Seiten neu."""
     state: dict = {}
@@ -671,6 +767,7 @@ def build_site() -> Path:
         state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         pass
+    _write_pwa_assets()
     config_path = BASE_DIR / "config.yaml"
     config = yaml.safe_load(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
     all_topics = config.get("topics", []) + state.get("custom_topics", [])
