@@ -12,10 +12,6 @@ feeds:
     url: https://www.diepresse.com/rss/Wirtschaft
   - name: Unternehmen
     url: https://www.diepresse.com/rss/Unternehmen
-  - name: ORF Österreich
-    url: https://rss.orf.at/oesterreich.xml
-  - name: ORF Wien
-    url: https://rss.orf.at/wien.xml
 
 max_articles_per_feed: 15
 
