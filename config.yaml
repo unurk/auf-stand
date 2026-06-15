@@ -83,7 +83,7 @@ editions:
     label: "Morgen-Ausgabe"
     lookback_hours: 18      # Artikel der letzten Nacht + Vorabend
   abend:
-    label: "16-Uhr-Update"
+    label: "Abend-Ausgabe"
     lookback_hours: 11      # nur was seit der Morgen-Ausgabe neu ist (Delta via state)
 
 # Vorausschau: Termine der nächsten 7 Tage, die im Morgen-Lagebild erscheinen.
