@@ -110,6 +110,30 @@ def send_photo(path, caption: str, chat_ids: list[str]) -> None:
             print(f"Telegram-Fehler ({chat_id}): {resp.json().get('description', resp.text)}")
 
 
+def send_audio(path, caption: str, chat_ids: list[str], title: str | None = None) -> None:
+    """Schickt eine mp3 als abspielbare Audio-Nachricht (Klartext-Caption)."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token or not chat_ids:
+        print("Telegram nicht konfiguriert — Audio-Versand übersprungen.")
+        return
+    url = f"https://api.telegram.org/bot{token}/sendAudio"
+    data = {"chat_id": "", "caption": caption, "performer": "Die Presse · Auf Stand"}
+    if title:
+        data["title"] = title
+    for chat_id in chat_ids:
+        data["chat_id"] = chat_id
+        try:
+            with open(path, "rb") as fh:
+                resp = httpx.post(url, data=data, files={"audio": fh}, timeout=60)
+        except Exception as exc:
+            print(f"Telegram-Audio-Fehler ({chat_id}): {exc}")
+            continue
+        if resp.status_code == 200:
+            print(f"Telegram: Audio gesendet an {chat_id}")
+        else:
+            print(f"Telegram-Fehler ({chat_id}): {resp.json().get('description', resp.text)}")
+
+
 def send_alert(text: str, chat_ids: list[str]) -> None:
     """Schickt eine Warnung als einfache Textnachricht (ohne Markdown-Formatierung)."""
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")

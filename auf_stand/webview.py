@@ -110,6 +110,12 @@ _PAGE_TEMPLATE = """\
               font-family: var(--sans); font-size: 13px; font-weight: 600;
               color: var(--accent); background: #eef3f8; border: 1px solid #d4e1ee;
               border-radius: 999px; padding: 7px 15px; margin: 0 0 22px; }
+    /* ── Audio-Player (Lagebild zum Hören) ── */
+    .audio-player { margin: 4px 0 26px; }
+    .audio-player .audio-label { display: block; font-family: var(--sans);
+              font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+              color: var(--muted); margin-bottom: 8px; }
+    .audio-player audio { width: 100%; height: 40px; }
     /* ── Heute-wichtig-Box ── */
     .highlights { background: var(--surface); border-left: 3px solid var(--accent);
                   border-radius: 8px; padding: 16px 18px; margin: 4px 0 26px; }
@@ -344,6 +350,11 @@ def _add_article_feedback(content: str, datum: str, edition: str) -> str:
 
 def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     """Verleiht dem Roh-Inhalt Die-Presse-Charakter (Pills, Kicker, Highlight-Box)."""
+    # Etwaigen Audio-Player aus früherem Build entfernen (wird in build_site neu,
+    # mit korrektem Pfad, eingesetzt) — hält das erneute Rendern idempotent.
+    content = re.sub(
+        r'<div class="audio-player">.*?</div>\s*', "", content, flags=re.DOTALL
+    )
     # Marken-Zeile entfernen (steht jetzt im Masthead) — als <p> oder <div>.
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
@@ -854,6 +865,33 @@ def _write_pwa_assets() -> None:
     )
 
 
+def _audio_player(src: str) -> str:
+    """HTML-Block für den Lagebild-Audioplayer, oder '' wenn keine mp3 da ist."""
+    return (
+        '<div class="audio-player">'
+        '<span class="audio-label">▶ Lagebild zum Hören</span>'
+        f'<audio controls preload="none" src="{src}"></audio>'
+        "</div>\n"
+    )
+
+
+def _prune_old_audio(days: int = 14) -> None:
+    """Löscht mp3-Dateien im Archiv, die älter als `days` Tage sind."""
+    from datetime import timedelta
+
+    cutoff = date.today() - timedelta(days=days)
+    for mp3 in ARCHIV_DIR.glob("*.mp3"):
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})-(morgen|abend|catchup)\.mp3$", mp3.name)
+        if not m:
+            continue
+        try:
+            d = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            continue
+        if d < cutoff:
+            mp3.unlink()
+
+
 def build_site() -> Path:
     """Kopiert neue Ausgaben ins Archiv und baut alle Site-Seiten neu."""
     state: dict = {}
@@ -879,6 +917,11 @@ def build_site() -> Path:
             if _parse(path):
                 shutil.copy2(path, ARCHIV_DIR / path.name)
                 fresh_copies.add(path.name)
+        # Audio-Ausgaben mitkopieren (Lagebild zum Hören).
+        for mp3 in OUT_DIR.glob("*.mp3"):
+            if re.match(r"^\d{4}-\d{2}-\d{2}-(morgen|abend|catchup)\.mp3$", mp3.name):
+                shutil.copy2(mp3, ARCHIV_DIR / mp3.name)
+    _prune_old_audio()
 
     editions = [
         (parsed, path)
@@ -898,6 +941,9 @@ def build_site() -> Path:
     for (d, _rank, edition), path in editions:
         raw = path.read_text(encoding="utf-8")
         content = _extract_body(raw, d.isoformat(), edition)
+        mp3_name = f"{d.isoformat()}-{edition}.mp3"
+        if (ARCHIV_DIR / mp3_name).exists():
+            content = content.replace("</h1>", "</h1>\n" + _audio_player(mp3_name), 1)
         branded = _render_page(_label(d, edition), content, "archiv", root="../")
         path.write_text(branded, encoding="utf-8")
 
@@ -907,6 +953,11 @@ def build_site() -> Path:
     latest_html = editions[0][1].read_text(encoding="utf-8")
     latest_d, _, latest_edition = editions[0][0]
     latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition)
+    latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
+    if (ARCHIV_DIR / latest_mp3).exists():
+        latest_content = latest_content.replace(
+            "</h1>", "</h1>\n" + _audio_player(f"archiv/{latest_mp3}"), 1
+        )
     from . import state as state_mod
     streak = state_mod.current_streak(state)
     if streak >= 2:

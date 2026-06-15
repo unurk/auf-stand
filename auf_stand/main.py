@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, render, state, synthesize, telegram, webpush
+from . import deliver, render, state, synthesize, telegram, tts, webpush
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,6 +122,20 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         feedback_key=feedback_key,
         article_headings=article_headings or None,
     )
+
+    # Audio-Ausgabe: das Lagebild zum Hören (best-effort, blockiert nie den Versand).
+    if tts.tts_configured(config):
+        try:
+            mp3 = tts.generate_lagebild_audio(lagebild, edition, config)
+            if mp3:
+                telegram.send_audio(
+                    mp3,
+                    "Dein Lagebild zum Hören",
+                    config.get("telegram_chat_ids", []),
+                    title=edition_config.get("label", edition),
+                )
+        except Exception as exc:
+            print(f"Audio-Schritt übersprungen: {exc}")
 
     # Web-Push an PWA-Abonnenten (nur wenn VAPID konfiguriert ist).
     if webpush.webpush_configured():
