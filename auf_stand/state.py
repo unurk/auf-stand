@@ -215,6 +215,21 @@ def save_topic_articles(state: dict, topics: list, articles: list) -> None:
     state["topic_articles"] = result
 
 
+def current_streak(state: dict) -> int:
+    """Aufeinanderfolgende Kalendertage (bis heute) mit mindestens einer Ausgabe."""
+    from datetime import date, timedelta
+    days = {s["date"] for s in state.get("stats", [])}
+    if not days:
+        return 0
+    d, streak = date.today(), 0
+    if d.isoformat() not in days:  # heute noch keine Ausgabe → ab gestern zählen
+        d -= timedelta(days=1)
+    while d.isoformat() in days:
+        streak += 1
+        d -= timedelta(days=1)
+    return streak
+
+
 def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)

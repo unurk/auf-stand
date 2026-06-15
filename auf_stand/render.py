@@ -15,13 +15,16 @@ HTML_TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <style>
-  body {{ margin: 0; background: #f5f3ef; font-family: Georgia, 'Times New Roman', serif;
-         color: #1a1a1a; line-height: 1.55; }}
+  body {{ margin: 0; background: #ffffff; font-family: Georgia, 'Times New Roman', serif;
+         color: #121212; line-height: 1.6; }}
   .wrap {{ max-width: 620px; margin: 0 auto; padding: 32px 20px 48px; }}
   .brand {{ font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
             font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
             color: #8a8378; margin-bottom: 28px; }}
-  h1 {{ font-size: 26px; line-height: 1.25; margin: 0 0 24px; }}
+  h1 {{ font-size: 28px; line-height: 1.2; margin: 0 0 12px; }}
+  .byline {{ font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+            font-size: 13px; color: #6b6b6b; margin: 0 0 24px; padding-bottom: 16px;
+            border-bottom: 1px solid #e3e1dc; }}
   h2 {{ font-size: 19px; margin: 28px 0 8px; }}
   p {{ margin: 0 0 12px; font-size: 17px; }}
   strong {{ font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -77,8 +80,12 @@ def write_output(markdown: str, edition: str) -> tuple[Path, Path]:
     md_path.write_text(markdown + "\n", encoding="utf-8")
     title_match = re.search(r"^#\s+(.+)$", markdown, re.MULTILINE)
     title = title_match.group(1) if title_match else "Dein Lagebild"
+    body = _markdown_to_html(markdown)
+    body = body.replace(
+        "</h1>", '</h1>\n  <p class="byline">Von der Auf-Stand-Redaktion</p>', 1
+    )
     html_path.write_text(
-        HTML_TEMPLATE.format(title=html.escape(title), body=_markdown_to_html(markdown)),
+        HTML_TEMPLATE.format(title=html.escape(title), body=body),
         encoding="utf-8",
     )
     return md_path, html_path
