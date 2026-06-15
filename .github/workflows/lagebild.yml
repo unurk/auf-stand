@@ -43,6 +43,9 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
         run: |
           mkdir -p data out
           SCHEDULE="${{ github.event.schedule }}"
@@ -75,6 +78,8 @@ jobs:
 
       - name: Web-Ansicht bauen und committen
         if: always() && github.ref == 'refs/heads/master'
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
         run: |
           python -m auf_stand.main site
           if [ -n "$(git status --porcelain site)" ]; then

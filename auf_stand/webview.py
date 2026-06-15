@@ -52,6 +52,7 @@ _PAGE_TEMPLATE = """\
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="__ROOT__manifest.webmanifest">
+  <script src="__ROOT__push-config.js"></script>
   <link rel="icon" href="__ROOT__favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="__ROOT__apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -657,9 +658,77 @@ window.asReset=function(){{
 </script>
 """
 
-    content = "<h1>Meine Themen</h1>\n" + assessment_html
+    content = "<h1>Meine Themen</h1>\n" + assessment_html + _PUSH_SECTION
     html = _render_page("Meine Themen", content, "dossier")
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
+
+
+# Push-Aktivierung — eigenständiger Block am Ende des Themen-Screens. Versteckt sich
+# selbst, wenn der Browser kein Push kann oder kein VAPID_PUBLIC_KEY gesetzt ist.
+_PUSH_SECTION = """
+<div id="push-section" style="display:none;border-top:1px solid var(--border);padding-top:24px;margin-top:36px">
+  <p style="font-size:15px;font-weight:600;font-family:var(--sans);margin:0 0 4px">🔔 Push-Benachrichtigungen</p>
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 14px;line-height:1.6">
+    Lass dich benachrichtigen, sobald ein neues Lagebild da ist — direkt aufs Gerät,
+    ohne die App zu öffnen. (Auf dem iPhone zuerst „Zum Home-Bildschirm" hinzufügen.)
+  </p>
+  <button class="as-btn-primary" id="push-enable" onclick="pushEnable()">Benachrichtigungen aktivieren</button>
+  <div id="push-cmd-wrap" style="display:none;margin-top:16px">
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 6px">
+      Fast geschafft: Sende diesen Code an deinen Telegram-Bot, um Push zu bestätigen.
+    </p>
+    <div class="as-cmd-box" id="push-cmd-text"></div>
+    <button class="tg-copy-btn" onclick="pushCopyCmd()">Kopieren</button>
+  </div>
+  <p id="push-msg" style="font-size:13px;font-family:var(--sans);margin:12px 0 0;color:var(--accent)"></p>
+</div>
+
+<script>
+(function(){
+  var section=document.getElementById('push-section');
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.VAPID_PUBLIC_KEY){
+    return;  // Push nicht unterstützt oder kein Schlüssel — Block bleibt verborgen.
+  }
+  section.style.display='';
+
+  function urlB64ToUint8(base64){
+    var pad='='.repeat((4-base64.length%4)%4);
+    var b=(base64+pad).replace(/-/g,'+').replace(/_/g,'/');
+    var raw=atob(b),arr=new Uint8Array(raw.length);
+    for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+    return arr;
+  }
+
+  window.pushEnable=function(){
+    var msg=document.getElementById('push-msg');
+    Notification.requestPermission().then(function(perm){
+      if(perm!=='granted'){msg.textContent='Benachrichtigungen wurden nicht erlaubt.';return;}
+      return navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(existing){
+          return existing||reg.pushManager.subscribe({
+            userVisibleOnly:true,
+            applicationServerKey:urlB64ToUint8(window.VAPID_PUBLIC_KEY)
+          });
+        });
+      }).then(function(sub){
+        var blob=btoa(JSON.stringify(sub)).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+        document.getElementById('push-cmd-text').textContent='/push '+blob;
+        document.getElementById('push-cmd-wrap').style.display='';
+        msg.textContent='';
+      });
+    }).catch(function(e){msg.textContent='Aktivierung fehlgeschlagen: '+e.message;});
+  };
+
+  window.pushCopyCmd=function(){
+    var t=document.getElementById('push-cmd-text').textContent;
+    navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){
+      var b=document.querySelector('#push-cmd-wrap .tg-copy-btn');
+      b.textContent='✓ Kopiert';setTimeout(function(){b.textContent='Kopieren';},2000);
+    });
+  };
+})();
+</script>
+"""
 
 
 def build_archiv_index(editions: list) -> None:
@@ -701,7 +770,7 @@ _MANIFEST = {
 # Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
 # damit ein Deploy alte Caches verdrängt.
 _SERVICE_WORKER = """\
-const CACHE = 'auf-stand-v1';
+const CACHE = 'auf-stand-v2';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -748,16 +817,41 @@ self.addEventListener('fetch', function(e){
     });
   }));
 });
+
+// Web-Push: Notification anzeigen und bei Klick die PWA öffnen.
+self.addEventListener('push', function(e){
+  var d = {};
+  try { d = e.data.json(); } catch(err){}
+  e.waitUntil(self.registration.showNotification(d.title || 'Auf Stand', {
+    body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
+    data: { url: d.url || './index.html' }, tag: 'lagebild'
+  }));
+});
+
+self.addEventListener('notificationclick', function(e){
+  e.notification.close();
+  var target = (e.notification.data && e.notification.data.url) || './index.html';
+  e.waitUntil(clients.matchAll({type:'window'}).then(function(list){
+    for(var i=0;i<list.length;i++){ if('focus' in list[i]) return list[i].focus(); }
+    if(clients.openWindow) return clients.openWindow(target);
+  }));
+});
 """
 
 
 def _write_pwa_assets() -> None:
-    """Schreibt Web-App-Manifest und Service Worker (Icons liegen als statische Dateien)."""
+    """Schreibt Web-App-Manifest, Service Worker und Push-Config (Public-Key)."""
+    import os
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     (SITE_DIR / "manifest.webmanifest").write_text(
         json.dumps(_MANIFEST, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     (SITE_DIR / "sw.js").write_text(_SERVICE_WORKER, encoding="utf-8")
+    # VAPID-Public-Key (öffentlich) für den Client. Leer ⇒ Push-UI bleibt verborgen.
+    vapid_public = os.environ.get("VAPID_PUBLIC_KEY", "")
+    (SITE_DIR / "push-config.js").write_text(
+        f'window.VAPID_PUBLIC_KEY = "{vapid_public}";\n', encoding="utf-8"
+    )
 
 
 def build_site() -> Path:

@@ -1,4 +1,4 @@
-const CACHE = 'auf-stand-v1';
+const CACHE = 'auf-stand-v2';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -43,5 +43,24 @@ self.addEventListener('fetch', function(e){
     return caches.match(req).then(function(hit){
       return hit || caches.match('./index.html');
     });
+  }));
+});
+
+// Web-Push: Notification anzeigen und bei Klick die PWA öffnen.
+self.addEventListener('push', function(e){
+  var d = {};
+  try { d = e.data.json(); } catch(err){}
+  e.waitUntil(self.registration.showNotification(d.title || 'Auf Stand', {
+    body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
+    data: { url: d.url || './index.html' }, tag: 'lagebild'
+  }));
+});
+
+self.addEventListener('notificationclick', function(e){
+  e.notification.close();
+  var target = (e.notification.data && e.notification.data.url) || './index.html';
+  e.waitUntil(clients.matchAll({type:'window'}).then(function(list){
+    for(var i=0;i<list.length;i++){ if('focus' in list[i]) return list[i].focus(); }
+    if(clients.openWindow) return clients.openWindow(target);
   }));
 });

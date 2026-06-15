@@ -215,6 +215,22 @@ def save_topic_articles(state: dict, topics: list, articles: list) -> None:
     state["topic_articles"] = result
 
 
+def add_push_subscription(state: dict, sub: dict) -> None:
+    """Speichert eine Web-Push-Subscription (dedupliziert per Endpoint)."""
+    endpoint = sub.get("endpoint")
+    if not endpoint:
+        return
+    subs = state.setdefault("push_subscriptions", [])
+    if not any(s.get("endpoint") == endpoint for s in subs):
+        subs.append(sub)
+
+
+def remove_push_subscription(state: dict, endpoint: str) -> None:
+    """Entfernt eine abgemeldete/abgelaufene Subscription."""
+    subs = state.get("push_subscriptions", [])
+    state["push_subscriptions"] = [s for s in subs if s.get("endpoint") != endpoint]
+
+
 def current_streak(state: dict) -> int:
     """Aufeinanderfolgende Kalendertage (bis heute) mit mindestens einer Ausgabe."""
     from datetime import date, timedelta

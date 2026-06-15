@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, render, state, synthesize, telegram
+from . import deliver, render, state, synthesize, telegram, webpush
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,6 +123,14 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         article_headings=article_headings or None,
     )
 
+    # Web-Push an PWA-Abonnenten (nur wenn VAPID konfiguriert ist).
+    if webpush.webpush_configured():
+        title_match = re.search(r"^#\s+(.+)$", lagebild, re.MULTILINE)
+        push_title = title_match.group(1).strip() if title_match else "Dein Lagebild"
+        push_body = article_headings[0] if article_headings else "Dein Lagebild ist da."
+        site_url = config.get("site_url", "https://unurk.github.io/auf-stand/")
+        webpush.send_push(push_title, push_body, site_url, current_state, config)
+
     if not keep_seen:
         points = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
         state.save_topic_articles(current_state, all_topics, result.articles)
@@ -165,7 +173,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site"])
+    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
@@ -190,6 +198,13 @@ def main() -> int:
         if args.command == "site":
             from . import webview
             webview.build_site()
+            return 0
+        if args.command == "vapid-keys":
+            pub, priv = webpush.generate_vapid_keys()
+            print("VAPID-Schlüsselpaar erzeugt — als GitHub-Secrets / in .env hinterlegen:\n")
+            print(f"VAPID_PUBLIC_KEY={pub}")
+            print(f"VAPID_PRIVATE_KEY={priv}")
+            print("VAPID_SUBJECT=mailto:unur@gmx.at")
             return 0
         if args.command == "test-fulltext":
             if not args.url:

@@ -1,6 +1,7 @@
 """Rückkanal: Beantwortet Telegram-Fragen auf Basis aktueller Presse-Artikel."""
 from __future__ import annotations
 
+import base64
 import json
 import os
 from pathlib import Path
@@ -122,6 +123,21 @@ def cmd_rueckkanal(config: dict) -> int:
                     tg.send_alert(f"ℹ️ Schlagwort #{kw} existiert bereits.", [chat_id])
             else:
                 tg.send_alert("Format: /thema-neu Name|Schlagwort", [chat_id])
+            continue
+
+        # /push <base64-blob> — Web-Push-Subscription aus der PWA registrieren
+        if text.startswith("/push"):
+            payload = text[5:].strip()
+            try:
+                pad = "=" * (-len(payload) % 4)
+                sub = json.loads(base64.urlsafe_b64decode(payload + pad))
+                state_module.add_push_subscription(current_state, sub)
+                state_module.save_state(current_state)
+                tg.send_alert("✅ Push-Benachrichtigungen aktiviert.", [chat_id])
+                print(f"Push-Abo registriert ({chat_id}).")
+            except Exception as exc:
+                print(f"Push-Code ungültig: {exc}")
+                tg.send_alert("❌ Push-Code ungültig. Bitte in der App neu erzeugen.", [chat_id])
             continue
 
         # Andere Slash-Befehle ignorieren

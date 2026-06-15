@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="manifest.webmanifest">
+  <script src="push-config.js"></script>
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -376,6 +377,69 @@ window.asDone=function(){
 window.asReset=function(){
   window.asOpen();
 };
+})();
+</script>
+
+<div id="push-section" style="display:none;border-top:1px solid var(--border);padding-top:24px;margin-top:36px">
+  <p style="font-size:15px;font-weight:600;font-family:var(--sans);margin:0 0 4px">🔔 Push-Benachrichtigungen</p>
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 14px;line-height:1.6">
+    Lass dich benachrichtigen, sobald ein neues Lagebild da ist — direkt aufs Gerät,
+    ohne die App zu öffnen. (Auf dem iPhone zuerst „Zum Home-Bildschirm" hinzufügen.)
+  </p>
+  <button class="as-btn-primary" id="push-enable" onclick="pushEnable()">Benachrichtigungen aktivieren</button>
+  <div id="push-cmd-wrap" style="display:none;margin-top:16px">
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 6px">
+      Fast geschafft: Sende diesen Code an deinen Telegram-Bot, um Push zu bestätigen.
+    </p>
+    <div class="as-cmd-box" id="push-cmd-text"></div>
+    <button class="tg-copy-btn" onclick="pushCopyCmd()">Kopieren</button>
+  </div>
+  <p id="push-msg" style="font-size:13px;font-family:var(--sans);margin:12px 0 0;color:var(--accent)"></p>
+</div>
+
+<script>
+(function(){
+  var section=document.getElementById('push-section');
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.VAPID_PUBLIC_KEY){
+    return;  // Push nicht unterstützt oder kein Schlüssel — Block bleibt verborgen.
+  }
+  section.style.display='';
+
+  function urlB64ToUint8(base64){
+    var pad='='.repeat((4-base64.length%4)%4);
+    var b=(base64+pad).replace(/-/g,'+').replace(/_/g,'/');
+    var raw=atob(b),arr=new Uint8Array(raw.length);
+    for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+    return arr;
+  }
+
+  window.pushEnable=function(){
+    var msg=document.getElementById('push-msg');
+    Notification.requestPermission().then(function(perm){
+      if(perm!=='granted'){msg.textContent='Benachrichtigungen wurden nicht erlaubt.';return;}
+      return navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(existing){
+          return existing||reg.pushManager.subscribe({
+            userVisibleOnly:true,
+            applicationServerKey:urlB64ToUint8(window.VAPID_PUBLIC_KEY)
+          });
+        });
+      }).then(function(sub){
+        var blob=btoa(JSON.stringify(sub)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+        document.getElementById('push-cmd-text').textContent='/push '+blob;
+        document.getElementById('push-cmd-wrap').style.display='';
+        msg.textContent='';
+      });
+    }).catch(function(e){msg.textContent='Aktivierung fehlgeschlagen: '+e.message;});
+  };
+
+  window.pushCopyCmd=function(){
+    var t=document.getElementById('push-cmd-text').textContent;
+    navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){
+      var b=document.querySelector('#push-cmd-wrap .tg-copy-btn');
+      b.textContent='✓ Kopiert';setTimeout(function(){b.textContent='Kopieren';},2000);
+    });
+  };
 })();
 </script>
 
