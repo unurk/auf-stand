@@ -297,24 +297,24 @@ def _ressort_tag(match: re.Match) -> str:
 
 
 def _add_article_feedback(content: str, datum: str, edition: str) -> str:
-    """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel (vor dem <hr>) ein."""
-    if 'class="article-fb"' in content:
-        return content
-    blocks = content.split("<hr>")
-    result = []
+    """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel ein."""
+    content = re.sub(r'\n?<div class="article-fb".*?</div>', "", content)
     idx = 0
-    for block in blocks:
-        if re.search(r"<h2>[1-9]", block):
-            key = f"{datum}|{edition}|{idx}"
-            block = block.rstrip() + (
-                f'\n<div class="article-fb" data-key="{key}">'
-                f'<button class="fb-btn" data-vote="up">👍 Relevant</button>'
-                f'<button class="fb-btn" data-vote="down">👎</button>'
-                f"</div>"
-            )
-            idx += 1
-        result.append(block)
-    return "<hr>".join(result)
+
+    def _insert(m: re.Match) -> str:
+        nonlocal idx
+        key = f"{datum}|{edition}|{idx}"
+        idx += 1
+        bar = (
+            f'\n<div class="article-fb" data-key="{key}">'
+            f'<button class="fb-btn" data-vote="up">👍 Relevant</button>'
+            f'<button class="fb-btn" data-vote="down">👎</button>'
+            f"</div>"
+        )
+        return m.group(0).rstrip() + bar
+
+    # Jeder Artikel reicht von <h2>[Ziffer] bis zum nächsten <h2>[Ziffer] oder <hr>
+    return re.sub(r"<h2>[1-9].*?(?=<h2>[1-9]|<hr>)", _insert, content, flags=re.DOTALL)
 
 
 def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
