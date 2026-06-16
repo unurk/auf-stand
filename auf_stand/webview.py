@@ -82,9 +82,13 @@ _PAGE_TEMPLATE = """\
             --serif: 'Libre Caslon Text', Georgia, 'Times New Roman', serif;
             --sans: 'Libre Franklin', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
     body { background: var(--bg); color: var(--text); font-family: Georgia, serif;
-           font-size: 18px; line-height: 1.65; padding-bottom: 76px;
-           -webkit-font-smoothing: antialiased; }
+           font-size: 18px; line-height: 1.65;
+           -webkit-font-smoothing: antialiased;
+           display: flex; flex-direction: column;
+           height: 100vh; height: -webkit-fill-available; overflow: hidden; }
+    .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     a { color: var(--accent-bright); text-decoration: none; }
     a:hover { text-decoration: underline; }
     /* ── Masthead ── */
@@ -185,9 +189,10 @@ _PAGE_TEMPLATE = """\
     .empty-state { color: var(--muted); font-style: italic; padding: 40px 0; text-align: center;
                    font-family: var(--sans); font-size: 15px; }
     /* ── Tab-Leiste unten ── */
-    .tabbar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+    .tabbar { height: 64px; flex-shrink: 0;
               background: #ffffff; border-top: 1px solid var(--border);
-              display: flex; z-index: 10; }
+              display: flex; z-index: 10;
+              padding-bottom: env(safe-area-inset-bottom); }
     .tab { flex: 1; display: flex; flex-direction: column; align-items: center;
            justify-content: center; gap: 3px; color: var(--muted);
            font-family: var(--sans); font-size: 10px;
@@ -268,12 +273,14 @@ _PAGE_TEMPLATE = """\
   </style>
 </head>
 <body>
+<div class="scroll-area">
 <header class="masthead">
   <div class="wordmark">Die Presse</div>
   <div class="sublabel">Auf Stand</div>
 </header>
 <div class="wrap">
 __CONTENT__
+</div>
 </div>
 <nav class="tabbar">
   <a href="__ROOT__index.html" class="tab __NAV_LAGEBILD__">__ICON_HOME__<span>Lagebild</span></a>
