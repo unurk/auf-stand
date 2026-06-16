@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
-  <link rel="manifest" href="manifest.webmanifest">
-  <script src="push-config.js"></script>
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../push-config.js"></script>
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Auf Stand">
@@ -225,11 +225,10 @@
   <div class="sublabel">Auf Stand</div>
 </header>
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Di, 16. Jun · Morgen-Ausgabe</p><h1>Ein neuer Tag.</h1><p class="byline">Von der „Presse“-Redaktion · 3 Themen · ca. 2 Min.</p></header>
-<p class="next-edition">Nächstes Lagebild: heute 11:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p><div class="highlights"><p><strong>Heute wichtig:</strong></p>
-  <p>1️⃣ Iran-Atomabkommen: USA und Iran einigen sich auf Uran-Vernichtung</p>
-  <p>2️⃣ Japans Notenbank erhöht Leitzins auf 31-Jahres-Hoch</p>
-  <p>3️⃣ Österreich startet WM-Kampagne gegen Jordanien</p>
+<header class="lagebild-header"><p class="kicker">Di, 16. Jun · Mittags-Ausgabe</p><h1>Guten Tag.</h1><p class="byline">Von der „Presse“-Redaktion · 3 Themen · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+  <p>1️⃣ Post erhöht Paketgebühren – bis zu sieben Euro Mehrkosten</p>
+  <p>2️⃣ Ölpreis sinkt nach Iran-Einigung – aber Entspannung bleibt begrenzt</p>
+  <p>3️⃣ Trump telefoniert mit Putin über Ukraine-Lösungen</p>
   </div><hr>
   <h2>1️⃣ 📊 Post belastet Online-Käufer mit bis zu sieben Euro neuen Gebühren</h2>
   <p><strong>Was ist neu:</strong> Die Österreichische Post führt heuer im zweiten Halbjahr drei neue Paketgebühren ein, die Konsumenten beim Online-Shopping deutlich treffen. Die Gesamtbelastung kann bis zu sieben Euro pro Bestellung ausmachen. Die Post selbst erwartet deswegen im Paketgeschäft einen „ordentlichen Dämpfer&quot; — obwohl das Paketgeschäft seit Jahren wächst.</p>
@@ -251,9 +250,9 @@
 </div>
 </div>
 <nav class="tabbar">
-  <a href="index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
-  <a href="dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
-  <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
+  <a href="../index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
+  <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
 <script>
@@ -277,7 +276,7 @@
   // PWA: Service Worker registrieren (Offline-Cache, „Auf Home Screen").
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
 })();
