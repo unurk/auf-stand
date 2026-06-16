@@ -1,7 +1,7 @@
 {
-  "name": "Auf Stand · Die Presse",
-  "short_name": "Auf Stand",
-  "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden auf Stand.",
+  "name": "Copilot · Die Presse",
+  "short_name": "Copilot",
+  "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden informiert.",
   "lang": "de-AT",
   "dir": "ltr",
   "start_url": "./index.html",

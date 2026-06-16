@@ -1,4 +1,4 @@
-const CACHE = 'auf-stand-v2';
+const CACHE = 'copilot-v1';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -50,7 +50,7 @@ self.addEventListener('fetch', function(e){
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}
-  e.waitUntil(self.registration.showNotification(d.title || 'Auf Stand', {
+  e.waitUntil(self.registration.showNotification(d.title || 'Copilot', {
     body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
     data: { url: d.url || './index.html' }, tag: 'lagebild'
   }));
