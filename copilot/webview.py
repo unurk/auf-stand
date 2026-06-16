@@ -31,7 +31,7 @@ _EDITIONS_RE = "morgen|mittag|nachmittag|abend|catchup"
 _FILENAME_RE = re.compile(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})\.html$")
 
 # ---------------------------------------------------------------------------
-# Design-System — Die Presse · Auf Stand (Dark, im Look der echten App)
+# Design-System — Die Presse · Copilot (Dark, im Look der echten App)
 # Platzhalter: __TITLE__  __ROOT__  __NAV_LAGEBILD__  __NAV_DOSSIER__
 #              __NAV_ARCHIV__  __CONTENT__
 # ---------------------------------------------------------------------------
@@ -65,14 +65,14 @@ _PAGE_TEMPLATE = """\
   <link rel="apple-touch-icon" href="__ROOT__apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Auf Stand">
-  <meta name="application-name" content="Auf Stand">
+  <meta name="apple-mobile-web-app-title" content="Copilot">
+  <meta name="application-name" content="Copilot">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <title>__TITLE__ · Die Presse · Auf Stand</title>
+  <title>__TITLE__ · Die Presse · Copilot</title>
   <style>
-    /* Auf Stand — helles, ruhiges Redaktions-Layout im Geist der New York Times:
+    /* Copilot — helles, ruhiges Redaktions-Layout im Geist der New York Times:
        Schwarz auf Weiß, viel Weißraum, ein einziger zurückhaltender Akzent (Link-Blau).
        Schriften: Libre Caslon Text (Headlines), Libre Franklin (UI), Georgia (Fließtext). */
     :root { --bg: #ffffff; --surface: #f7f6f3;
@@ -276,7 +276,7 @@ _PAGE_TEMPLATE = """\
 <div class="scroll-area">
 <header class="masthead">
   <div class="wordmark">Die Presse</div>
-  <div class="sublabel">Auf Stand</div>
+  <div class="sublabel">Copilot</div>
 </header>
 <div class="wrap">
 __CONTENT__
@@ -688,7 +688,7 @@ def build_dossier(
 
     assessment_html = f"""
 <div id="as-intro">
-  <p class="as-intro-text">Wähle die Themen aus, über die du regelmäßig auf Stand gehalten werden möchtest. Die Fragen helfen dir einzuschätzen, was für dich relevant ist.</p>
+  <p class="as-intro-text">Wähle die Themen aus, über die du regelmäßig informiert werden möchtest. Die Fragen helfen dir einzuschätzen, was für dich relevant ist.</p>
   <button class="as-btn-primary" onclick="asOpen()">Themen auswählen →</button>
 </div>
 
@@ -732,8 +732,16 @@ def build_dossier(
 <script>
 (function(){{
 var TOPICS={topics_js};
-var PREF_KEY='auf_stand_prefs';
-var CUSTOM_KEY='auf_stand_custom';
+var PREF_KEY='copilot_prefs';
+var CUSTOM_KEY='copilot_custom';
+var OLD_PREF_KEY='auf_stand_prefs';
+var OLD_CUSTOM_KEY='auf_stand_custom';
+if(!localStorage.getItem(PREF_KEY) && localStorage.getItem(OLD_PREF_KEY)){{
+  localStorage.setItem(PREF_KEY, localStorage.getItem(OLD_PREF_KEY));
+}}
+if(!localStorage.getItem(CUSTOM_KEY) && localStorage.getItem(OLD_CUSTOM_KEY)){{
+  localStorage.setItem(CUSTOM_KEY, localStorage.getItem(OLD_CUSTOM_KEY));
+}}
 var selected=new Set();
 var customTopics=[];
 
@@ -927,9 +935,9 @@ def build_archiv_index(editions: list) -> None:
 
 
 _MANIFEST = {
-    "name": "Auf Stand · Die Presse",
-    "short_name": "Auf Stand",
-    "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden auf Stand.",
+    "name": "Copilot · Die Presse",
+    "short_name": "Copilot",
+    "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden informiert.",
     "lang": "de-AT",
     "dir": "ltr",
     "start_url": "./index.html",
@@ -950,7 +958,7 @@ _MANIFEST = {
 # Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
 # damit ein Deploy alte Caches verdrängt.
 _SERVICE_WORKER = """\
-const CACHE = 'auf-stand-v2';
+const CACHE = 'copilot-v1';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
@@ -1002,7 +1010,7 @@ self.addEventListener('fetch', function(e){
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}
-  e.waitUntil(self.registration.showNotification(d.title || 'Auf Stand', {
+  e.waitUntil(self.registration.showNotification(d.title || 'Copilot', {
     body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
     data: { url: d.url || './index.html' }, tag: 'lagebild'
   }));
@@ -1142,7 +1150,7 @@ def build_site() -> Path:
     if streak >= 2:
         latest_content = _insert_after_header(
             latest_content,
-            f'<div class="streak">🔥 {streak} Tage in Folge auf Stand</div>\n',
+            f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n',
         )
     # Dezente Rhythmus-Zeile direkt unter dem Header (nur Startseite).
     hint = _next_edition_hint(latest_edition)

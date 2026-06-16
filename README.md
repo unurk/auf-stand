@@ -1,4 +1,4 @@
-# Auf Stand — MVP
+# Copilot — MVP
 
 Prototyp für das Konzept „Die Presse als Hintergrund-Dienst": 1–2x täglich ein
 **Lagebild** (3–5 materielle Entwicklungen je nach Nachrichtenlage, rund 90 Sekunden
@@ -17,20 +17,20 @@ cp .env.example .env    # ANTHROPIC_API_KEY eintragen (console.anthropic.com)
 
 ```bash
 # 1. Feeds verifizieren (URLs können sich ändern):
-python -m auf_stand.main feeds
+python -m copilot.main feeds
 
 # 2. Pipeline ohne API-Kosten testen — baut den Prompt und legt ihn in out/ ab:
-python -m auf_stand.main morgen --dry-run
+python -m copilot.main morgen --dry-run
 
 # 3. Erstes echtes Lagebild erzeugen (braucht ANTHROPIC_API_KEY in .env):
-python -m auf_stand.main morgen
+python -m copilot.main morgen
 # -> out/JJJJ-MM-TT-morgen.md und .html (im Browser öffnen)
 
 # 17-Uhr-Update (zeigt nur, was seit der Morgen-Ausgabe neu ist):
-python -m auf_stand.main abend
+python -m copilot.main abend
 
 # Nach Urlaub/Pause:
-python -m auf_stand.main catchup
+python -m copilot.main catchup
 ```
 
 `--keep-seen` verhindert beim Testen, dass Artikel als „gesehen" markiert werden.
@@ -47,8 +47,8 @@ kein Login-Scraping bauen.
 macOS/Linux, `crontab -e`:
 
 ```
-0 6  * * * cd /pfad/zu/auf-stand && .venv/bin/python -m auf_stand.main morgen
-0 17 * * * cd /pfad/zu/auf-stand && .venv/bin/python -m auf_stand.main abend
+0 6  * * * cd /pfad/zu/auf-stand && .venv/bin/python -m copilot.main morgen
+0 17 * * * cd /pfad/zu/auf-stand && .venv/bin/python -m copilot.main abend
 ```
 
 E-Mail-Versand: SMTP-Daten in `.env`, Empfänger in `config.yaml` unter `recipients`.
@@ -58,7 +58,7 @@ E-Mail-Versand: SMTP-Daten in `.env`, Empfänger in `config.yaml` unter `recipie
 Im Projektordner `claude` starten — `CLAUDE.md` gibt Kontext, Konventionen und
 die Roadmap vor. Sinnvolle erste Aufträge:
 
-1. „Führe `python -m auf_stand.main feeds` aus und repariere ggf. die Feed-URLs
+1. „Führe `python -m copilot.main feeds` aus und repariere ggf. die Feed-URLs
    in config.yaml."
 2. „Erzeuge ein Lagebild mit --dry-run, lies den Prompt in out/ und schlage
    Verbesserungen am Auswahlprinzip in prompts/lagebild.md vor."

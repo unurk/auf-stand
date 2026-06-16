@@ -54,30 +54,30 @@ jobs:
           mkdir -p data out
           SCHEDULE="${{ github.event.schedule }}"
           if [ "$SCHEDULE" = "0 7 * * 6" ]; then
-            python -m auf_stand.main woche
+            python -m copilot.main woche
           elif [ "$SCHEDULE" = "10 4 * * *" ]; then
-            python -m auf_stand.main morgen
+            python -m copilot.main morgen
           elif [ "$SCHEDULE" = "10 9 * * *" ]; then
-            python -m auf_stand.main mittag
+            python -m copilot.main mittag
           elif [ "$SCHEDULE" = "10 14 * * *" ]; then
-            python -m auf_stand.main nachmittag
+            python -m copilot.main nachmittag
           elif [ "$SCHEDULE" = "10 18 * * *" ]; then
-            python -m auf_stand.main abend
+            python -m copilot.main abend
           else
             # Externer Cron-Trigger (cron-job.org) oder manueller Start:
             # Ausgabe anhand von Uhrzeit + Wochentag bestimmen (vier Presse-Blöcke).
             HOUR=$(date -u +%H)
             DOW=$(date -u +%u)   # 1=Mo … 6=Sa, 7=So
             if [ "$DOW" = "6" ] && [ "$HOUR" = "07" ]; then
-              python -m auf_stand.main woche
+              python -m copilot.main woche
             elif [ "$HOUR" -le "08" ]; then
-              python -m auf_stand.main morgen
+              python -m copilot.main morgen
             elif [ "$HOUR" -le "13" ]; then
-              python -m auf_stand.main mittag
+              python -m copilot.main mittag
             elif [ "$HOUR" -le "18" ]; then
-              python -m auf_stand.main nachmittag
+              python -m copilot.main nachmittag
             else
-              python -m auf_stand.main abend
+              python -m copilot.main abend
             fi
           fi
 
@@ -86,14 +86,14 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python -m auf_stand.main rueckkanal
+        run: python -m copilot.main rueckkanal
 
       - name: Web-Ansicht bauen und committen
         if: always() && github.ref == 'refs/heads/master'
         env:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
         run: |
-          python -m auf_stand.main site
+          python -m copilot.main site
           if [ -n "$(git status --porcelain site)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -135,4 +135,4 @@ jobs:
         run: |
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
             -d chat_id=8962080832 \
-            -d text="❌ Auf Stand: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"
+            -d text="❌ Copilot: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"

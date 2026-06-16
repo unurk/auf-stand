@@ -1,7 +1,7 @@
-# Auf Stand — Konfiguration
+# Copilot — Konfiguration
 
 # Öffentliche RSS-Feeds der Presse (Headlines + Teaser).
-# Beim ersten Lauf mit `python -m auf_stand.main feeds` verifizieren —
+# Beim ersten Lauf mit `python -m copilot.main feeds` verifizieren —
 # URL-Schema kann sich ändern. Weitere Ressorts: EU, Recht, Tech, Science, Meinung …
 feeds:
   - name: Startseite
@@ -131,7 +131,7 @@ termine:
 # E-Mail-Versand (optional). SMTP-Zugang kommt aus .env — hier nur Empfänger.
 # Leer lassen, solange nur Dateien in out/ erzeugt werden sollen.
 recipients: []
-mail_subject_prefix: "Auf Stand"
+mail_subject_prefix: "Copilot"
 
 # Telegram-Versand (optional). Bot-Token kommt aus .env — hier nur Chat-IDs.
 # Chat-ID herausfinden: Bot starten, https://api.telegram.org/bot<TOKEN>/getUpdates aufrufen.

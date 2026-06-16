@@ -117,7 +117,7 @@ def send_audio(path, caption: str, chat_ids: list[str], title: str | None = None
         print("Telegram nicht konfiguriert — Audio-Versand übersprungen.")
         return
     url = f"https://api.telegram.org/bot{token}/sendAudio"
-    data = {"chat_id": "", "caption": caption, "performer": "Die Presse · Auf Stand"}
+    data = {"chat_id": "", "caption": caption, "performer": "Die Presse · Copilot"}
     if title:
         data["title"] = title
     for chat_id in chat_ids:

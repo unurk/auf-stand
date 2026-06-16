@@ -39,7 +39,7 @@ HTML_TEMPLATE = """<!doctype html>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand">Die Presse · Auf Stand</div>
+  <div class="brand">Die Presse · Copilot</div>
   {body}
 </div>
 </body>
@@ -65,7 +65,7 @@ def _markdown_to_html(markdown: str) -> str:
             out.append(f"<h1>{escaped[2:]}</h1>")
         elif line.startswith("## "):
             out.append(f"<h2>{escaped[3:]}</h2>")
-        elif "auf Stand ✓" in line:
+        elif "Du bist informiert" in line:
             out.append(f'<div class="done">{escaped.strip("<em></em>")}</div>')
         else:
             out.append(f"<p>{escaped}</p>")
@@ -76,7 +76,7 @@ def insert_reporters_footer(markdown: str) -> str:
     """Sammelt die je Punkt genannten „Bericht: …"-Namen zu einer Fußzeile.
 
     Zählt nur, was tatsächlich im Text steht (keine erfundenen Namen). Setzt die Zeile
-    direkt vor die „Du bist auf Stand"-Abschlusszeile, sonst ans Ende.
+    direkt vor die „Du bist informiert"-Abschlusszeile, sonst ans Ende.
     """
     names: list[str] = []
     for m in re.finditer(r"Bericht:\s*([^)·\n]+)", markdown):
@@ -94,7 +94,7 @@ def insert_reporters_footer(markdown: str) -> str:
     footer = f"*Heute mit Berichterstattung von: {joined} · Die Presse*"
     lines = markdown.splitlines()
     for i, line in enumerate(lines):
-        if "Du bist auf Stand" in line:
+        if "Du bist informiert" in line:
             lines.insert(i, footer)
             lines.insert(i + 1, "")
             return "\n".join(lines)

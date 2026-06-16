@@ -62,7 +62,7 @@ def build_image(stats: dict, path: Path) -> Path:
     fig.patch.set_facecolor(BG)
 
     # Kopf
-    fig.text(0.5, 0.93, "DIE PRESSE · AUF STAND", ha="center",
+    fig.text(0.5, 0.93, "DIE PRESSE · COPILOT", ha="center",
              fontsize=15, color=MUTED, family="sans-serif")
     fig.text(0.5, 0.855, "Deine Wochen-Quittung", ha="center",
              fontsize=44, color=INK, family="serif", weight="bold")
@@ -98,7 +98,7 @@ def build_image(stats: dict, path: Path) -> Path:
 
     # Fazit
     fig.text(0.5, 0.175,
-             f"Du warst {stats['days_on_stand']} von 7 Tagen auf Stand",
+             f"Du warst {stats['days_on_stand']} von 7 Tagen informiert",
              ha="center", fontsize=24, color=GREEN, family="serif", weight="bold")
     fig.text(0.5, 0.115,
              f"Verdichtet aus {stats['articles']} Artikeln in {stats['editions']} "
@@ -128,7 +128,7 @@ def cmd_woche(config: dict) -> int:
     caption = (
         f"📬 Deine Wochen-Quittung: {stats['points']} Entwicklungen aus "
         f"{stats['articles']} Artikeln, in ca. {stats['minutes']} Minuten. "
-        f"Du warst {stats['days_on_stand']}/7 Tagen auf Stand ✓"
+        f"Du warst {stats['days_on_stand']}/7 Tagen informiert ✓"
     )
     telegram.send_photo(image, caption, config.get("telegram_chat_ids", []))
     print(f"Quittung erzeugt: {image}")

@@ -1,4 +1,4 @@
-"""CLI: python -m auf_stand.main morgen|mittag|nachmittag|abend|catchup|feeds [--dry-run] [--keep-seen]"""
+"""CLI: python -m copilot.main morgen|mittag|nachmittag|abend|catchup|feeds [--dry-run] [--keep-seen]"""
 from __future__ import annotations
 
 import argparse
@@ -136,7 +136,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     md_path, html_path = render.write_output(lagebild, edition)
     print(f"Lagebild erzeugt:\n  {md_path}\n  {html_path}")
 
-    subject = f"{config.get('mail_subject_prefix', 'Auf Stand')} — {edition_config.get('label', edition)}"
+    subject = f"{config.get('mail_subject_prefix', 'Copilot')} — {edition_config.get('label', edition)}"
     deliver.send_email(
         subject, lagebild, html_path.read_text(encoding="utf-8"), config.get("recipients", [])
     )
@@ -221,7 +221,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
-    parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
+    parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
@@ -265,7 +265,7 @@ def main() -> int:
         return run_edition(args.command, config, args.dry_run, args.keep_seen)
     except Exception as exc:
         telegram.send_alert(
-            f"❌ Auf Stand: Lauf '{args.command}' fehlgeschlagen: {exc}",
+            f"❌ Copilot: Lauf '{args.command}' fehlgeschlagen: {exc}",
             config.get("telegram_chat_ids", []),
         )
         raise

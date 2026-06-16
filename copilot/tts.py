@@ -69,9 +69,9 @@ def _to_speech_text(markdown: str) -> str:
         # E-Paper-Footer komplett weglassen.
         if "E-Paper" in line:
             continue
-        # Abschluss-Zeile: nur „Du bist auf Stand." behalten, Lesezeit/Verweis weg.
-        if "auf Stand" in line and "Lesezeit" in line:
-            lines.append("Du bist auf Stand.")
+        # Abschluss-Zeile: nur „Du bist informiert." behalten, Lesezeit/Verweis weg.
+        if "informiert" in line and "Lesezeit" in line:
+            lines.append("Du bist informiert.")
             continue
         # Links: nur den sichtbaren Text behalten, URL verwerfen.
         line = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", line)

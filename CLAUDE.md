@@ -1,4 +1,4 @@
-# Auf Stand — Die Presse als Hintergrund-Dienst (MVP)
+# Copilot — Die Presse als Hintergrund-Dienst (MVP)
 
 ## Was dieses Projekt ist
 
@@ -7,7 +7,7 @@ die Nutzerin **4× täglich** ein **Lagebild** — eine redaktionelle Synthese v
 Entwicklungen je nach Nachrichtenlage (an ruhigen Tagen weniger), die sich materiell
 geändert haben. Die vier Ausgaben sind an den **Presse-Kuratierungstakt** (Rebrush 2026)
 angedockt: **06:00 · 11:00 · 16:00 · 20:00 Uhr**. Lesezeit rund 90 Sekunden (an dichten
-Tagen etwas mehr), am Ende das Signal „Du bist auf Stand ✓". Vorbild ist die Produktlogik
+Tagen etwas mehr), am Ende das Signal „Du bist informiert ✓". Vorbild ist die Produktlogik
 von WHOOP: arbeitet im Hintergrund, verdichtet, meldet sich nur zu relevanten Momenten.
 
 Wichtigste Produktregel: **Wir optimieren auf Time-to-Informed (kurz!), nicht auf
@@ -17,13 +17,13 @@ widerspricht dem Produkt und wird nicht gebaut.
 ## Architektur
 
 ```
-auf_stand/
+copilot/
   fetch.py       RSS-Feeds der Presse holen & normalisieren (nur öffentliche Teaser)
   state.py       Gesehene Artikel in data/state.json -> Delta zwischen Ausgaben
   synthesize.py  Claude API: erzeugt das Lagebild aus Artikeln + Themen-Trackern
   render.py      Markdown- und HTML-Ausgabe nach out/
   deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
-  main.py        CLI: morgen | abend | catchup [--dry-run]
+  main.py        CLI: morgen | mittag | nachmittag | abend | catchup [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts)
 manual_input/    Hier können Volltexte (Premium) als .txt/.md abgelegt werden
@@ -48,7 +48,7 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
 ## Content-Zugang (wichtig)
 
 - RSS-Feeds (diepresse.com/rss/<Ressort>) sind öffentlich: Headlines + Teaser.
-  Feed-URLs beim ersten Lauf verifizieren (`python -m auf_stand.main feeds`).
+  Feed-URLs beim ersten Lauf verifizieren (`python -m copilot.main feeds`).
 - Volltexte: Der User hat ein Premium-Abo und arbeitet bei der Presse. Für den
   Prototyp werden Volltexte manuell in `manual_input/` abgelegt (Datei pro Artikel).
   KEIN Login-Scraping mit persönlichen Zugangsdaten bauen — für den echten Pilot
@@ -62,7 +62,7 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
 3. E-Mail-Versand an kleine Testgruppe (Concierge-MVP, siehe Konzeptpapier)
 4. 17-Uhr-Ausgabe als Audio: TTS-Anbindung (z. B. ElevenLabs/OpenAI TTS), mp3 nach out/
 5. Telegram-Bot als Push-Kanal (einfacher als WhatsApp Business API)
-6. Mini-Web-Ansicht mit „Auf Stand ✓"-Status (statisches HTML reicht zunächst)
+6. Mini-Web-Ansicht mit „Du bist informiert ✓"-Status (statisches HTML reicht zunächst)
 
 ## Was bewusst NICHT gebaut wird
 

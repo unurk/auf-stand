@@ -39,15 +39,15 @@ create_job() {
 }
 
 echo "→ Morgen-Ausgabe  (05:00 UTC = 07:00 Wien)..."
-create_job "Auf Stand · Morgen"  5 0 "-1"
+create_job "Copilot · Morgen"  5 0 "-1"
 echo " OK"
 
 echo "→ Abend-Ausgabe   (14:00 UTC = 16:00 Wien)..."
-create_job "Auf Stand · Abend"  14 0 "-1"
+create_job "Copilot · Abend"  14 0 "-1"
 echo " OK"
 
 echo "→ Wochen-Quittung (07:00 UTC Sa = 09:00 Wien)..."
-create_job "Auf Stand · Woche"   7 0 "6"
+create_job "Copilot · Woche"   7 0 "6"
 echo " OK"
 
 echo ""
