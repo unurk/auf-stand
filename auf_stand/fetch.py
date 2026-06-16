@@ -26,6 +26,7 @@ class Article:
     ressort: str
     published: datetime | None
     fulltext: str | None = None
+    author: str | None = None
 
     def age_hours(self) -> float | None:
         if not self.published:
@@ -42,6 +43,23 @@ class FetchResult:
 def _clean(text: str) -> str:
     text = TAG_RE.sub(" ", text or "")
     return html.unescape(re.sub(r"\s+", " ", text)).strip()
+
+
+def _author(entry) -> str | None:
+    """Autor aus dem Feed-Eintrag (dc:creator/author), bereinigt. None wenn leer."""
+    raw = entry.get("author")
+    if not raw:
+        authors = entry.get("authors")
+        if authors and isinstance(authors, list):
+            raw = authors[0].get("name") if isinstance(authors[0], dict) else None
+    if not raw:
+        return None
+    name = _clean(raw)
+    # E-Mail-Adressen verwerfen, „(Die Presse)"-Zusatz und führendes „Von " entfernen.
+    name = re.sub(r"\S+@\S+", "", name)
+    name = re.sub(r"\((?:die\s+)?presse\)", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"^[Vv]on\s+", "", name).strip(" ·,–—")
+    return name or None
 
 
 def _parse_date(entry) -> datetime | None:
@@ -71,6 +89,7 @@ def fetch_feed(name: str, url: str, max_articles: int) -> tuple[list[Article], s
                 link=link,
                 ressort=name,
                 published=_parse_date(entry),
+                author=_author(entry),
             )
         )
     return articles, None

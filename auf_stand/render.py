@@ -72,6 +72,35 @@ def _markdown_to_html(markdown: str) -> str:
     return "\n  ".join(out)
 
 
+def insert_reporters_footer(markdown: str) -> str:
+    """Sammelt die je Punkt genannten „Bericht: …"-Namen zu einer Fußzeile.
+
+    Zählt nur, was tatsächlich im Text steht (keine erfundenen Namen). Setzt die Zeile
+    direkt vor die „Du bist auf Stand"-Abschlusszeile, sonst ans Ende.
+    """
+    names: list[str] = []
+    for m in re.finditer(r"Bericht:\s*([^)·\n]+)", markdown):
+        name = m.group(1).strip()
+        if name and name not in names:
+            names.append(name)
+    if not names:
+        return markdown
+    if len(names) == 1:
+        joined = names[0]
+    elif len(names) == 2:
+        joined = f"{names[0]} und {names[1]}"
+    else:
+        joined = ", ".join(names[:-1]) + f" und {names[-1]}"
+    footer = f"*Heute mit Berichterstattung von: {joined} · Die Presse*"
+    lines = markdown.splitlines()
+    for i, line in enumerate(lines):
+        if "Du bist auf Stand" in line:
+            lines.insert(i, footer)
+            lines.insert(i + 1, "")
+            return "\n".join(lines)
+    return markdown.rstrip() + "\n\n" + footer
+
+
 def write_output(markdown: str, edition: str) -> tuple[Path, Path]:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y-%m-%d")
@@ -82,7 +111,7 @@ def write_output(markdown: str, edition: str) -> tuple[Path, Path]:
     title = title_match.group(1) if title_match else "Dein Lagebild"
     body = _markdown_to_html(markdown)
     body = body.replace(
-        "</h1>", '</h1>\n  <p class="byline">Von der Auf-Stand-Redaktion</p>', 1
+        "</h1>", '</h1>\n  <p class="byline">Von der „Presse“-Redaktion</p>', 1
     )
     html_path.write_text(
         HTML_TEMPLATE.format(title=html.escape(title), body=body),

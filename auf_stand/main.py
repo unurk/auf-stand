@@ -96,6 +96,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     lagebild = re.sub(
         r"Lesezeit ca\.\s*\d+\s*Sekunden", f"Lesezeit ca. {secs} Sekunden", lagebild
     )
+    # Redakteur:innen-Fußzeile aus den je Punkt genannten „Bericht: …"-Namen.
+    lagebild = render.insert_reporters_footer(lagebild)
     from . import epaper as epaper_module
     lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config))
     md_path, html_path = render.write_output(lagebild, edition)

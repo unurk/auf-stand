@@ -128,14 +128,15 @@ def build_prompt(
             article.published.strftime("%d.%m. %H:%M UTC") if article.published else "ohne Datum"
         )
         link_part = f"\n  Link: {article.link}" if article.link else ""
+        author_part = f" — Autor: {article.author}" if getattr(article, "author", None) else ""
         if article.fulltext:
             lines.append(
-                f"- [{article.ressort}] {article.title} ({published}){link_part}\n"
+                f"- [{article.ressort}] {article.title} ({published}){author_part}{link_part}\n"
                 f"  [VOLLTEXT]\n{article.fulltext}\n  [/VOLLTEXT]"
             )
         else:
             lines.append(
-                f"- [{article.ressort}] {article.title} ({published})\n  {article.teaser}{link_part}"
+                f"- [{article.ressort}] {article.title} ({published}){author_part}\n  {article.teaser}{link_part}"
             )
 
     return "\n".join(lines)

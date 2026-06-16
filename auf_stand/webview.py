@@ -135,6 +135,11 @@ _PAGE_TEMPLATE = """\
                    letter-spacing: 0.04em; text-decoration: none; }
     .source-link:hover { background: #284f6f; color: #ffffff;
                          text-decoration: none; }
+    .byline-source { font-family: var(--sans); font-size: 12px; font-style: italic;
+                     color: var(--muted); white-space: nowrap; }
+    .reporters { font-family: var(--sans); font-size: 13px; color: var(--muted);
+                 margin: 28px 0 0; padding-top: 16px;
+                 border-top: 1px solid var(--border); }
     /* ── Status / Done box ── */
     .done { border: 1px solid #cfe3d3; border-radius: 10px; padding: 14px 18px;
             background: #f0f7f1; color: #2e6b3f;
@@ -321,10 +326,25 @@ _RESSORT_HUE = {
 }
 
 
-def _ressort_tag(match: re.Match) -> str:
-    name = match.group(1).strip()
+# Redaktionelle Byline (zentral, damit alte Seiten beim Build normalisiert werden).
+_BYLINE = 'Von der „Presse“-Redaktion'
+
+
+def _ressort_tag_str(name: str) -> str:
+    name = name.strip()
     hue = _RESSORT_HUE.get(name.split("/")[0].split()[0].lower(), 24)
-    return f' <span class="ressort" style="--h:{hue}">{name}</span>'
+    return f'<span class="ressort" style="--h:{hue}">{name}</span>'
+
+
+def _meta_tag(m: re.Match) -> str:
+    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile."""
+    ressort, _, bericht = m.group(1).partition("·")
+    out = _ressort_tag_str(ressort)
+    if "Bericht:" in bericht:
+        name = bericht.split("Bericht:", 1)[1].strip()
+        if name:
+            out += f' <span class="byline-source">Bericht: {name}</span>'
+    return out + " "
 
 
 def _add_article_feedback(content: str, datum: str, edition: str) -> str:
@@ -359,23 +379,32 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
-    # Ressort am Punkt-Ende „… </a> (Politik)" → farbiger Tag (vor Link-Umbau).
+    # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
+    # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
     if 'class="ressort"' not in content:
-        content = re.sub(r'</a>\s*\(([^)]{2,30})\)', lambda m: "</a>" + _ressort_tag(m), content)
+        content = re.sub(
+            r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
+        )
     # Quell-Links als rote Primary-Pill auszeichnen.
     content = re.sub(
         r'<a href="([^"]+)">→ Artikel</a>',
         r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
         content,
     )
-    # Redaktionelle Byline direkt unter die H1 — deterministisch, damit sie nie fehlt.
+    # Redaktionelle Byline normalisieren (auch alte Archivseiten), sonst einsetzen.
+    content = re.sub(
+        r'<p class="byline">.*?</p>',
+        f'<p class="byline">{_BYLINE}</p>', content, count=1, flags=re.DOTALL,
+    )
     if 'class="byline"' not in content:
         content = re.sub(
-            r"(</h1>)",
-            r'\1\n<p class="byline">Von der Auf-Stand-Redaktion</p>',
-            content,
-            count=1,
+            r"(</h1>)", rf'\1\n<p class="byline">{_BYLINE}</p>', content, count=1
         )
+    # Redakteur:innen-Fußzeile als eigene Klasse auszeichnen.
+    content = re.sub(
+        r'<p><em>(Heute mit Berichterstattung von:.*?)</em></p>',
+        r'<p class="reporters">\1</p>', content, count=1, flags=re.DOTALL,
+    )
     # „Heute wichtig" + die nummerierten Zeilen zu einer Highlight-Box bündeln.
     # Nur einmal — beim erneuten Rendern ist die Box schon vorhanden.
     if 'class="highlights"' not in content:
