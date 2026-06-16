@@ -100,6 +100,12 @@ _PAGE_TEMPLATE = """\
              text-transform: uppercase; color: var(--accent); font-weight: 700; }
     em { font-style: italic; color: var(--muted); }
     hr { border: none; border-top: 1px solid var(--border); margin: 34px 0; }
+    /* ── Lagebild-Kopf (Kicker · Begrüßung · Meta) ── */
+    .lagebild-header { margin: 0; }
+    .kicker { font-family: var(--sans); font-size: 12px; font-weight: 600;
+              letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+              margin: 0 0 10px; }
+    .lagebild-header h1 { margin: 0 0 14px; }
     /* ── Byline (redaktionelle Stimme) ── */
     .byline { font-family: var(--sans); font-size: 13px; color: var(--muted);
               font-weight: 500; letter-spacing: 0.01em; margin: 0 0 24px;
@@ -347,6 +353,41 @@ def _meta_tag(m: re.Match) -> str:
     return out + " "
 
 
+_GREETING = {
+    "morgen": "Guten Morgen.",
+    "abend": "Guten Abend.",
+    "catchup": "Willkommen zurück.",
+}
+
+
+def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | None) -> str:
+    """Baut den Seitenkopf: Kicker (Datum · Ausgabe), Begrüßung, Meta-Byline."""
+    try:
+        d = date.fromisoformat(datum_iso)
+        kicker = f"{WEEKDAYS[d.weekday()]}, {d.day}. {MONTHS[d.month - 1]} · {_EDITION_LABEL.get(edition, edition)}"
+    except (ValueError, TypeError):
+        kicker = _EDITION_LABEL.get(edition, edition)
+    greeting = _GREETING.get(edition, "Dein Lagebild.")
+    meta = [_BYLINE]
+    if points == 1:
+        meta.append("1 Thema")
+    elif points > 1:
+        meta.append(f"{points} Themen")
+    if lesezeit and lesezeit < 90:
+        meta.append(f"ca. {lesezeit} Sek.")
+    elif lesezeit:
+        mins = round(lesezeit / 60 * 2) / 2
+        label = f"{mins:.1f}".rstrip("0").rstrip(".").replace(".", ",")
+        meta.append(f"ca. {label} Min.")
+    return (
+        '<header class="lagebild-header">'
+        f'<p class="kicker">{kicker}</p>'
+        f"<h1>{greeting}</h1>"
+        f'<p class="byline">{" · ".join(meta)}</p>'
+        "</header>"
+    )
+
+
 def _add_article_feedback(content: str, datum: str, edition: str) -> str:
     """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel ein."""
     content = re.sub(r'\n?<div class="article-fb".*?</div>', "", content)
@@ -391,15 +432,33 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
         r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
         content,
     )
-    # Redaktionelle Byline normalisieren (auch alte Archivseiten), sonst einsetzen.
-    content = re.sub(
-        r'<p class="byline">.*?</p>',
-        f'<p class="byline">{_BYLINE}</p>', content, count=1, flags=re.DOTALL,
-    )
-    if 'class="byline"' not in content:
+    # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
+    if datum:
+        points = len(re.findall(r"<h2>\s*[1-9]", content))
+        m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
+        lesezeit = int(m.group(1)) if m else None
+        header = _lagebild_header(datum, edition, points, lesezeit)
+        if '<header class="lagebild-header">' in content:
+            # Idempotent: bestehenden Header komplett ersetzen (kein Verschachteln).
+            content = re.sub(
+                r'<header class="lagebild-header">.*?</header>',
+                header, content, count=1, flags=re.DOTALL,
+            )
+        else:
+            content = re.sub(
+                r'<h1>.*?</h1>\s*(?:<p class="byline">.*?</p>\s*)?',
+                header, content, count=1, flags=re.DOTALL,
+            )
+    else:
+        # Fallback (kein Datum): nur Byline normalisieren bzw. einsetzen.
         content = re.sub(
-            r"(</h1>)", rf'\1\n<p class="byline">{_BYLINE}</p>', content, count=1
+            r'<p class="byline">.*?</p>',
+            f'<p class="byline">{_BYLINE}</p>', content, count=1, flags=re.DOTALL,
         )
+        if 'class="byline"' not in content:
+            content = re.sub(
+                r"(</h1>)", rf'\1\n<p class="byline">{_BYLINE}</p>', content, count=1
+            )
     # Redakteur:innen-Fußzeile als eigene Klasse auszeichnen.
     content = re.sub(
         r'<p><em>(Heute mit Berichterstattung von:.*?)</em></p>',
@@ -904,6 +963,15 @@ def _audio_player(src: str) -> str:
     )
 
 
+def _insert_after_header(content: str, snippet: str) -> str:
+    """Fügt `snippet` direkt nach dem Seitenkopf ein (Fallback: nach </h1>, sonst voran)."""
+    if "</header>" in content:
+        return content.replace("</header>", "</header>\n" + snippet, 1)
+    if "</h1>" in content:
+        return content.replace("</h1>", "</h1>\n" + snippet, 1)
+    return snippet + content
+
+
 def _prune_old_audio(days: int = 14) -> None:
     """Löscht mp3-Dateien im Archiv, die älter als `days` Tage sind."""
     from datetime import timedelta
@@ -972,7 +1040,7 @@ def build_site() -> Path:
         content = _extract_body(raw, d.isoformat(), edition)
         mp3_name = f"{d.isoformat()}-{edition}.mp3"
         if (ARCHIV_DIR / mp3_name).exists():
-            content = content.replace("</h1>", "</h1>\n" + _audio_player(mp3_name), 1)
+            content = _insert_after_header(content, _audio_player(mp3_name))
         branded = _render_page(_label(d, edition), content, "archiv", root="../")
         path.write_text(branded, encoding="utf-8")
 
@@ -982,17 +1050,18 @@ def build_site() -> Path:
     latest_html = editions[0][1].read_text(encoding="utf-8")
     latest_d, _, latest_edition = editions[0][0]
     latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition)
+    # Reihenfolge nach dem Header: Streak-Chip, dann Audio-Player.
+    from . import state as state_mod
     latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
     if (ARCHIV_DIR / latest_mp3).exists():
-        latest_content = latest_content.replace(
-            "</h1>", "</h1>\n" + _audio_player(f"archiv/{latest_mp3}"), 1
+        latest_content = _insert_after_header(
+            latest_content, _audio_player(f"archiv/{latest_mp3}")
         )
-    from . import state as state_mod
     streak = state_mod.current_streak(state)
     if streak >= 2:
-        latest_content = (
-            f'<div class="streak">🔥 {streak} Tage in Folge auf Stand</div>\n'
-            + latest_content
+        latest_content = _insert_after_header(
+            latest_content,
+            f'<div class="streak">🔥 {streak} Tage in Folge auf Stand</div>\n',
         )
     title = _label(latest_d, latest_edition)
     index_html = _render_page(title, latest_content, "lagebild")
