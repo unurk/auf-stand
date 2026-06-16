@@ -2,9 +2,12 @@ name: Lagebild
 
 on:
   schedule:
-    - cron: "0 5 * * *"   # 7:00 Uhr Wien (UTC+2 Sommer / UTC+1 Winter)
-    - cron: "0 14 * * *"  # 16:00 Uhr Wien
-    - cron: "0 7 * * 6"   # Samstag 9:00 Wien: Wochen-Quittung
+    # Presse-Kuratierungstakt (Zeiten Wien; UTC+2 Sommer / UTC+1 Winter, leichte Drift).
+    - cron: "10 4 * * *"   # 06:10 Wien → morgen
+    - cron: "10 9 * * *"   # 11:10 Wien → mittag
+    - cron: "10 14 * * *"  # 16:10 Wien → nachmittag
+    - cron: "10 18 * * *"  # 20:10 Wien → abend
+    - cron: "0 7 * * 6"    # Samstag 9:00 Wien: Wochen-Quittung
   workflow_dispatch:       # Manueller Start über GitHub UI
 
 jobs:
@@ -52,19 +55,27 @@ jobs:
           SCHEDULE="${{ github.event.schedule }}"
           if [ "$SCHEDULE" = "0 7 * * 6" ]; then
             python -m auf_stand.main woche
-          elif [ "$SCHEDULE" = "0 5 * * *" ]; then
+          elif [ "$SCHEDULE" = "10 4 * * *" ]; then
             python -m auf_stand.main morgen
-          elif [ "$SCHEDULE" = "0 14 * * *" ]; then
+          elif [ "$SCHEDULE" = "10 9 * * *" ]; then
+            python -m auf_stand.main mittag
+          elif [ "$SCHEDULE" = "10 14 * * *" ]; then
+            python -m auf_stand.main nachmittag
+          elif [ "$SCHEDULE" = "10 18 * * *" ]; then
             python -m auf_stand.main abend
           else
             # Externer Cron-Trigger (cron-job.org) oder manueller Start:
-            # Ausgabe anhand von Uhrzeit + Wochentag bestimmen.
+            # Ausgabe anhand von Uhrzeit + Wochentag bestimmen (vier Presse-Blöcke).
             HOUR=$(date -u +%H)
             DOW=$(date -u +%u)   # 1=Mo … 6=Sa, 7=So
             if [ "$DOW" = "6" ] && [ "$HOUR" = "07" ]; then
               python -m auf_stand.main woche
-            elif [ "$HOUR" -le "09" ]; then
+            elif [ "$HOUR" -le "08" ]; then
               python -m auf_stand.main morgen
+            elif [ "$HOUR" -le "13" ]; then
+              python -m auf_stand.main mittag
+            elif [ "$HOUR" -le "18" ]; then
+              python -m auf_stand.main nachmittag
             else
               python -m auf_stand.main abend
             fi

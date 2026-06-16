@@ -1,4 +1,4 @@
-"""CLI: python -m auf_stand.main morgen|abend|catchup|feeds [--dry-run] [--keep-seen]"""
+"""CLI: python -m auf_stand.main morgen|mittag|nachmittag|abend|catchup|feeds [--dry-run] [--keep-seen]"""
 from __future__ import annotations
 
 import argparse
@@ -70,6 +70,13 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
     cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
     fb_hint = state.article_feedback_hint(current_state, cutoff)
+
+    # Nächste Ausgabe im Presse-Takt bestimmen (Reihenfolge = config-Reihenfolge).
+    order = list(editions.keys())
+    nxt = order[(order.index(edition) + 1) % len(order)]
+    when = "morgen" if order.index(edition) == len(order) - 1 else "heute"
+    next_edition = f"Nächstes Lagebild: {when} {editions[nxt].get('time', '')} Uhr."
+
     prompt = synthesize.build_prompt(
         selection,
         all_topics,
@@ -78,6 +85,9 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         dossier=current_state.get("dossier", {}),
         article_feedback_hint=fb_hint,
         user_topic_prefs=current_state.get("user_topic_prefs") or None,
+        next_edition=next_edition,
+        edition_emoji=edition_config.get("emoji", "☀️"),
+        show_vorausschau=(edition == "morgen"),
     )
 
     if dry_run:
@@ -189,7 +199,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Auf Stand — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
+    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(

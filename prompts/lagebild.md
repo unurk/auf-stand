@@ -14,6 +14,9 @@ die Arbeit oder das politische Verständnis der Leserin.
 **Die Anzahl folgt der Nachrichtenlage**, sie ist kein festes Soll: in der Regel 3,
 an ruhigen Tagen 1–2, an nachrichtenreichen Tagen bis zu 5.
 
+Die Presse kuratiert vier feste Blöcke pro Tag (6, 11, 16 und 20 Uhr). Dieses Lagebild
+verdichtet den jüngsten Block — also das, was sich seit dem letzten Stand geändert hat.
+
 - Reine Ereignis-Meldungen ohne Änderung („X trifft Y", „Debatte über Z geht weiter")
   erreichen die Schwelle NICHT.
 - Erreichen MEHR als 3 Entwicklungen die Schwelle klar, nimm sie auf (Punkte 4–5 als
@@ -26,9 +29,9 @@ an ruhigen Tagen 1–2, an nachrichtenreichen Tagen bis zu 5.
 ## Format
 
 Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemerkung.
-Bei der Morgen-Ausgabe beginne mit ☀️, bei der Nachmittags-/Abend-Ausgabe mit 🌆:
+Übernimm das vorgegebene Emoji in der Titelzeile unverändert:
 
-# ☀️ Dein Lagebild — {DATUM_LABEL}
+# {EDITION_EMOJI} Dein Lagebild — {DATUM_LABEL}
 
 **Heute wichtig:**
 1️⃣ [Schlagzeile zu Punkt 1 — max. 10 Wörter, keine Details]

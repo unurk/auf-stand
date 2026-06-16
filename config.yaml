@@ -85,14 +85,30 @@ fulltext_ressorts:
   - Wirtschaft
   - Unternehmen
 
-# Ausgaben
+# Ausgaben — angedockt an die vier Presse-Kuratierungszeiten (Rebrush 2026):
+# 06:00 · 11:00 · 16:00 · 20:00. Reihenfolge = Tagestakt; lookback deckt jeweils den
+# Block seit dem vorigen Zeitpunkt (+ Puffer). morgen großzügig über Nacht.
 editions:
   morgen:
     label: "Morgen-Ausgabe"
-    lookback_hours: 18      # Artikel der letzten Nacht + Vorabend
+    time: "06:00"
+    emoji: "☀️"
+    lookback_hours: 10
+  mittag:
+    label: "Mittags-Ausgabe"
+    time: "11:00"
+    emoji: "🌤️"
+    lookback_hours: 5.5
+  nachmittag:
+    label: "Nachmittags-Ausgabe"
+    time: "16:00"
+    emoji: "🌆"
+    lookback_hours: 5.5
   abend:
     label: "Abend-Ausgabe"
-    lookback_hours: 11      # nur was seit der Morgen-Ausgabe neu ist (Delta via state)
+    time: "20:00"
+    emoji: "🌙"
+    lookback_hours: 4.5
 
 # Vorausschau: Termine der nächsten 7 Tage, die im Morgen-Lagebild erscheinen.
 # Format: datum (YYYY-MM-DD), name, tracker (optional — muss exakt einem Themen-Tracker entsprechen).

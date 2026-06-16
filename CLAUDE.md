@@ -3,11 +3,12 @@
 ## Was dieses Projekt ist
 
 Prototyp für ein neues Digitalprodukt der „Presse": Statt eines Artikel-Feeds bekommt
-die Nutzerin 1–2x täglich ein **Lagebild** — eine redaktionelle Synthese von 3–5
+die Nutzerin **4× täglich** ein **Lagebild** — eine redaktionelle Synthese von 3–5
 Entwicklungen je nach Nachrichtenlage (an ruhigen Tagen weniger), die sich materiell
-geändert haben. Lesezeit rund 90 Sekunden (an dichten Tagen etwas mehr),
-am Ende das Signal „Du bist auf Stand ✓". Vorbild ist die Produktlogik von WHOOP:
-arbeitet im Hintergrund, verdichtet, meldet sich nur zu relevanten Momenten.
+geändert haben. Die vier Ausgaben sind an den **Presse-Kuratierungstakt** (Rebrush 2026)
+angedockt: **06:00 · 11:00 · 16:00 · 20:00 Uhr**. Lesezeit rund 90 Sekunden (an dichten
+Tagen etwas mehr), am Ende das Signal „Du bist auf Stand ✓". Vorbild ist die Produktlogik
+von WHOOP: arbeitet im Hintergrund, verdichtet, meldet sich nur zu relevanten Momenten.
 
 Wichtigste Produktregel: **Wir optimieren auf Time-to-Informed (kurz!), nicht auf
 Time-on-Site.** Jedes Feature, das Scrollen, Stöbern oder längere Sessions fördert,
@@ -67,5 +68,8 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
 
 - Kein Artikel-Feed, keine Endlos-Liste, kein „Mehr laden"
 - Keine Klick-Personalisierung; Themen-Tracker sind explizit gewählte Themen
-- Mehr als 2 Ausgaben/Pushes pro Tag
+- Kein Dauerrauschen: Ausgaben/Pushes ausschließlich zu den vier festen
+  Presse-Kuratierungszeiten (06/11/16/20). Die festen Zeitpunkte sind selbst der
+  Anti-Doomscroll-Mechanismus — keine beliebigen Zusatz-Pushes dazwischen.
+  (Frühere Regel „max. 2/Tag" bewusst auf den Presse-Rebrush-Takt umgestellt.)
 - Credential-basiertes Scraping hinter der Paywall

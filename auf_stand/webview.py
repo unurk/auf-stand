@@ -18,9 +18,17 @@ SITE_DIR = BASE_DIR / "site"
 ARCHIV_DIR = SITE_DIR / "archiv"
 STATE_PATH = BASE_DIR / "data" / "state.json"
 
-_EDITION_RANK = {"catchup": 0, "morgen": 1, "abend": 2}
-_EDITION_LABEL = {"morgen": "Morgen-Ausgabe", "abend": "Abend-Ausgabe", "catchup": "Catch-up"}
-_FILENAME_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})-(morgen|abend|catchup)\.html$")
+_EDITION_RANK = {"catchup": 0, "morgen": 1, "mittag": 2, "nachmittag": 3, "abend": 4}
+_EDITION_LABEL = {
+    "morgen": "Morgen-Ausgabe", "mittag": "Mittags-Ausgabe",
+    "nachmittag": "Nachmittags-Ausgabe", "abend": "Abend-Ausgabe",
+    "catchup": "Catch-up",
+}
+# Presse-Kuratierungszeiten je Ausgabe (für die dezente Rhythmus-Anzeige).
+_EDITION_TIME = {"morgen": "06:00", "mittag": "11:00", "nachmittag": "16:00", "abend": "20:00"}
+_EDITION_ORDER = ["morgen", "mittag", "nachmittag", "abend"]
+_EDITIONS_RE = "morgen|mittag|nachmittag|abend|catchup"
+_FILENAME_RE = re.compile(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})\.html$")
 
 # ---------------------------------------------------------------------------
 # Design-System — Die Presse · Auf Stand (Dark, im Look der echten App)
@@ -106,6 +114,8 @@ _PAGE_TEMPLATE = """\
               letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
               margin: 0 0 10px; }
     .lagebild-header h1 { margin: 0 0 14px; }
+    .next-edition { font-family: var(--sans); font-size: 12px; color: var(--muted);
+                    margin: 0 0 22px; }
     /* ── Byline (redaktionelle Stimme) ── */
     .byline { font-family: var(--sans); font-size: 13px; color: var(--muted);
               font-weight: 500; letter-spacing: 0.01em; margin: 0 0 24px;
@@ -355,9 +365,26 @@ def _meta_tag(m: re.Match) -> str:
 
 _GREETING = {
     "morgen": "Guten Morgen.",
+    "mittag": "Guten Tag.",
+    "nachmittag": "Guten Nachmittag.",
     "abend": "Guten Abend.",
     "catchup": "Willkommen zurück.",
 }
+
+
+def _next_edition_hint(edition: str) -> str:
+    """Dezente Rhythmus-Zeile für die Startseite (nächstes Lagebild + Presse-Takt)."""
+    if edition not in _EDITION_ORDER:
+        return ""
+    i = _EDITION_ORDER.index(edition)
+    nxt = _EDITION_ORDER[(i + 1) % len(_EDITION_ORDER)]
+    when = "morgen" if i == len(_EDITION_ORDER) - 1 else "heute"
+    return (
+        '<p class="next-edition">'
+        f"Nächstes Lagebild: {when} {_EDITION_TIME[nxt]} Uhr · "
+        "Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr"
+        "</p>"
+    )
 
 
 def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | None) -> str:
@@ -978,7 +1005,7 @@ def _prune_old_audio(days: int = 14) -> None:
 
     cutoff = date.today() - timedelta(days=days)
     for mp3 in ARCHIV_DIR.glob("*.mp3"):
-        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})-(morgen|abend|catchup)\.mp3$", mp3.name)
+        m = re.match(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})\.mp3$", mp3.name)
         if not m:
             continue
         try:
@@ -1016,7 +1043,7 @@ def build_site() -> Path:
                 fresh_copies.add(path.name)
         # Audio-Ausgaben mitkopieren (Lagebild zum Hören).
         for mp3 in OUT_DIR.glob("*.mp3"):
-            if re.match(r"^\d{4}-\d{2}-\d{2}-(morgen|abend|catchup)\.mp3$", mp3.name):
+            if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})\.mp3$", mp3.name):
                 shutil.copy2(mp3, ARCHIV_DIR / mp3.name)
     _prune_old_audio()
 
@@ -1063,6 +1090,10 @@ def build_site() -> Path:
             latest_content,
             f'<div class="streak">🔥 {streak} Tage in Folge auf Stand</div>\n',
         )
+    # Dezente Rhythmus-Zeile direkt unter dem Header (nur Startseite).
+    hint = _next_edition_hint(latest_edition)
+    if hint:
+        latest_content = _insert_after_header(latest_content, hint)
     title = _label(latest_d, latest_edition)
     index_html = _render_page(title, latest_content, "lagebild")
     index.write_text(index_html, encoding="utf-8")

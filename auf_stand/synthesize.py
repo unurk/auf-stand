@@ -71,6 +71,9 @@ def build_prompt(
     dossier: dict | None = None,
     article_feedback_hint: str = "",
     user_topic_prefs: list[str] | None = None,
+    next_edition: str = "",
+    edition_emoji: str = "☀️",
+    show_vorausschau: bool = False,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -81,11 +84,10 @@ def build_prompt(
         if topics
         else ""
     )
-    is_morning = "Morgen" in edition_label
-    next_edition = "Nächstes Update: heute 16:00." if is_morning else "Nächste Ausgabe: morgen 7:00."
-    vorausschau = format_vorausschau(termine or []) if is_morning else ""
+    vorausschau = format_vorausschau(termine or []) if show_vorausschau else ""
     template = (
-        template.replace("{DATUM_LABEL}", date_label(edition_label))
+        template.replace("{EDITION_EMOJI}", edition_emoji)
+        .replace("{DATUM_LABEL}", date_label(edition_label))
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
         .replace("{VORAUSSCHAU_SECTION}", vorausschau)
         .replace("{LESEZEIT}", "90")
