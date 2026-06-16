@@ -55,6 +55,30 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 1
 
     current_state = state.load_state()
+
+    # Monotonie-Schutz: Ausgaben laufen pro Tag in fester Reihenfolge
+    # (morgen→mittag→nachmittag→abend). Ist heute bereits ein gleich- oder
+    # höherrangiger Block ausgeliefert, darf ein verspäteter/doppelter Lauf für
+    # einen früheren/gleichen Block nicht erneut synthetisieren oder pushen.
+    # Schützt vor verspätet gefeuerten GitHub-Actions-Cron-Läufen (z. B. ein
+    # 5 h zu später 11-Uhr-Cron, der nach der 16-Uhr-Ausgabe noch eine stale
+    # Mittags-Ausgabe nachschöbe).
+    order = list(editions.keys())
+    rank = order.index(edition)
+    today = f"{datetime.now():%Y-%m-%d}"
+    delivered_today = [
+        order.index(s["edition"])
+        for s in current_state.get("stats", [])
+        if s.get("date") == today and s.get("edition") in order
+    ]
+    if delivered_today and max(delivered_today) >= rank:
+        print(
+            f"Block '{edition}' ist heute bereits durch eine gleich- oder höherrangige "
+            f"Ausgabe abgedeckt — kein doppeltes Lagebild. "
+            f"(Schutz vor verspäteten/doppelten Cron-Läufen)"
+        )
+        return 0
+
     articles = filter_recent(result.articles, float(edition_config.get("lookback_hours", 18)))
     new_articles, _ = state.split_new(articles, current_state)
 
@@ -72,9 +96,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     fb_hint = state.article_feedback_hint(current_state, cutoff)
 
     # Nächste Ausgabe im Presse-Takt bestimmen (Reihenfolge = config-Reihenfolge).
-    order = list(editions.keys())
-    nxt = order[(order.index(edition) + 1) % len(order)]
-    when = "morgen" if order.index(edition) == len(order) - 1 else "heute"
+    nxt = order[(rank + 1) % len(order)]
+    when = "morgen" if rank == len(order) - 1 else "heute"
     next_edition = f"Nächstes Lagebild: {when} {editions[nxt].get('time', '')} Uhr."
 
     prompt = synthesize.build_prompt(
