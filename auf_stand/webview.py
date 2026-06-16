@@ -370,13 +370,60 @@ def _meta_tag(m: re.Match) -> str:
     return out + " "
 
 
-_GREETING = {
-    "morgen": "Guten Morgen.",
-    "mittag": "Guten Tag.",
-    "nachmittag": "Guten Nachmittag.",
-    "abend": "Guten Abend.",
-    "catchup": "Willkommen zurück.",
+_GREETING_POOL: dict[str, list[str]] = {
+    "morgen": [
+        "Guten Morgen.",
+        "Schön, dass du da bist.",
+        "Ein neuer Tag.",
+        "Guten Morgen. Los geht's.",
+        "Bereit?",
+        "Guten Morgen. Hier ist er.",
+        "Frisch informiert starten.",
+    ],
+    "mittag": [
+        "Guten Tag.",
+        "Kurze Pause.",
+        "Halbzeit.",
+        "Schön, dass du schaust.",
+        "Mitten im Tag.",
+        "Guten Tag. Kurz.",
+        "Der Überblick zur Mittagszeit.",
+    ],
+    "nachmittag": [
+        "Guten Nachmittag.",
+        "Fast geschafft.",
+        "Kurz innehalten.",
+        "Schön, dass du da bist.",
+        "Der Nachmittag, kompakt.",
+        "Noch ein Blick.",
+        "Guten Nachmittag. Da sind wir.",
+    ],
+    "abend": [
+        "Guten Abend.",
+        "Feierabend — fast.",
+        "Der Tag, kompakt.",
+        "Schön, dass du da bist.",
+        "Was bleibt vom Tag.",
+        "Guten Abend. Kurz noch.",
+        "Der Abend gehört dir.",
+    ],
+    "catchup": [
+        "Willkommen zurück.",
+        "Schön, dass du wieder da bist.",
+        "Was sich getan hat.",
+        "Willkommen. Kurz nachgeholt.",
+        "Die letzten Tage, kompakt.",
+    ],
 }
+
+
+def _pick_greeting(edition: str, datum_iso: str) -> str:
+    pool = _GREETING_POOL.get(edition, ["Dein Lagebild."])
+    try:
+        idx = date.fromisoformat(datum_iso).toordinal() % len(pool)
+    except (ValueError, TypeError):
+        idx = 0
+    return pool[idx]
 
 
 def _next_edition_hint(edition: str) -> str:
@@ -401,7 +448,7 @@ def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | 
         kicker = f"{WEEKDAYS[d.weekday()]}, {d.day}. {MONTHS[d.month - 1]} · {_EDITION_LABEL.get(edition, edition)}"
     except (ValueError, TypeError):
         kicker = _EDITION_LABEL.get(edition, edition)
-    greeting = _GREETING.get(edition, "Dein Lagebild.")
+    greeting = _pick_greeting(edition, datum_iso)
     meta = [_BYLINE]
     if points == 1:
         meta.append("1 Thema")
