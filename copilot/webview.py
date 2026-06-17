@@ -96,6 +96,8 @@ _PAGE_TEMPLATE = """\
                 border-bottom: 1px solid var(--text); }
     .wordmark { font-family: var(--serif); font-weight: 400; font-size: 38px;
                 letter-spacing: 0.01em; color: var(--text); line-height: 1; }
+    .wordmark-logo { display: block; margin: 0 auto; width: clamp(180px, 60vw, 230px);
+                     height: auto; }
     .sublabel { font-family: var(--sans); font-size: 10px; letter-spacing: 0.42em;
                 text-transform: uppercase; color: var(--muted); margin-top: 12px;
                 font-weight: 600; padding-left: 0.42em; }
@@ -275,7 +277,7 @@ _PAGE_TEMPLATE = """\
 <body>
 <div class="scroll-area">
 <header class="masthead">
-  <div class="wordmark">Die Presse</div>
+  <img class="wordmark-logo" src="__ROOT__die-presse-logo.png" alt="Die Presse">
   <div class="sublabel">Copilot</div>
 </header>
 <div class="wrap">
@@ -961,9 +963,9 @@ _MANIFEST = {
 # Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
 # damit ein Deploy alte Caches verdrängt.
 _SERVICE_WORKER = """\
-const CACHE = 'copilot-v1';
+const CACHE = 'copilot-v2';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
-  './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './die-presse-logo.png'];
 
 self.addEventListener('install', function(e){
   self.skipWaiting();
