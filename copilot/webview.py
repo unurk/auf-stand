@@ -99,8 +99,6 @@ _PAGE_TEMPLATE = """\
     .sublabel { font-family: var(--sans); font-size: 10px; letter-spacing: 0.42em;
                 text-transform: uppercase; color: var(--muted); margin-top: 12px;
                 font-weight: 600; padding-left: 0.42em; }
-    .sublabel.personal { text-transform: none; letter-spacing: 0.04em;
-                         padding-left: 0; font-size: 11px; font-style: italic; }
     /* ── Layout ── */
     .wrap { max-width: 680px; margin: 0 auto; padding: 38px 20px 56px; }
     /* ── Typografie (Serifen-Skala) ── */
@@ -278,7 +276,7 @@ _PAGE_TEMPLATE = """\
 <div class="scroll-area">
 <header class="masthead">
   <div class="wordmark">Die Presse</div>
-  <div class="sublabel personal">personalisiert für Andreas Rast</div>
+  <div class="sublabel">Copilot</div>
 </header>
 <div class="wrap">
 __CONTENT__
@@ -420,6 +418,9 @@ _GREETING_POOL: dict[str, list[str]] = {
 
 
 def _pick_greeting(edition: str, datum_iso: str) -> str:
+    # Demo-Personalisierung: feste Begrüßung für die Vorführ-Ausgabe (15. Juni, morgen).
+    if datum_iso == "2026-06-15" and edition == "morgen":
+        return "Guten Morgen, Andreas Rast."
     pool = _GREETING_POOL.get(edition, ["Dein Lagebild."])
     try:
         idx = date.fromisoformat(datum_iso).toordinal() % len(pool)
