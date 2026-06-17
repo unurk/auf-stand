@@ -47,22 +47,18 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 1
     edition_config = editions[edition]
 
-    result = fetch_all(config)
-    for error in result.errors:
-        print(f"Warnung: {error}")
-    if not result.articles and edition != "catchup":
-        print("Keine Artikel geladen — Abbruch. `feeds` zum Diagnostizieren ausführen.")
-        return 1
-
     current_state = state.load_state()
 
-    # Monotonie-Schutz: Ausgaben laufen pro Tag in fester Reihenfolge
-    # (morgen→mittag→nachmittag→abend). Ist heute bereits ein gleich- oder
-    # höherrangiger Block ausgeliefert, darf ein verspäteter/doppelter Lauf für
-    # einen früheren/gleichen Block nicht erneut synthetisieren oder pushen.
-    # Schützt vor verspätet gefeuerten GitHub-Actions-Cron-Läufen (z. B. ein
-    # 5 h zu später 11-Uhr-Cron, der nach der 16-Uhr-Ausgabe noch eine stale
-    # Mittags-Ausgabe nachschöbe).
+    # Monotonie-Schutz — bewusst VOR dem Fetch, damit übersprungene Läufe weder
+    # RSS abrufen noch einen API-Call auslösen. Ausgaben laufen pro Tag in fester
+    # Reihenfolge (morgen→mittag→nachmittag→abend). Ist heute bereits ein gleich-
+    # oder höherrangiger Block ausgeliefert, darf ein späterer Lauf für einen
+    # früheren/gleichen Block nicht erneut synthetisieren oder pushen.
+    # Das macht zweierlei robust:
+    #  - verspätet gefeuerte Crons (z. B. ein 5 h zu später 11-Uhr-Cron, der
+    #    nach der 16-Uhr-Ausgabe noch eine stale Mittags-Ausgabe nachschöbe);
+    #  - die engmaschigen Wiederhol-Cron-Läufe je Ausgabe-Fenster (alle 30 Min):
+    #    nur der erste liefert aus, alle weiteren werden still übersprungen.
     order = list(editions.keys())
     rank = order.index(edition)
     today = f"{datetime.now():%Y-%m-%d}"
@@ -75,9 +71,16 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         print(
             f"Block '{edition}' ist heute bereits durch eine gleich- oder höherrangige "
             f"Ausgabe abgedeckt — kein doppeltes Lagebild. "
-            f"(Schutz vor verspäteten/doppelten Cron-Läufen)"
+            f"(Schutz vor verspäteten/doppelten/Wiederhol-Cron-Läufen)"
         )
         return 0
+
+    result = fetch_all(config)
+    for error in result.errors:
+        print(f"Warnung: {error}")
+    if not result.articles and edition != "catchup":
+        print("Keine Artikel geladen — Abbruch. `feeds` zum Diagnostizieren ausführen.")
+        return 1
 
     articles = filter_recent(result.articles, float(edition_config.get("lookback_hours", 18)))
     new_articles, _ = state.split_new(articles, current_state)

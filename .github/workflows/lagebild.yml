@@ -2,12 +2,17 @@ name: Lagebild
 
 on:
   schedule:
-    # Presse-Kuratierungstakt (Zeiten Wien; UTC+2 Sommer / UTC+1 Winter, leichte Drift).
-    - cron: "10 4 * * *"   # 06:10 Wien → morgen
-    - cron: "10 9 * * *"   # 11:10 Wien → mittag
-    - cron: "10 14 * * *"  # 16:10 Wien → nachmittag
-    - cron: "10 18 * * *"  # 20:10 Wien → abend
-    - cron: "0 7 * * 6"    # Samstag 9:00 Wien: Wochen-Quittung
+    # GitHub-Actions-Crons feuern unzuverlässig (Verspätung bis zu Stunden,
+    # gelegentliches komplettes Auslassen). Darum je Ausgabe-Fenster MEHRERE
+    # Versuche im 30-Minuten-Takt — es genügt, wenn EINER feuert. Der Block-Guard
+    # in main.py liefert je Tag und Block trotzdem nur einmal aus (idempotent,
+    # kein Duplikat bei Mehrfachlauf). Die Fenster starten zur Kuratierungszeit
+    # und decken Sommer- wie Winterzeit ab (Wien = UTC+2 Sommer / UTC+1 Winter).
+    - cron: "*/30 4-6 * * *"    # morgen     (~06:00 Wien)
+    - cron: "*/30 9-11 * * *"   # mittag     (~11:00 Wien)
+    - cron: "*/30 14-16 * * *"  # nachmittag (~16:00 Wien)
+    - cron: "*/30 18-20 * * *"  # abend      (~20:00 Wien)
+    - cron: "0 7 * * 6"         # Samstag 9:00 Wien: Wochen-Quittung
   workflow_dispatch:       # Manueller Start über GitHub UI
 
 jobs:
@@ -52,25 +57,16 @@ jobs:
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
         run: |
           mkdir -p data out
-          SCHEDULE="${{ github.event.schedule }}"
-          if [ "$SCHEDULE" = "0 7 * * 6" ]; then
+          # woche kommt ausschließlich vom expliziten Samstags-Cron.
+          # Alle anderen Läufe (Wiederhol-Crons je Fenster, manueller Start,
+          # externer Trigger) wählen die Ausgabe nach Wall-Clock-Uhrzeit. So
+          # erwischt selbst ein stark verspäteter Cron den AKTUELL richtigen
+          # Block; der Block-Guard in main.py liefert je Block nur einmal aus.
+          if [ "${{ github.event.schedule }}" = "0 7 * * 6" ]; then
             python -m copilot.main woche
-          elif [ "$SCHEDULE" = "10 4 * * *" ]; then
-            python -m copilot.main morgen
-          elif [ "$SCHEDULE" = "10 9 * * *" ]; then
-            python -m copilot.main mittag
-          elif [ "$SCHEDULE" = "10 14 * * *" ]; then
-            python -m copilot.main nachmittag
-          elif [ "$SCHEDULE" = "10 18 * * *" ]; then
-            python -m copilot.main abend
           else
-            # Externer Cron-Trigger (cron-job.org) oder manueller Start:
-            # Ausgabe anhand von Uhrzeit + Wochentag bestimmen (vier Presse-Blöcke).
             HOUR=$(date -u +%H)
-            DOW=$(date -u +%u)   # 1=Mo … 6=Sa, 7=So
-            if [ "$DOW" = "6" ] && [ "$HOUR" = "07" ]; then
-              python -m copilot.main woche
-            elif [ "$HOUR" -le "08" ]; then
+            if [ "$HOUR" -le "08" ]; then
               python -m copilot.main morgen
             elif [ "$HOUR" -le "13" ]; then
               python -m copilot.main mittag
@@ -89,6 +85,7 @@ jobs:
         run: python -m copilot.main rueckkanal
 
       - name: Web-Ansicht bauen und committen
+        id: site
         if: always() && github.ref == 'refs/heads/master'
         env:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
@@ -104,20 +101,26 @@ jobs:
               sleep $((2 ** i))
               git pull --rebase origin master
             done
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Keine Änderung an site/ — kein Commit."
+            echo "Keine Änderung an site/ — kein Commit, kein Deploy."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Pages nur hochladen/deployen, wenn site/ sich tatsächlich geändert hat.
+      # Sonst würden die vielen Wiederhol-Cron-Läufe (alle 30 Min) zig leere
+      # Deploys/Tag auslösen; bei unveränderter Seite bedient Pages weiter den
+      # letzten Stand.
       - name: GitHub Pages hochladen
         uses: actions/upload-pages-artifact@v3
-        if: always() && github.ref == 'refs/heads/master'
+        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
         with:
           path: site
 
       - name: GitHub Pages deployen
         id: pages-deployment
         uses: actions/deploy-pages@v4
-        if: always() && github.ref == 'refs/heads/master'
+        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
 
       - name: State sichern
         uses: actions/cache/save@v4
