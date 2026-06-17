@@ -1,6 +1,6 @@
-const CACHE = 'copilot-v1';
+const CACHE = 'copilot-v2';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
-  './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './die-presse-logo.png'];
 
 self.addEventListener('install', function(e){
   self.skipWaiting();
