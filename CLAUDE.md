@@ -73,3 +73,12 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
   Anti-Doomscroll-Mechanismus — keine beliebigen Zusatz-Pushes dazwischen.
   (Frühere Regel „max. 2/Tag" bewusst auf den Presse-Rebrush-Takt umgestellt.)
 - Credential-basiertes Scraping hinter der Paywall
+
+## Auslösung / Timing
+
+Die Ausgaben laufen in GitHub Actions (`.github/workflows/lagebild.yml`). Verlässlich
+**pünktlich** ist nur der externe Trigger: cron-job.org stößt 4×/Tag + Sa den Workflow per
+`workflow_dispatch`-API an (Setup: `scripts/setup_cron.sh`, Doku im README). Jeder Trigger
+benennt die Ausgabe explizit über den `edition`-Workflow-Input. Die GitHub-eigenen
+`schedule`-Crons sind erwiesenermaßen unzuverlässig (verspätet/ausgelassen) und bleiben nur
+als Best-Effort-Fallback; der Block-Guard in `main.py` hält Doppelläufe idempotent.

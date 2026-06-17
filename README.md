@@ -42,9 +42,33 @@ RSS liefert nur Teaser. Für tiefere Synthese: Volltexte als .txt/.md in
 Für den echten Pilot: offiziellen Content-Feed über die Presse-IT anfragen,
 kein Login-Scraping bauen.
 
-## Automatisieren (täglich 6:00 und 17:00)
+## Zuverlässiges Timing (cron-job.org → GitHub Actions)
 
-macOS/Linux, `crontab -e`:
+Die vier Ausgaben (06/11/16/20 Uhr Wien) + die Wochen-Quittung laufen in GitHub
+Actions. GitHubs **interner** Schedule-Cron ist aber unzuverlässig (feuert
+verspätet, lässt Läufe aus). Verlässlich pünktlich wird es durch einen **externen
+Trigger**, der den Workflow per `workflow_dispatch`-API anstößt (startet <1 min):
+
+```
+CRONJOB_KEY=<cron-job.org-API-Key> GH_TOKEN=<GitHub-PAT> bash scripts/setup_cron.sh
+```
+
+Einmalig nötig:
+
+1. **GitHub Fine-grained PAT** auf `unurk/auf-stand`, Permission **Actions: Read and
+   write** → als `GH_TOKEN`.
+2. **cron-job.org**-Konto (kostenlos) → API-Key → als `CRONJOB_KEY`.
+3. Script ausführen — es legt fünf Jobs in der Zeitzone *Europe/Vienna* an (ganzjährig
+   pünktlich, kein DST-Drift) und benennt je Job die Ausgabe explizit über den
+   `edition`-Input des Workflows. Erneutes Ausführen ist idempotent.
+4. Verifizieren: auf cron-job.org bei einem Job *„Run now"* → in GitHub Actions
+   erscheint <1 min ein `workflow_dispatch`-Lauf, Telegram-/Web-Push kommt sofort.
+
+Secrets (PAT, API-Key) **niemals** ins Repo committen — nur zur Laufzeit übergeben;
+der PAT lebt allein in den cron-job.org-Job-Headern. Die GitHub-Schedule-Crons im
+Workflow bleiben als Best-Effort-Fallback erhalten.
+
+**Lokal/manuell** geht weiter über die CLI, z. B. `crontab -e`:
 
 ```
 0 6  * * * cd /pfad/zu/auf-stand && .venv/bin/python -m copilot.main morgen
