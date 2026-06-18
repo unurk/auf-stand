@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -324,10 +346,10 @@
   <p><strong>Was ist neu:</strong> Die Sicherheitsmaßnahmen am Flughafen Wien werden gelockert: Bessere Scanner ermöglichen es, dass Reisende künftig mehr als die bisherigen 100 Milliliter Flüssigkeiten im Handgepäck mitnehmen dürfen. Parallel hat die EU eine Verbesserung der Fluggastrechte beschlossen. Die neuen Regeln gelten bereits.</p>
   <p><strong>Warum es zählt:</strong> Für dich als Pendler:in oder Urlauber:in bedeutet das konkrete Erleichterung: Kosmetika, Zahnpasta und Getränke lassen sich künftig weniger restriktiv packen. Das spart Zeit beim Check-in und Stress vor der Abreise. Die EU-weite Änderung der Fluggastrechte schärft zudem deinen Schutz bei Verspätungen und Ausfällen nach.</p>
   <p><a class="source-link" href="https://www.diepresse.com/30635783/kann-ich-jetzt-mehr-als-100-milliliter-im-flieger-mitnehmen-was-reisende-wissen-sollten">Weiterlesen bei der Presse →</a> (Wien/Lokales)</p>
-<div class="article-fb" data-key="2026-06-17|morgen|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><h2>2️⃣ 🏛 Budget-Debatte: Agenda Austria warnt vor zu optimistischen Annahmen</h2>
+<div class="article-fb" data-key="2026-06-17|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>2️⃣ 🏛 Budget-Debatte: Agenda Austria warnt vor zu optimistischen Annahmen</h2>
   <p>Die Denkfabrik Agenda Austria kritisiert vor der heutigen Prognose des Fiskalrats die Grundlagen des Budgets: Es fehle ein „Risikoszenario&quot; und ein finanzieller Puffer für den Fall, dass die Wirtschaft weniger wächst als geplant. Die Regierung plane mit zu rosigen Zahlen.</p>
   <p><strong>Warum es zählt:</strong> Das Budget ist deine finanzielle Sicherheit — es entscheidet über Steuern, Sozialleistungen und öffentliche Investitionen. Wenn die Annahmen zu optimistisch sind und die Wirtschaft schwächelt, drohen später Sparmaßnahmen oder höhere Abgaben. (Politik)</p>
-<div class="article-fb" data-key="2026-06-17|morgen|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <div class="done">✅ <em>Du bist informiert — Lesezeit ca. 75 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
@@ -369,6 +391,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

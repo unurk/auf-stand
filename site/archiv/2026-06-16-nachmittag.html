@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -324,15 +346,15 @@
   <h2>1️⃣ 🌍 G7 einigt sich auf Energiesanktionen gegen Russland</h2>
   <p><strong>Was ist neu:</strong> Die G7-Staaten haben sich nach Angaben aus Diplomatenkreisen auf neue Sanktionen gegen Russlands Öl- und Gassektor verständigt. Die Maßnahmen sollen die Finanzierungsmöglichkeiten des Kriegs weiter einschränken und sind Teil einer koordinierten Strategie, um Putins Spielraum zu begrenzen.</p>
   <p><strong>Warum es zählt:</strong> Für Österreich als energieabhängige Volkswirtschaft bedeuten härtere Sanktionen gegen russische Energieträger längerfristig Druck auf Strompreise und Versorgungssicherheit — auch wenn die unmittelbare Wirkung begrenzt ist. Gleichzeitig festigt die G7-Einigung den westlichen Kurs gegen Russland, was außenpolitisch relevant bleibt. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/30641314/g7-staaten-beraten-ueber-strengere-energiesanktionen-gegen-russland">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>2️⃣ 🇪🇺 EU verbietet Begriffe wie „veganes Huhn&quot;</h2>
   <p><strong>Was ist neu:</strong> Das EU-Parlament hat beschlossen, dass Fleischbegriffe künftig nur für tierische Produkte gelten dürfen — „veganes Huhn&quot; oder „Seitan-Steak&quot; sind damit nicht mehr zulässig. Die Regelung gilt vorerst bis Ende 2027.</p>
   <p><strong>Warum es zählt:</strong> Für Hersteller von Fleischersatzprodukten wird es teurer, neue Namen zu entwickeln und Verpackungen umzustellen. Für dich als Konsument:in ändert sich die Einkaufslogik — Alternativprodukte werden weniger unmittelbar erkennbar sein. Die Lobby der klassischen Fleischwirtschaft setzt sich durch, während die Debatte über Verbrauchertransparenz noch nicht zu Ende ist. <span class="ressort" style="--h:24">EU-Politik</span> <a class="source-link" href="https://www.diepresse.com/30638799/veganes-huhn-und-seitan-steak-werden-verboten-eu-parlament-schuetzt-fleischbegriffe">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>3️⃣ 🏛️ Regierung plant Wirtschaftsprojekte vor Naturschutz</h2>
   <p><strong>Was ist neu:</strong> Die österreichische Regierung plant, „strategische Projekte&quot; der Wirtschaft künftig zu priorisieren und damit implizit Umweltschutzauflagen zu lockern — etwa für bedrohte Arten wie die Haselmaus. Das ist Teil eines Pakets von 117 Maßnahmen gegen De-Industrialisierung, zieht aber fünf Monate später zwischen Politik und Wirtschaft sehr unterschiedliche Bilanzen.</p>
   <p><strong>Warum es zählt:</strong> Dieser Kurs signalisiert eine Verschiebung: Wirtschaftsinteressen sollen künftig leichter über Naturschutzgesetze hinweggehen können. Das beschleunigt manche Großprojekte, erhöht aber das Risiko von Umweltschäden und längerfristigen Rechtsstreitigkeiten. Für deine Region vor Ort kann das konkret bedeuten, dass Schutzgebiete unter Druck geraten. <span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://www.diepresse.com/30549181/harte-zeiten-fuer-haselmaus-und-co-regierung-plant-vorrang-fuer-strategische-projekte-der-wirtschaft">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|2"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand hat die Iran-Einigung den Ölpreis um knapp 5 % gesenkt. Experten rechnen aber damit, dass er noch monatelang angespannt bleibt — wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und bestehender regionaler Unsicherheiten.</p>
   <hr>
@@ -377,6 +399,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

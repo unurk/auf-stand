@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -323,11 +345,11 @@
   <h2>1️⃣ 🌍 Iran und Trump spalten G7 – Ukraine könnte aus dem Fokus rücken</h2>
   <p><strong>Was ist neu:</strong> Der G7-Gipfel im französischen Évian wird von zwei Konfliktlinien dominiert: Einerseits der Iran-Deal, andererseits die Stimmungen des US-Präsidenten Trump, die das bisherige Programm durcheinander wirbeln. Die europäischen G7-Staaten wollen ihre Rolle bei der Stabilisierung der Hormuz-Straße unterstreichen – das zentrale Schifffahrtsrouting am Golf. Gleichzeitig sind sie aber besorgt, dass Trump in Évian zentrale Themen verdrängt: die Ukraine und China.</p>
   <p><strong>Warum es zählt:</strong> Der G7 entscheidet indirekt mit, wie westliche Außenpolitik koordiniert wird. Wenn der US-Präsident seine Aufmerksamkeit weg von der Ukraine lenkt und die Europäer stattdessen Iran-Stabilität vor Krieg priorisieren müssen, schwächt das die vereinigte Unterstützung für Kiew und verzögert Lösungen. Für Österreich heißt das konkret: mehr Druck auf die EU, eigene Außenpolitik und Sanktionen zu tragen. (Politik) <a class="source-link" href="https://www.diepresse.com/29606654/iran-und-donald-trump-wirbeln-die-agenda-des-g7-gipfels-durcheinander">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>2️⃣ 🔬 Großbritannien verbietet soziale Netzwerke für unter 16-Jährige</h2>
   <p><strong>Was ist neu:</strong> Die britische Labour-Regierung plant ein striktes Verbot von TikTok, Instagram und YouTube für Kinder unter 16 Jahren. Die Bevölkerung unterstützt das Vorhaben mehrheitlich. Experten jedoch sehen das Modell kritisch – sowohl technisch (wie lässt sich das durchsetzen?) als auch inhaltlich (Zensur vs. Schutz).</p>
   <p><strong>Warum es zählt:</strong> Großbritannien setzt hier ein Signal für andere Länder, darunter die EU. Sollte das Verbot funktionieren, könnte Österreich und die EU ähnliche Regelungen erwägen. Das würde das Geschäftsmodell dieser Plattformen massiv treffen und Regeln für Tech-Konzerne neu definieren. (Digitales) <a class="source-link" href="https://www.diepresse.com/30269127/verboten-fuer-kinder-unter-16-briten-gehen-rigoros-gegen-tiktok-instagram-und-youtube-vor">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 105 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
@@ -369,6 +391,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -327,11 +349,11 @@
   <p><strong>Was ist neu:</strong> Bulgariens Ministerpräsident Rumen Radew wird kommende Sanktionen gegen Russland auf EU-Ebene blockieren. Grund: Die wirtschaftlichen Folgen für Bulgarien seien zu gravierend. Das ist eine konkrete Entscheidung, die den einstimmig erforderlichen EU-Beschluss gefährdet — bei Sanktionen muss jedes Mitgliedsland zustimmen.</p>
   <p><strong>Warum es zählt:</strong> Dieses Veto zeigt, dass die EU-Einheit gegen Russland bröckelt. Bulgarien ist wirtschaftlich eng mit Russland verflochten, insbesondere beim Gas. Solche Blockaden schwächen die Handlungsfähigkeit der Union in ihrer Außenpolitik und sind ein Signal für Moskau, auf Zeit zu spielen. Für Österreich bedeutet das: Die Debatte über Sanktionen wird schwieriger — ein Land kann künftig öfter Druck aufbauen.</p>
   <p>(International · <a class="source-link" href="https://www.diepresse.com/31440372/bulgarien-wird-veto-gegen-russland-sanktionen-der-eu-einlegen">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-18|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><h2>2️⃣ 🏛 Stocker setzt auf kleineres EU-Budget — Rabatt bis Jahresende</h2>
+<div class="article-fb" data-key="2026-06-18|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>2️⃣ 🏛 Stocker setzt auf kleineres EU-Budget — Rabatt bis Jahresende</h2>
   <p><strong>Was ist neu:</strong> Bundeskanzler Stocker bekräftigt die österreichische Forderung nach einem kleineren EU-Budgetvolumen. Die Obergrenze soll bei etwa einem Prozent der Wirtschaftsleistung liegen statt höher. Stocker will bis Jahresende einen österreichischen Rabatt auf die Zahlungen durchsetzen.</p>
   <p><strong>Warum es zählt:</strong> Das EU-Budget wird derzeit neu verhandelt — ein Kampf um Milliarden für jeden Mitgliedstaat. Österreich als Nettozahler versucht, seine Beitragslast zu senken. Das ist eine klassische Interessenvertretung, kann aber auch EU-Projekte (Grüner Deal, Verteidigungsfonds) bremsen. Für dein Geldbörserl könnte das später Auswirkungen auf Förderungen haben.</p>
   <p>(Politik · <a class="source-link" href="https://www.diepresse.com/31439492/stocker-bekraeftigt-forderung-nach-kleinerem-eu-budgetvolumen">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-18|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-18|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (17.06.) haben erste iranische Rohölexporte per Schiff wieder begonnen — die ersten Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber vor anhaltenden Spannungen wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionalen Risiken — Entspannung bleibt also begrenzt.</p>
   <hr>
@@ -376,6 +398,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

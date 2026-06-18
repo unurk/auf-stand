@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -325,17 +347,17 @@
   <p><strong>Was ist neu:</strong> Österreichs Wirtschaftsminister Wolfgang Hattmannsdorfer hat in einem Interview klare Prioritäten gesetzt: Die Senkung der Strompreise rangiert für ihn deutlich vor Naturschutzmaßnahmen. Er argumentiert, dass Österreich für mehr Wettbewerbsfähigkeit einen „Schulterschluss&quot; braucht – zentral dafür seien die kommenden Lohnverhandlungen und der schnellere Ausbau erneuerbarer Energien.</p>
   <p><strong>Warum es zählt:</strong> Das signalisiert eine Verschiebung in der Regierungspolitik. Für deine Stromrechnung und dein Portemonnaie könnte das bedeuten: Es wird Druck auf Energiepreise geben. Gleichzeitig zeigt sich ein Konflikt zwischen Wachstumspolitik und Naturschutz, der auch Genehmigungsverfahren für Energieprojekte beschleunigen könnte.</p>
   <p>(Wirtschaft) [→ Artikel](https://www.diepresse.com/29884706/hattmannsdorfer-die-haselmaus-ist-nicht-wichtiger-als-guenstige-strompreise)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>2️⃣ 🏛 Kassenärzte in Tirol: 45 Prozent haben Patientenstopp</h2>
   <p><strong>Was ist neu:</strong> Fast jede zweite Kassenordination in Tirol nimmt derzeit keine neuen Patientinnen und Patienten mehr auf — eine aktuelle Erhebung zeigt, dass Tirol damit über dem österreichischen Durchschnitt liegt. Bestimmte Fachrichtungen sind besonders betroffen.</p>
   <p><strong>Warum es zählt:</strong> Das macht es für dich als Patientin schwerer, überhaupt noch einen Kassenarzt zu finden. Der Zugang zur medizinischen Versorgung wird knapper, was längere Wartezeiten und Druck auf Privatordinationen bedeutet.</p>
   <p>(Gesundheit) [→ Artikel](https://tirol.orf.at/stories/3358320/)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>3️⃣ 🏛 Salzburg: SPÖ wählt Peter Eder zum neuen Parteichef</h2>
   <p><strong>Was ist neu:</strong> Nach fast zwei Jahren interimistischer Führung durch ein Trio bekommt die Salzburger SPÖ heute einen neuen alleinigen Vorsitzenden: Arbeiterkammerpräsident Peter Eder wird auf dem Landesparteitag in St. Johann gewählt.</p>
   <p><strong>Warum es zählt:</strong> Das klärt die personelle Situation vor wichtigen politischen Entscheidungen in Salzburg und gibt der SPÖ wieder klare Führungsstrukturen.</p>
   <p>(Politik) [→ Artikel](https://salzburg.orf.at/stories/3358304/)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|2"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächstes Update: heute 16:00.</em></p>
 </div>
 </div>
@@ -375,6 +397,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

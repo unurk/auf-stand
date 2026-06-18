@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -325,11 +347,11 @@
   <p><strong>Warum es zählt:</strong> Ein niedrigerer Ölpreis dämpft die Energiekosten in Österreich — das wirkt sich auf Strom-, Heiz- und Transportkosten aus und entlastet deine Kaufkraft. Allerdings rechnen Analysten damit, dass der Preis noch monatelang angespannt bleibt: Chinas schwache Nachfrage, OPEC-Förderdrosselungen und anhaltende regionale Unsicherheiten halten den Druck oben. Eine schnelle, dauerhafte Entspannung ist nicht zu erwarten.</p>
   <p><strong>Was kommt:</strong> Die tatsächliche Umsetzung des Deals und die weitere Entwicklung im Nahen Osten bleiben Haupttreiber für die Energiepreise.</p>
   <p>(Politik/International · <a class="source-link" href="https://www.diepresse.com/30800885/warum-trump-die-europaeer-in-der-strasse-von-hormuz-braucht">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-16|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><h2>2️⃣ 🇭🇺 Ungarns neue Regierung zerlegt Orbáns Propagandanetzwerk</h2>
+<div class="article-fb" data-key="2026-06-16|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>2️⃣ 🇭🇺 Ungarns neue Regierung zerlegt Orbáns Propagandanetzwerk</h2>
   <p><strong>Was ist neu:</strong> Die neu gewählte ungarische Regierung löst drei Dutzend Stiftungen auf, mit denen Orbáns abgewählte Fidesz-Partei jahrelang die öffentliche Meinung beeinflusste — darunter das einflussreiche Mathias Corvinus Collegium, dessen Brüsseler Dependance ihre üppige Finanzierung verliert.</p>
   <p><strong>Warum es zählt:</strong> Das Signal aus Budapest zeigt, dass ein Regierungswechsel auch die institutionalisierten Strukturen von Macht und Einflussnahme abstoßen kann. Für die EU ist das relevant: Transparenz und Kontrolle über Lobbystrukturen werden gestärkt. Gleichzeitig unterstreicht es, wie tief Orbáns Netzwerk in die Gesellschaft reichte.</p>
   <p>(Politik · <a class="source-link" href="https://www.diepresse.com/30547421/viktor-orbans-milliardenschwere-pr-maschine-wird-verschrottet">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-16|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand hat die Iran-Einigung den Ölpreis um knapp 5 % gesenkt. Experten rechnen aber damit, dass er noch monatelang angespannt bleibt — wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und bestehender regionaler Unsicherheiten.</p>
   <hr>
@@ -374,6 +396,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

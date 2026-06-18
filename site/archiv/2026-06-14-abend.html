@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -323,11 +345,11 @@
   <h2>1️⃣ 🌍 Schweiz lehnt Bevölkerungsobergrenze deutlich ab</h2>
   <p><strong>Was ist neu:</strong> Die Schweiz hat sich beim Referendum gegen eine vom nationalpopulistischen Milieu vorangetriebene strikte Obergrenze für die Einwohnerzahl ausgesprochen. Die Befürworter einer maximalen Bevölkerung zeichneten sich am Sonntag als klare Verlierer ab. Das Votum ist weltweit einzigartig — kein anderes Land hat seine Bevölkerungsgröße per Verfassungsreferendum festschreiben wollen. Hintergrund ist ein vieldiskutierter Begriff des „Dichtestress&quot;, der auf verhaltensbiologischen Experimenten aus amerikanischen Laboren basiert und in der Schweizer Politikdebatte zentrales Argument der Gegner von Migration und Wachstum war.</p>
   <p><strong>Warum es zählt:</strong> Das Ergebnis zeigt, dass Schweizer Wähler trotz wachsender Migrations- und Integrationsdiskurse rechtsnationale Bevölkerungspolitik ablehnen. Für Österreich relevant: Die Schweiz ist Referenzland für konservative Migrationspolitik — dieses Votum signalisiert, dass auch dort eine Grenze für restriktive Maßnahmen besteht. Es schwächt zugleich die wissenschaftliche Legitimation von „Überbevölkerungs&quot;-Argumenten. <a class="source-link" href="https://www.diepresse.com/30228134/schweiz-darf-mehr-als-zehn-millionen-einwohner-haben">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-14|abend|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-14|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>2️⃣ ⚖️ Schulbibliothek wird nach tödlicher Attacke auf Lehrerin umgebaut</h2>
   <p><strong>Was ist neu:</strong> Nach dem Femizid an einer Lehrerin, der sich am Freitag in einer oberösterreichischen Schulbibliothek ereignet haben soll, wird der Raum umgebaut. Der Ort ist zentral gelegen und Schüler müssten ihn regelmäßig passieren. Die betroffene Volks- und Mittelschule bleiben nächste Woche noch mit reduziertem Betrieb geöffnet.</p>
   <p><strong>Warum es zählt:</strong> Die Entscheidung der Schule zeigt, wie ein Schultrauma durch räumliche Umgestaltung adressiert werden soll — ein Ansatz, der die Rückkehr zur Normalität für Schüler und Lehrkörper ermöglichen soll. Gleichzeitig dokumentiert der Fall erneut geschlechtsspezifische Gewalt im Arbeitsumfeld. <a class="source-link" href="https://www.diepresse.com/30227031/schulbibliothek-wird-nach-femizid-in-oberoesterreich-umgebaut">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-14|abend|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-14|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
@@ -369,6 +391,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback

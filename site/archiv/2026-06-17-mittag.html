@@ -139,6 +139,28 @@
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Karten) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 14px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: #f1f4f8; color: #7c8aa0;
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-card { padding: 18px 20px 16px; }
+    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+    }
     /* ── Ressort-Tag ── */
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
@@ -324,14 +346,14 @@
   <h2>1️⃣ 📊 BMW-Gewinnwarnung trifft Österreichs Zulieferer hart</h2>
   <p><strong>Was ist neu:</strong> Der Autohersteller BMW senkt seine Jahresprognose deutlich und fährt seinen Sparkurs auf. Der Grund: schwächere Nachfrage und höhere Kosten. BMW produziert im österreichischen Steyr und ist ein Großauftraggeber für heimische Kfz-Zulieferer — eine Branche, die bereits unter Druck steht.</p>
   <p><strong>Warum es zählt:</strong> Die BMW-Warnung signalisiert Probleme im gesamten europäischen Autosektor. Für Österreichs Exportwirtschaft, die stark von der Automobilindustrie abhängt, könnte das Aufträge und Arbeitsplätze kosten. Der neue Vorstandschef Milan Nedeljkovic muss das Vertrauen der Märkte zurückgewinnen — bisher ein Fehlstart. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30863279/bmw-aktie-unter-druck-das-steckt-hinter-dem-zwoelf-prozent-einbruch">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-17|mittag|0"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>2️⃣ 🏛️ Fiskalrat verlangt zusätzliches Sparpaket — Defizit bleibt zu hoch</h2>
   <p><strong>Was ist neu:</strong> Österreichs unabhängige Staatsschuldenwächter lehnen das Doppelbudget von Finanzminister Markus Marterbauer ab. Das Defizit sinkt nicht ausreichend — es bleibt bis Ende des Jahrzehnts bei knapp vier Prozent statt der geforderten drei. Die Folge: Österreich braucht ein zusätzliches Sparpaket von fast sechs Milliarden Euro. Gleichzeitig erwartet der Fiskalrat einen historischen Rekord bei der Staatsverschuldung.</p>
   <p><strong>Warum es zählt:</strong> Das ist ein klares politisches Signal: Die bisherigen Sparmaßnahmen reichen nicht. Regierung und Opposition werden unter Druck geraten, nachzulegen — durch Kürzungen oder höhere Einnahmen, die am Ende dein Haushalt und der Arbeitsmarkt spüren werden. (Politik · <a class="source-link" href="https://www.diepresse.com/30857681/fiskalrat-zerreisst-doppelbudget-defizit-bleibt-zu-hoch-oesterreich-braucht-weiteres-sparpaket-von-fast-sechs-milliarden">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-17|mittag|1"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>3️⃣ 📊 Inflation klettert auf 3,7 Prozent — Flugtickets und Energiepreise treiben</h2>
   <p>Österreichs Inflationsrate ist im Mai gestiegen. Flugtickets, Treibstoff und Heizöl waren die Haupttreiber. Das verschärft Druck auf die Kaufkraft — gerade bei Pendlern und für den Sommer relevant. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30869849/inflation-stieg-im-mai-auf-3-7-prozent">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-17|mittag|2"><button class="fb-btn" data-vote="up">👍 Relevant</button><button class="fb-btn" data-vote="down">👎</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (16.06.) hat sich die Lage durch iranische Rohölexporte per Schiff etwas entspannt — erste Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber: Er bleibt noch monatelang angespannt wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionaler Unsicherheiten. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30848620/tracking-website-zeigt-iranische-oel-exporte-per-schiff-laufen-wieder-an">Weiterlesen bei der Presse →</a>)</p>
   <hr>
@@ -376,6 +398,33 @@
       } else if(card){
         card.appendChild(n);
       }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
     });
   })();
   // Artikel-Feedback
