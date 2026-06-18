@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
-  <link rel="manifest" href="manifest.webmanifest">
-  <script src="push-config.js"></script>
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../push-config.js"></script>
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Copilot">
@@ -223,14 +223,11 @@
 <body>
 <div class="scroll-area">
 <header class="masthead">
-  <img class="wordmark-logo" src="die-presse-logo.png" alt="Die Presse">
+  <img class="wordmark-logo" src="../die-presse-logo.png" alt="Die Presse">
   <div class="sublabel">Copilot</div>
 </header>
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Do, 18. Jun · Nachmittags-Ausgabe</p><h1>Der Nachmittag, kompakt.</h1><p class="byline">Von der „Presse“-Redaktion · 3 Themen · ca. 2 Min.</p></header>
-<p class="next-edition">Nächstes Lagebild: heute 20:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p>
-<div class="streak">🔥 7 Tage in Folge informiert</div>
-<div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header"><p class="kicker">Do, 18. Jun · Nachmittags-Ausgabe</p><h1>Der Nachmittag, kompakt.</h1><p class="byline">Von der „Presse“-Redaktion · 3 Themen · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>1️⃣ Iran und USA einigen sich — Ölpreise fallen, erste Tanker unterwegs</p>
   <p>2️⃣ Ukraine fliegt Großangriff auf Russland — Eskalation ohne Diplomatie</p>
   <p>3️⃣ Energiepreise: Entspannung hält an, aber Experten warnen vor längeren Spannungen</p>
@@ -258,9 +255,9 @@
 </div>
 </div>
 <nav class="tabbar">
-  <a href="index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
-  <a href="dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
-  <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
+  <a href="../index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Lagebild</span></a>
+  <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
 <script>
@@ -284,7 +281,7 @@
   // PWA: Service Worker registrieren (Offline-Cache, „Auf Home Screen").
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
 })();
