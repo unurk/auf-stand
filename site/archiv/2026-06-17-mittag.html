@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="../manifest.webmanifest">
@@ -15,217 +15,306 @@
   <meta name="application-name" content="Copilot">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Mi 17. Jun · Mittags-Ausgabe · Die Presse · Copilot</title>
   <style>
-    /* Copilot — helles, ruhiges Redaktions-Layout im Geist der New York Times:
-       Schwarz auf Weiß, viel Weißraum, ein einziger zurückhaltender Akzent (Link-Blau).
-       Schriften: Libre Caslon Text (Headlines), Libre Franklin (UI), Georgia (Fließtext). */
-    :root { --bg: #ffffff; --surface: #f7f6f3;
-            --border: #e3e1dc; --text: #121212; --fg: #121212;
-            --muted: #6b6b6b; --accent: #326891;
-            --accent-bright: #326891;
-            --serif: 'Libre Caslon Text', Georgia, 'Times New Roman', serif;
-            --sans: 'Libre Franklin', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; }
+    /* Copilot · Die Presse — Design B (Modern Clean)
+       Schriften: Source Serif 4 (Headlines), Libre Franklin (UI + Text).
+       Akzent: #1e5fd6 (Presse-Blau). Hintergrund: #eef1f5 mit weißen Karten. */
+    :root {
+      --bg: #eef1f5; --surface: #ffffff; --border: #e6eaf0;
+      --text: #16202b; --fg: #3a444f; --muted: #7c8aa0;
+      --accent: #1e5fd6; --accent-soft: rgba(30,95,214,.10);
+      --accent-shadow: rgba(30,95,214,.50);
+      --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      --sans: 'Libre Franklin', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: -webkit-fill-available; }
-    body { background: var(--bg); color: var(--text); font-family: Georgia, serif;
-           font-size: 18px; line-height: 1.65;
-           -webkit-font-smoothing: antialiased;
-           display: flex; flex-direction: column;
-           height: 100vh; height: -webkit-fill-available; overflow: hidden; }
+    body {
+      background: #dfe3e8; color: var(--text); font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column;
+      height: 100vh; height: -webkit-fill-available; overflow: hidden;
+    }
+    /* ── App-Shell (zentrierte Handy-Säule) ── */
+    .app {
+      max-width: 430px; width: 100%; margin: 0 auto; background: var(--bg);
+      display: flex; flex-direction: column;
+      height: 100vh; height: -webkit-fill-available; overflow: hidden;
+    }
+    /* ── Scroll-Bereich ── */
     .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-    a { color: var(--accent-bright); text-decoration: none; }
+    a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    /* ── Masthead ── */
-    .masthead { text-align: center; padding: 34px 20px 20px;
-                border-bottom: 1px solid var(--text); }
-    .wordmark { font-family: var(--serif); font-weight: 400; font-size: 38px;
-                letter-spacing: 0.01em; color: var(--text); line-height: 1; }
-    .wordmark-logo { display: block; margin: 0 auto; width: clamp(180px, 60vw, 230px);
-                     height: auto; }
-    .sublabel { font-family: var(--sans); font-size: 10px; letter-spacing: 0.42em;
-                text-transform: uppercase; color: var(--muted); margin-top: 12px;
-                font-weight: 600; padding-left: 0.42em; }
+    /* ── Topbar (ersetzt Masthead) ── */
+    .topbar {
+      background: var(--surface); box-shadow: 0 1px 0 var(--border);
+      flex-shrink: 0;
+    }
+    .brandrow {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 22px 14px;
+    }
+    .wordmark-text {
+      font-family: var(--serif); font-weight: 700; font-size: 19px;
+      letter-spacing: -.01em; color: var(--text);
+    }
+    .copilot-pill {
+      display: inline-flex; align-items: center; padding: 5px 11px;
+      border-radius: 999px; font: 700 10px var(--sans);
+      letter-spacing: .1em; text-transform: uppercase;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .progress-track { height: 2px; background: var(--bg); }
+    .progress-bar {
+      height: 100%; border-radius: 0 2px 2px 0;
+      background: var(--accent); width: 0; transition: width .12s linear;
+    }
+    /* ── Masthead ausblenden (Topbar übernimmt) ── */
+    .masthead { display: none; }
     /* ── Layout ── */
-    .wrap { max-width: 680px; margin: 0 auto; padding: 38px 20px 56px; }
-    /* ── Typografie (Serifen-Skala) ── */
-    h1 { font-family: var(--serif); font-size: 2.5rem; line-height: 1.16;
-         margin: 0 0 14px; font-weight: 400; color: var(--text);
-         letter-spacing: -0.005em; }
-    h2 { font-family: var(--serif); font-size: 1.55rem; line-height: 1.25;
-         margin: 44px 0 12px; font-weight: 700; color: var(--text); }
-    p { margin: 0 0 15px; color: #1f1f1f; }
-    strong { font-family: var(--sans); font-size: 11.5px; letter-spacing: 0.07em;
-             text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .wrap { padding: 6px 0 16px; }
+    /* ── Typografie ── */
+    h1 {
+      font-family: var(--serif); font-size: 1.9rem; line-height: 1.14;
+      margin: 0 0 12px; font-weight: 600; color: var(--text); letter-spacing: -.015em;
+    }
+    h2 {
+      font-family: var(--serif); font-size: 1.25rem; line-height: 1.25;
+      margin: 0 0 10px; font-weight: 600; color: var(--text);
+    }
+    p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
+    strong {
+      font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--accent); font-weight: 700;
+    }
     em { font-style: italic; color: var(--muted); }
-    hr { border: none; border-top: 1px solid var(--border); margin: 34px 0; }
-    /* ── Lagebild-Kopf (Kicker · Begrüßung · Meta) ── */
-    .lagebild-header { margin: 0; }
-    .kicker { font-family: var(--sans); font-size: 12px; font-weight: 600;
-              letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
-              margin: 0 0 10px; }
-    .lagebild-header h1 { margin: 0 0 14px; }
-    .next-edition { font-family: var(--sans); font-size: 12px; color: var(--muted);
-                    margin: 0 0 22px; }
-    /* ── Byline (redaktionelle Stimme) ── */
-    .byline { font-family: var(--sans); font-size: 13px; color: var(--muted);
-              font-weight: 500; letter-spacing: 0.01em; margin: 0 0 24px;
-              padding-bottom: 16px; border-bottom: 1px solid var(--border);
-              text-transform: none; }
-    /* ── Streak-Ritus (nur Startseite) ── */
-    .streak { display: inline-flex; align-items: center; gap: 7px;
-              font-family: var(--sans); font-size: 13px; font-weight: 600;
-              color: var(--accent); background: #eef3f8; border: 1px solid #d4e1ee;
-              border-radius: 999px; padding: 7px 15px; margin: 0 0 22px; }
-    /* ── Audio-Player (Lagebild zum Hören) ── */
-    .audio-player { margin: 4px 0 26px; }
-    .audio-player .audio-label { display: block; font-family: var(--sans);
-              font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-              color: var(--muted); margin-bottom: 8px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+    /* ── Lagebild-Kopf als Karte ── */
+    .lagebild-header {
+      background: var(--surface); border-radius: 18px; padding: 20px;
+      margin: 8px 16px 6px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+    }
+    .kicker {
+      font: 600 11px var(--sans); letter-spacing: .04em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 10px;
+    }
+    .lagebild-header h1 { margin: 0 0 12px; }
+    .next-edition { font: 400 12px var(--sans); color: var(--muted); margin: 8px 0 0; }
+    /* ── Byline ── */
+    .byline {
+      font: 500 13px var(--sans); color: var(--muted);
+      padding-top: 10px; border-top: 1px solid var(--border); margin: 10px 0 0;
+    }
+    /* ── Streak ── */
+    .streak {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 12px var(--sans); color: #c47d1a;
+      background: #fff3e0; border-radius: 999px;
+      padding: 5px 13px; margin: 10px 0 0;
+    }
+    /* ── Audio-Player ── */
+    .audio-player {
+      background: var(--surface); border-radius: 14px; padding: 16px 18px;
+      margin: 6px 16px; box-shadow: 0 8px 20px -14px rgba(22,32,43,.22);
+    }
+    .audio-player .audio-label {
+      display: block; font: 600 11px var(--sans); letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
     .audio-player audio { width: 100%; height: 40px; }
-    /* ── Heute-wichtig-Box ── */
-    .highlights { background: var(--surface); border-left: 3px solid var(--accent);
-                  border-radius: 8px; padding: 16px 18px; margin: 4px 0 26px; }
-    .highlights p { margin: 0 0 8px; font-size: 16px; }
+    /* ── Heute-wichtig-Box als Karte ── */
+    .highlights {
+      background: var(--surface); border-radius: 18px; padding: 18px 20px;
+      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+    }
+    .highlights strong { display: block; margin-bottom: 10px; }
+    .highlights p { margin: 0 0 7px; font-size: 14px; line-height: 1.45; color: var(--fg); }
     .highlights p:last-child { margin-bottom: 0; }
-    .highlights strong { display: block; margin-bottom: 8px; }
-    /* ── Ressort-Tag (farbig, oklch via --h — helle Variante) ── */
-    .ressort { display: inline-block; background: oklch(0.95 0.03 var(--h, 24));
-               color: oklch(0.45 0.13 var(--h, 24)); border-radius: 999px;
-               padding: 3px 11px; font-family: var(--sans); font-size: 11px;
-               font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-               vertical-align: middle; }
-    /* ── Quell-Link als Primary-Pill ── */
-    .source-link { display: inline-block; margin-top: 4px; background: var(--accent);
-                   color: #ffffff; border-radius: 999px; padding: 5px 15px;
-                   font-family: var(--sans); font-size: 12px; font-weight: 600;
-                   letter-spacing: 0.04em; text-decoration: none; }
-    .source-link:hover { background: #284f6f; color: #ffffff;
-                         text-decoration: none; }
-    .byline-source { font-family: var(--sans); font-size: 12px; font-style: italic;
-                     color: var(--muted); white-space: nowrap; }
-    .reporters { font-family: var(--sans); font-size: 13px; color: var(--muted);
-                 margin: 28px 0 0; padding-top: 16px;
-                 border-top: 1px solid var(--border); }
-    /* ── Status / Done box ── */
-    .done { border: 1px solid #cfe3d3; border-radius: 10px; padding: 14px 18px;
-            background: #f0f7f1; color: #2e6b3f;
-            font-family: var(--sans); font-size: 14px; margin: 32px 0; }
-    /* ── Archiv-Karten ── */
-    .archiv-grid { display: grid;
-                   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                   gap: 12px; margin-top: 28px; }
-    .archiv-card { display: block; border: 1px solid var(--border); border-radius: 10px;
-                   padding: 16px 18px; background: var(--surface); }
+    /* ── Story-Karten (h2 + Body bis zur nächsten hr) ── */
+    .story-card {
+      background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
+      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+    }
+    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
+    h2 { margin: 28px 0 10px; }
+    /* ── Ressort-Tag ── */
+    .ressort {
+      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
+      letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
+    }
+    /* ── Quell-Link als Pill ── */
+    .source-link {
+      display: inline-block; background: var(--accent); color: #fff;
+      border-radius: 999px; padding: 6px 16px; font: 600 12px var(--sans);
+      letter-spacing: .03em; text-decoration: none; margin-top: 4px;
+      transition: filter .15s;
+    }
+    .source-link:hover { filter: brightness(.9); text-decoration: none; }
+    .byline-source { font: italic 12px var(--sans); color: var(--muted); white-space: nowrap; }
+    .reporters {
+      font: 400 13px var(--sans); color: var(--muted);
+      margin: 6px 16px 0; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    /* ── Done-Box ── */
+    .done {
+      background: var(--surface); border-radius: 18px; padding: 16px 20px;
+      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+      font: 600 13px var(--sans); color: #1f8a5b;
+    }
+    /* ── Archiv ── */
+    .archiv-grid {
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 8px 16px 0;
+    }
+    .archiv-card {
+      display: block; background: var(--surface); border-radius: 14px;
+      padding: 15px 18px; box-shadow: 0 8px 22px -14px rgba(22,32,43,.25);
+      border: 1.5px solid var(--border); transition: border-color .15s;
+    }
     .archiv-card:hover { border-color: var(--accent); text-decoration: none; }
-    .archiv-date { display: block; font-family: var(--sans);
-                   font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
-    .archiv-label { display: block; font-family: var(--sans);
-                    font-size: 12px; color: var(--muted); }
-    /* ── Dossier / Themen-Verlauf ── */
-    .dossier-topic { margin: 0 0 40px; }
-    .dossier-topic h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px;
-                        margin-bottom: 16px; }
+    .archiv-date { display: block; font: 600 14px var(--sans); color: var(--text); margin-bottom: 3px; }
+    .archiv-label { display: block; font: 400 12px var(--sans); color: var(--muted); }
+    /* ── Dossier / Themen ── */
+    .dossier-topic {
+      background: var(--surface); border-radius: 14px; padding: 18px 20px;
+      margin: 6px 16px; box-shadow: 0 8px 22px -14px rgba(22,32,43,.25);
+    }
+    .dossier-topic h2 {
+      margin: 0 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px;
+    }
     .dossier-entries { list-style: none; padding: 0; margin: 0; }
-    .dossier-entries li { padding: 10px 0; border-bottom: 1px solid var(--border);
-                           display: flex; gap: 14px; align-items: baseline; font-size: 16px;
-                           color: #1f1f1f; }
+    .dossier-entries li {
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+      display: flex; gap: 12px; align-items: baseline; font-size: 14px; color: var(--fg);
+    }
     .dossier-entries li:last-child { border-bottom: none; }
-    .dossier-date { font-family: var(--sans); font-size: 12px;
-                    color: var(--accent); font-weight: 600; white-space: nowrap; min-width: 72px; }
-    .empty-state { color: var(--muted); font-style: italic; padding: 40px 0; text-align: center;
-                   font-family: var(--sans); font-size: 15px; }
-    /* ── Tab-Leiste unten ── */
-    .tabbar { height: 64px; flex-shrink: 0;
-              background: #ffffff; border-top: 1px solid var(--border);
-              display: flex; z-index: 10;
-              padding-bottom: env(safe-area-inset-bottom); }
-    .tab { flex: 1; display: flex; flex-direction: column; align-items: center;
-           justify-content: center; gap: 3px; color: var(--muted);
-           font-family: var(--sans); font-size: 10px;
-           letter-spacing: 0.04em; text-transform: uppercase; border-top: 2px solid transparent; }
+    .dossier-date { font: 600 12px var(--sans); color: var(--accent); white-space: nowrap; min-width: 68px; }
+    .empty-state {
+      color: var(--muted); font-style: italic; padding: 32px 16px;
+      text-align: center; font: 400 15px var(--sans);
+    }
+    /* ── Tab-Leiste (sticky unten) ── */
+    .tabbar {
+      background: var(--surface); border-top: 1px solid var(--border);
+      display: flex; z-index: 20; padding: 8px 4px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      flex-shrink: 0;
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; color: var(--muted);
+      font: 500 10px var(--sans); letter-spacing: .02em; text-transform: uppercase;
+      transition: color .15s; border-top: 2px solid transparent; padding-top: 6px;
+    }
     .tab:hover { color: var(--text); text-decoration: none; }
-    .tab svg { width: 23px; height: 23px; }
-    .tab.active { color: var(--text); border-top-color: var(--accent); }
+    .tab svg { width: 22px; height: 22px; }
+    .tab.active { color: var(--accent); font-weight: 700; border-top-color: var(--accent); }
     /* ── Artikel-Feedback ── */
-    .article-fb { display: flex; gap: 8px; margin: 14px 0 4px; }
-    .fb-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
-              padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--muted);
-              font-family: var(--sans); line-height: 1; }
-    .fb-btn.active[data-vote="up"] { background: #eaf5ec;
-              border-color: #9ccfa5; color: #2e6b3f; }
-    .fb-btn.active[data-vote="down"] { background: #fdeceb;
-              border-color: #e3a9a4; color: #b3261e; }
+    .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
+    .fb-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #eef2f7; border: none; border-radius: 999px;
+      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      color: var(--muted); transition: all .15s; line-height: 1;
+    }
+    .fb-btn:hover { filter: brightness(.97); }
+    .fb-btn.active[data-vote="up"] {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 12px -4px var(--accent-shadow);
+    }
+    .fb-btn.active[data-vote="down"] { background: #28303a; color: #fff; }
     /* ── Themen-Reiter ── */
-    .schlagwort-badge { display: inline-block; font-size: 11px; font-family: var(--sans);
-                        color: var(--accent); background: #eef3f8;
-                        border: 1px solid #d4e1ee; border-radius: 999px;
-                        padding: 2px 8px; margin-left: 8px; vertical-align: middle;
-                        letter-spacing: 0.03em; }
-    .dossier-empty { color: var(--muted); font-style: italic; font-size: 14px;
-                     font-family: var(--sans); padding: 10px 0 6px; }
-    .topic-stand { font-size: 13px; color: var(--muted); font-style: italic;
-                   font-family: var(--sans); margin: 6px 0 10px; }
+    .schlagwort-badge {
+      display: inline-block; font: 600 11px var(--sans); color: var(--accent);
+      background: var(--accent-soft); border-radius: 999px;
+      padding: 2px 8px; margin-left: 8px; vertical-align: middle; letter-spacing: .03em;
+    }
+    .dossier-empty { color: var(--muted); font-style: italic; font: 400 13px var(--sans); padding: 6px 0; }
+    .topic-stand { font: italic 13px var(--sans); color: var(--muted); margin: 4px 0 10px; }
     .topic-articles { list-style: none; padding: 0; margin: 0; }
-    .topic-article { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .topic-article { padding: 9px 0; border-bottom: 1px solid var(--border); }
     .topic-article:last-child { border-bottom: none; }
-    .topic-article a { color: var(--fg); text-decoration: none; display: flex;
-                        justify-content: space-between; align-items: baseline; gap: 10px; }
-    .topic-article-title { flex: 1; font-size: 15px; line-height: 1.4; }
-    .topic-article-date { font-size: 12px; color: var(--muted);
-                           font-family: var(--sans); white-space: nowrap; }
+    .topic-article a {
+      color: var(--fg); text-decoration: none; display: flex;
+      justify-content: space-between; align-items: baseline; gap: 10px;
+    }
+    .topic-article-title { flex: 1; font-size: 14px; line-height: 1.4; }
+    .topic-article-date { font: 400 12px var(--sans); color: var(--muted); white-space: nowrap; }
     /* ── Assessment v2 (Toggle-Karten) ── */
-    .as-intro-text { font-size: 15px; color: var(--muted); font-family: var(--sans);
-                     line-height: 1.6; margin-bottom: 20px; }
-    .as-btn-primary { background: var(--accent); border-color: var(--accent);
-                       color: #ffffff; font-weight: 600; border-radius: 999px;
-                       padding: 13px 28px; font-size: 15px; cursor: pointer;
-                       font-family: var(--sans); border: none; display: inline-block; }
-    .as-toggle-card { display: flex; gap: 14px; align-items: flex-start;
-                       padding: 14px; border: 1px solid var(--border); border-radius: 10px;
-                       margin: 8px 0; cursor: pointer; transition: border-color 0.15s,background 0.15s;
-                       user-select: none; }
-    .as-toggle-card.selected { border-color: var(--accent); background: #eef3f8; }
-    .as-card-check { width: 22px; height: 22px; border-radius: 50%;
-                      border: 1.5px solid var(--border); display: flex; align-items: center;
-                      justify-content: center; flex-shrink: 0; font-size: 12px;
-                      color: transparent; margin-top: 1px; transition: all 0.15s; }
-    .as-toggle-card.selected .as-card-check { background: var(--accent);
-      border-color: var(--accent); color: #ffffff; }
-    .as-card-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
-    .as-card-q { font-size: 13px; color: var(--muted); font-family: var(--sans); line-height: 1.4; }
-    .as-custom-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 12px; }
+    .as-intro-text { font: 400 15px var(--sans); color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+    .as-btn-primary {
+      background: var(--accent); color: #fff; font-weight: 600; border-radius: 999px;
+      padding: 13px 28px; font-size: 15px; cursor: pointer; font-family: var(--sans);
+      border: none; display: inline-block; transition: filter .15s;
+    }
+    .as-btn-primary:hover { filter: brightness(.93); }
+    .as-toggle-card {
+      display: flex; gap: 14px; align-items: flex-start; padding: 14px;
+      border: 1.5px solid var(--border); border-radius: 14px; margin: 8px 0;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      user-select: none; background: var(--surface);
+    }
+    .as-toggle-card.selected {
+      border-color: rgba(30,95,214,.35); background: var(--accent-soft);
+    }
+    .as-card-check {
+      width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15s;
+    }
+    .as-toggle-card.selected .as-card-check {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
+    .as-card-name { font: 600 14.5px var(--sans); margin-bottom: 3px; line-height: 1.3; }
+    .as-card-q { font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.42; margin-top: 5px; }
+    .as-custom-section { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 12px; }
     .as-custom-inputs { display: flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
-    .as-custom-input { flex: 1; min-width: 130px; background: #ffffff;
-                        border: 1px solid var(--border); border-radius: 8px;
-                        padding: 10px 12px; color: var(--fg); font-size: 14px;
-                        font-family: var(--sans); outline: none; }
+    .as-custom-input {
+      flex: 1; min-width: 130px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; color: var(--fg); font: 400 14px var(--sans); outline: none;
+    }
     .as-custom-input:focus { border-color: var(--accent); }
-    .as-add-btn { background: none; border: 1px solid var(--border); border-radius: 999px;
-                   padding: 10px 18px; color: var(--fg); font-size: 14px;
-                   cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+    .as-add-btn {
+      background: none; border: 1px solid var(--border); border-radius: 999px;
+      padding: 10px 18px; color: var(--fg); font: 400 14px var(--sans);
+      cursor: pointer; white-space: nowrap; transition: border-color .15s;
+    }
     .as-add-btn:hover { border-color: var(--accent); }
-    .as-confirm-row { display: flex; justify-content: space-between; align-items: center;
-                       margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-    .as-cmd-box { background: var(--surface); border: 1px solid var(--border);
-                   border-radius: 8px; padding: 14px; margin: 10px 0 16px;
-                   font-family: monospace; font-size: 13px; color: var(--accent);
-                   white-space: pre-wrap; line-height: 1.7; }
-    .tg-copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px;
-                   padding: 5px 12px; font-size: 12px; color: var(--muted);
-                   cursor: pointer; font-family: var(--sans); margin-left: 8px; }
-    .reset-link { font-size: 12px; color: var(--muted); font-family: var(--sans);
-                  text-decoration: underline; cursor: pointer; margin-top: 24px;
-                  display: inline-block; background: none; border: none; padding: 0; }
+    .as-confirm-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);
+    }
+    .as-cmd-box {
+      background: #f1f4f8; border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; margin: 10px 0 16px; font-family: monospace; font-size: 13px;
+      color: var(--accent); white-space: pre-wrap; line-height: 1.7;
+    }
+    .tg-copy-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 12px; font: 400 12px var(--sans); color: var(--muted);
+      cursor: pointer; margin-left: 8px;
+    }
+    .reset-link {
+      font: 400 12px var(--sans); color: var(--muted); text-decoration: underline;
+      cursor: pointer; margin-top: 20px; display: inline-block; background: none;
+      border: none; padding: 0;
+    }
   </style>
 </head>
 <body>
-<div class="scroll-area">
-<header class="masthead">
-  <img class="wordmark-logo" src="../die-presse-logo.png" alt="Die Presse">
-  <div class="sublabel">Copilot</div>
-</header>
+<div class="app">
+<div class="topbar">
+  <div class="brandrow">
+    <div class="wordmark-text">Die Presse</div>
+    <div class="copilot-pill">Copilot</div>
+  </div>
+  <div class="progress-track"><div class="progress-bar" id="__pb"></div></div>
+</div>
+<div class="scroll-area" id="__sa">
 <div class="wrap">
 <header class="lagebild-header"><p class="kicker">Mi, 17. Jun · Mittags-Ausgabe</p><h1>Schön, dass du schaust.</h1><p class="byline">Von der „Presse“-Redaktion · 3 Themen · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>1️⃣ BMW senkt Jahresprognose deutlich — Auswirkungen auf Österreichs Kfz-Industrie</p>
@@ -257,8 +346,39 @@
   <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
 </nav>
+</div>
 <script>
 (function(){
+  // Lesefortschritts-Balken
+  var sa=document.getElementById('__sa'), pb=document.getElementById('__pb');
+  if(sa&&pb){
+    sa.addEventListener('scroll',function(){
+      var max=sa.scrollHeight-sa.clientHeight;
+      pb.style.width=(max>0?Math.round(sa.scrollTop/max*100):0)+'%';
+    },{passive:true});
+  }
+  // Story-Sektionen in Karten verpacken (h2…hr → .story-card)
+  (function(){
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var nodes=Array.from(wrap.childNodes);
+    var card=null;
+    nodes.forEach(function(n){
+      var tag=n.nodeType===1?n.tagName:'';
+      if(tag==='H2'){
+        card=document.createElement('div');
+        card.className='story-card';
+        n.parentNode.insertBefore(card,n);
+        card.appendChild(n);
+      } else if(tag==='HR'){
+        card=null;
+        wrap.removeChild(n);
+      } else if(card){
+        card.appendChild(n);
+      }
+    });
+  })();
+  // Artikel-Feedback
   function castVote(btn){
     var bar=btn.closest('.article-fb');
     var key='afb_'+bar.dataset.key;
@@ -275,7 +395,7 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
-  // PWA: Service Worker registrieren (Offline-Cache, „Auf Home Screen").
+  // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
       navigator.serviceWorker.register('../sw.js').catch(function(){});
