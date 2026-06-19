@@ -239,7 +239,19 @@ _PAGE_TEMPLATE = """\
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -438,6 +450,15 @@ __CONTENT__
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';
@@ -660,8 +681,9 @@ def _add_article_feedback(content: str, datum: str, edition: str) -> str:
         )
         return m.group(0).rstrip() + bar
 
-    # Jeder Artikel reicht von <h2>[Ziffer] bis zum nächsten <h2>[Ziffer] oder <hr>
-    return re.sub(r"<h2>[1-9].*?(?=<h2>[1-9]|<hr>)", _insert, content, flags=re.DOTALL)
+    # Jeder Artikel — nach Emoji-Stripping keine Ziffernpräfixe mehr:
+    # alle h2 außer "Deine Themen" bekommen einen Feedback-Balken.
+    return re.sub(r"<h2>(?!Deine Themen).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
 
 
 def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
@@ -688,20 +710,39 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
         r'\1',
         content,
     )
-    # Nummern-Emojis aus "Heute wichtig"-Einträgen entfernen
+    # Nummern-Emojis (z.B. 1️⃣) aus "Heute wichtig"-Einträgen entfernen
+    # Nur Emoji-Ziffernfolgen (mit Variation Selector U+FE0F oder Combining Enclosing Keycap)
     content = re.sub(
         r'(<div class="highlights">)(.*?)(</div>)',
         lambda m: m.group(1)
-            + re.sub(r'\d[^\w\s]*\s*(?:[^\x00-\x7F]\S*\s*)?', '', m.group(2))
+            + re.sub(r'\d\uFE0F?\u20E3?\s*', '', m.group(2))
             + m.group(3),
         content,
         flags=re.DOTALL,
     )
-    # Quell-Links als rote Primary-Pill auszeichnen.
+    # Quell-Links als Pill auszeichnen.
     content = re.sub(
         r'<a href="([^"]+)">→ Artikel</a>',
         r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
         content,
+    )
+    # E-Paper-Paragraph (📰) entfernen — steht bereits in der Tab-Leiste.
+    content = re.sub(r'\s*<p>[^<]*📰.*?</p>', '', content, flags=re.DOTALL)
+    # Done-Box: Emoji und ungültige <em>-Tags bereinigen.
+    content = re.sub(
+        r'<div class="done">[^<]*<em>(.*?)(?:</em>)?</div>',
+        r'<div class="done"><span class="done-check">✓</span> \1</div>',
+        content, flags=re.DOTALL,
+    )
+    content = re.sub(
+        r'<div class="done">[✅\s]*(.*?)</div>',
+        r'<div class="done"><span class="done-check">✓</span> \1</div>',
+        content, flags=re.DOTALL,
+    )
+    # "Deine Themen" h2 bekommt eigene Klasse → kein Accordion.
+    content = content.replace(
+        '<h2>Deine Themen</h2>',
+        '<h2 class="topic-summary-head">Deine Themen</h2>',
     )
     # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
     if datum:
