@@ -175,6 +175,9 @@
       transition: filter .15s;
     }
     .source-link:hover { filter: brightness(.9); text-decoration: none; }
+    /* ── Ressort-Pill + Quell-Link: eigene Zeile statt am Fließtext zu hängen ── */
+    .article-foot { display: flex; align-items: center; flex-wrap: wrap;
+                     gap: 10px; margin: 14px 16px 28px; }
     .byline-source { font: italic 12px var(--sans); color: var(--muted); white-space: nowrap; }
     .reporters {
       font: 400 13px var(--sans); color: var(--muted);
@@ -340,6 +343,7 @@
 <div class="wrap">
 <h1>Archiv</h1>
 <div class="archiv-grid">
+<a class="archiv-card" href="2026-06-19-morgen.html"><span class="archiv-date">Fr 19. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-18-abend.html"><span class="archiv-date">Do 18. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-18-nachmittag.html"><span class="archiv-date">Do 18. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-18-mittag.html"><span class="archiv-date">Do 18. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
