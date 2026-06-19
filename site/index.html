@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <title>Fr 19. Jun · Morgen-Ausgabe · Die Presse · Copilot</title>
+  <title>Fr 19. Jun · Mittags-Ausgabe · Die Presse · Copilot</title>
   <style>
     /* Copilot · Die Presse — Design B (Modern Clean)
        Schriften: Source Serif 4 (Headlines), Libre Franklin (UI + Text).
@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -338,29 +350,28 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Fr, 19. Jun · Morgen-Ausgabe</p><h1>Guten Morgen. Hier ist er.</h1><p class="byline">Von der „Presse“-Redaktion · ca. 2 Min.</p><div class="streak">🔥 8 Tage in Folge informiert</div>
+<header class="lagebild-header"><p class="kicker">Fr, 19. Jun · Mittags-Ausgabe</p><h1>Guten Tag. Kurz.</h1><p class="byline">Von der „Presse“-Redaktion · ca. 2 Min.</p><div class="streak">🔥 8 Tage in Folge informiert</div>
 
-<p class="next-edition">Nächstes Lagebild: heute 11:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p>
+<p class="next-edition">Nächstes Lagebild: heute 16:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p>
 </header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
-  <p>EU verlängert Russland-Sanktionen erstmals auf zwölf Monate</p>
-  <p>Britischer Premier Starmer unter Druck — Herausforderer gewinnt Nachwahl</p>
-  <p>Pentagon beansprucht Mrd. Dollar für Iran-Krieg</p>
+  <p>Energiepreise sinken weiter — gute Nachricht für dein Budget</p>
+  <p>Trump erhöht Druck auf Pharmaindustrie — auch Österreich betroffen</p>
   </div><hr>
-  <h2>EU verlängert Russland-Sanktionen erstmals auf zwölf Monate</h2>
-  <p><strong>Was ist neu:</strong> Die Europäische Union hat ihre Wirtschaftssanktionen gegen Russland zum ersten Mal nicht nur für sechs Monate, sondern für ein volles Jahr verlängert. Bulgariens Ministerpräsident Radew kündigt jedoch an, Teile des Sanktionspakets nicht zu unterstützen — ein Veto, das das gesamte Paket blockieren könnte.</p>
-  <p><strong>Warum es zählt:</strong> Die Verlängerung auf zwölf Monate signalisiert eine historische Festigung der europäischen Russland-Politik: Nicht mehr Halbjahreszyklus, sondern strategische Verlängerung. Das schafft Planungssicherheit für österreichische Unternehmen, aber auch Unsicherheit — Bulgariens Blockadehaltung zeigt, dass die EU-Einheit bröckelt. Wie schnell das Veto fällt, hat unmittelbare Auswirkungen auf österreichische Export- und Handelsbeziehungen. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31451734/eu-verlaengert-russland-sanktionen-erstmals-um-zwoelf-monate-bulgarien-kuendigt-veto-an">Weiterlesen bei der Presse →</a></p><hr>
-  <h2>Britischer Premier Starmer unter Druck — Herausforderer gewinnt Nachwahl</h2>
-  <p><strong>Was ist neu:</strong> Andy Burnham, parteiinterner Rivale des britischen Premiers Keir Starmer, hat eine Nachwahl im Kreis Makerfield gewonnen und sichert sich damit einen Parlamentssitz. Das eröffnet ihm die Möglichkeit, Starmer zur Führungswahl herauszufordern.</p>
-  <p><strong>Warum es zählt:</strong> Dies ist ein innenpolitisches Erdbeben in Großbritannien. Ein etablierter Politiker kann nun formell gegen den amtierenden Premier antreten — ein Zeichen von Schwäche der Labour-Regierung nach nur kurzer Amtszeit. Für österreichische Anleger und Exporteure ist relevant: politische Instabilität in einem der größten EU-Handelspartner schafft Volatilität. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31450635/britischem-premier-starmer-droht-das-aus-parteirivale-burnham-gewinnt-nachwahl">Weiterlesen bei der Presse →</a></p><hr>
-  <h2>Pentagon fordert 80 Mrd. Dollar für Iran-Krieg und weitere Rüstungsausgaben</h2>
-  <p><strong>Was ist neu:</strong> Das US-Verteidigungsministerium benötigt laut Bericht 80 Milliarden Dollar für den Iran-Krieg und andere Rüstungsausgaben. Parallel sind die Verhandlungen mit dem Iran ins Stocken geraten — US-Vizepräsident Vance sagt eine geplante Schweiz-Reise ab.</p>
-  <p><strong>Warum es zählt:</strong> Die massive Summe zeigt die finanzielle Last eines Konflikts, der wirtschaftlich auf der ganzen Welt durchschlägt — von Ölpreisen über Rüstungsausgaben bis zu Flüchtlingsbewegungen. Die abgesagte Verhandlung deutet auf Eskalation statt Deeskalation hin. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31451901/bericht-us-pentagon-benoetigt-80-mrd-us-dollar-fuer-iran-krieg-und-andere-ausgaben">Weiterlesen bei der Presse →</a></p><hr>
-  <h2>Deine Themen</h2>
-  <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (18.06.) keine neuen materiellen Änderungen in den Meldungen des heutigen Morgens.</p>
+  <h2>Haushaltsenergie im Mai billiger — Trend setzt sich fort</h2>
+  <p><strong>Was ist neu:</strong> Der Energiepreisindex für Österreichs Haushalte ist im Mai gegenüber April um 2,2 Prozent gefallen. Experten rechnen mit weiteren Preisrückgängen in den kommenden Wochen. Hintergrund ist die allmähliche Entspannung auf den globalen Energiemärkten — iranische Rohölexporte haben wieder begonnen, der Ölpreis ist zuletzt um knapp 5 Prozent gefallen.</p>
+  <p><strong>Warum es zählt:</strong> Nach Monaten der Teuerung merkst du das an der Stromrechnung. Allerdings bleibt Energie noch immer ein wesentlicher Inflationstreiber im Vergleich zum Vorjahr — die Entspannung wird also begrenzt bleiben. Der Grund: schwache Nachfrage in China, OPEC-Förderdrosselungen und anhaltende geopolitische Risiken im Nahen Osten halten die Preise höher, als sie ohne diese Faktoren wären.</p>
+  <p><strong>Was kommt:</strong> Wie lange die Entspannung hält, hängt davon ab, ob die iranischen Exporte stabil weitergehen und ob regionale Konflikte nicht eskalieren. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/31476187/haushaltsenergie-im-mai-billiger-weitere-preisrueckgaenge-erwartet">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-19|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Trump attackiert Arzneimittelpreise — Druck wächst auch in Europa</h2>
+  <p><strong>Was ist neu:</strong> US-Präsident Trump fordert massiv höhere Medikamentenpreise für Deutschland und Europa. Nach seinen Worten zahlen die USA derzeit „zwei Drittel der globalen Innovation&quot; — ein Argument, das die Pharmaindustrie unter Druck bringt, ihre europäischen Preise anzuheben. Der Chef von Boehringer Ingelheim bestätigt der „Presse&quot;, dass dieser Druck real ist.</p>
+  <p><strong>Warum es zählt:</strong> Das könnte für dich als Patient:in konkrete Folgen haben — höhere Medikamentenpreise in Europa führen mittelfristig zu höheren Zuzahlungen und zu Debatten über die Erstattung durch Krankenkassen. Für Österreich bedeutet es Zusatzdruck auf ein ohnehin angespanntes Gesundheitsbudget. <span class="ressort" style="--h:175">Wirtschaft</span> <span class="byline-source">Bericht: [Autor nicht angegeben]</span> <a class="source-link" href="https://www.diepresse.com/31473295/trump-draengt-deutsche-sollen-mehr-fuer-medikamente-bezahlen">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-19|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Finanzministerium erhöht Betrugsbekämpfung — 1,4 Mrd. Euro Mehreinnahmen geplant</h2>
+  <p>Die Regierung stockt die Betrugsbekämpfung auf — mit mehr Personal in Finanzämtern und neuen Maßnahmen. Bis 2029 rechnet das Finanzministerium damit, 1,4 Milliarden Euro Mehreinnahmen zu generieren. Das ist Teil der Budgetsanierung. <span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://www.diepresse.com/31454494/betrugsbekaempfung-finanzministerium-rechnet-mit-1-4-mrd-mehreinnahmen-bis-2029">Weiterlesen bei der Presse →</a></p>
+  <h2 class="topic-summary-head">Deine Themen</h2>
+  <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (18.06.) keine neuen materiellen Änderungen — die Entspannung setzt sich wie gewarnt fort, bleibt aber begrenzt.</p>
+<div class="article-fb" data-key="2026-06-19|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <p class="reporters">Heute mit Berichterstattung von: [Autor nicht angegeben] · Die Presse</p>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 120 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
-  <div class="done">✅ <em>Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
-  <hr>
-  <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>
 </div>
 <nav class="tabbar">
@@ -406,6 +417,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';

@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -345,18 +357,20 @@
   </div><hr>
   <h2>BMW-Gewinnwarnung trifft Österreichs Zulieferer hart</h2>
   <p><strong>Was ist neu:</strong> Der Autohersteller BMW senkt seine Jahresprognose deutlich und fährt seinen Sparkurs auf. Der Grund: schwächere Nachfrage und höhere Kosten. BMW produziert im österreichischen Steyr und ist ein Großauftraggeber für heimische Kfz-Zulieferer — eine Branche, die bereits unter Druck steht.</p>
-  <p><strong>Warum es zählt:</strong> Die BMW-Warnung signalisiert Probleme im gesamten europäischen Autosektor. Für Österreichs Exportwirtschaft, die stark von der Automobilindustrie abhängt, könnte das Aufträge und Arbeitsplätze kosten. Der neue Vorstandschef Milan Nedeljkovic muss das Vertrauen der Märkte zurückgewinnen — bisher ein Fehlstart. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30863279/bmw-aktie-unter-druck-das-steckt-hinter-dem-zwoelf-prozent-einbruch">Weiterlesen bei der Presse →</a>)</p><hr>
+  <p><strong>Warum es zählt:</strong> Die BMW-Warnung signalisiert Probleme im gesamten europäischen Autosektor. Für Österreichs Exportwirtschaft, die stark von der Automobilindustrie abhängt, könnte das Aufträge und Arbeitsplätze kosten. Der neue Vorstandschef Milan Nedeljkovic muss das Vertrauen der Märkte zurückgewinnen — bisher ein Fehlstart. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30863279/bmw-aktie-unter-druck-das-steckt-hinter-dem-zwoelf-prozent-einbruch">Weiterlesen bei der Presse →</a>)</p>
+<div class="article-fb" data-key="2026-06-17|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Fiskalrat verlangt zusätzliches Sparpaket — Defizit bleibt zu hoch</h2>
   <p><strong>Was ist neu:</strong> Österreichs unabhängige Staatsschuldenwächter lehnen das Doppelbudget von Finanzminister Markus Marterbauer ab. Das Defizit sinkt nicht ausreichend — es bleibt bis Ende des Jahrzehnts bei knapp vier Prozent statt der geforderten drei. Die Folge: Österreich braucht ein zusätzliches Sparpaket von fast sechs Milliarden Euro. Gleichzeitig erwartet der Fiskalrat einen historischen Rekord bei der Staatsverschuldung.</p>
-  <p><strong>Warum es zählt:</strong> Das ist ein klares politisches Signal: Die bisherigen Sparmaßnahmen reichen nicht. Regierung und Opposition werden unter Druck geraten, nachzulegen — durch Kürzungen oder höhere Einnahmen, die am Ende dein Haushalt und der Arbeitsmarkt spüren werden. (Politik · <a class="source-link" href="https://www.diepresse.com/30857681/fiskalrat-zerreisst-doppelbudget-defizit-bleibt-zu-hoch-oesterreich-braucht-weiteres-sparpaket-von-fast-sechs-milliarden">Weiterlesen bei der Presse →</a>)</p><hr>
+  <p><strong>Warum es zählt:</strong> Das ist ein klares politisches Signal: Die bisherigen Sparmaßnahmen reichen nicht. Regierung und Opposition werden unter Druck geraten, nachzulegen — durch Kürzungen oder höhere Einnahmen, die am Ende dein Haushalt und der Arbeitsmarkt spüren werden. (Politik · <a class="source-link" href="https://www.diepresse.com/30857681/fiskalrat-zerreisst-doppelbudget-defizit-bleibt-zu-hoch-oesterreich-braucht-weiteres-sparpaket-von-fast-sechs-milliarden">Weiterlesen bei der Presse →</a>)</p>
+<div class="article-fb" data-key="2026-06-17|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Inflation klettert auf 3,7 Prozent — Flugtickets und Energiepreise treiben</h2>
-  <p>Österreichs Inflationsrate ist im Mai gestiegen. Flugtickets, Treibstoff und Heizöl waren die Haupttreiber. Das verschärft Druck auf die Kaufkraft — gerade bei Pendlern und für den Sommer relevant. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30869849/inflation-stieg-im-mai-auf-3-7-prozent">Weiterlesen bei der Presse →</a>)</p><hr>
-  <h2>Deine Themen</h2>
+  <p>Österreichs Inflationsrate ist im Mai gestiegen. Flugtickets, Treibstoff und Heizöl waren die Haupttreiber. Das verschärft Druck auf die Kaufkraft — gerade bei Pendlern und für den Sommer relevant. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30869849/inflation-stieg-im-mai-auf-3-7-prozent">Weiterlesen bei der Presse →</a>)</p>
+<div class="article-fb" data-key="2026-06-17|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (16.06.) hat sich die Lage durch iranische Rohölexporte per Schiff etwas entspannt — erste Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber: Er bleibt noch monatelang angespannt wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionaler Unsicherheiten. (Wirtschaft · <a class="source-link" href="https://www.diepresse.com/30848620/tracking-website-zeigt-iranische-oel-exporte-per-schiff-laufen-wieder-an">Weiterlesen bei der Presse →</a>)</p>
   <hr>
-  <div class="done">✅ <em>Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
   <hr>
-  <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
 </div>
 </div>
 <nav class="tabbar">
@@ -402,6 +416,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';

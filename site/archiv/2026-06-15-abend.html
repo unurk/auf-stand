@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -344,13 +356,14 @@
   </div><hr>
   <h2>Iran und Trump spalten G7 – Ukraine könnte aus dem Fokus rücken</h2>
   <p><strong>Was ist neu:</strong> Der G7-Gipfel im französischen Évian wird von zwei Konfliktlinien dominiert: Einerseits der Iran-Deal, andererseits die Stimmungen des US-Präsidenten Trump, die das bisherige Programm durcheinander wirbeln. Die europäischen G7-Staaten wollen ihre Rolle bei der Stabilisierung der Hormuz-Straße unterstreichen – das zentrale Schifffahrtsrouting am Golf. Gleichzeitig sind sie aber besorgt, dass Trump in Évian zentrale Themen verdrängt: die Ukraine und China.</p>
-  <p><strong>Warum es zählt:</strong> Der G7 entscheidet indirekt mit, wie westliche Außenpolitik koordiniert wird. Wenn der US-Präsident seine Aufmerksamkeit weg von der Ukraine lenkt und die Europäer stattdessen Iran-Stabilität vor Krieg priorisieren müssen, schwächt das die vereinigte Unterstützung für Kiew und verzögert Lösungen. Für Österreich heißt das konkret: mehr Druck auf die EU, eigene Außenpolitik und Sanktionen zu tragen. (Politik) <a class="source-link" href="https://www.diepresse.com/29606654/iran-und-donald-trump-wirbeln-die-agenda-des-g7-gipfels-durcheinander">Weiterlesen bei der Presse →</a></p><hr>
+  <p><strong>Warum es zählt:</strong> Der G7 entscheidet indirekt mit, wie westliche Außenpolitik koordiniert wird. Wenn der US-Präsident seine Aufmerksamkeit weg von der Ukraine lenkt und die Europäer stattdessen Iran-Stabilität vor Krieg priorisieren müssen, schwächt das die vereinigte Unterstützung für Kiew und verzögert Lösungen. Für Österreich heißt das konkret: mehr Druck auf die EU, eigene Außenpolitik und Sanktionen zu tragen. (Politik) <a class="source-link" href="https://www.diepresse.com/29606654/iran-und-donald-trump-wirbeln-die-agenda-des-g7-gipfels-durcheinander">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-15|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Großbritannien verbietet soziale Netzwerke für unter 16-Jährige</h2>
   <p><strong>Was ist neu:</strong> Die britische Labour-Regierung plant ein striktes Verbot von TikTok, Instagram und YouTube für Kinder unter 16 Jahren. Die Bevölkerung unterstützt das Vorhaben mehrheitlich. Experten jedoch sehen das Modell kritisch – sowohl technisch (wie lässt sich das durchsetzen?) als auch inhaltlich (Zensur vs. Schutz).</p>
-  <p><strong>Warum es zählt:</strong> Großbritannien setzt hier ein Signal für andere Länder, darunter die EU. Sollte das Verbot funktionieren, könnte Österreich und die EU ähnliche Regelungen erwägen. Das würde das Geschäftsmodell dieser Plattformen massiv treffen und Regeln für Tech-Konzerne neu definieren. (Digitales) <a class="source-link" href="https://www.diepresse.com/30269127/verboten-fuer-kinder-unter-16-briten-gehen-rigoros-gegen-tiktok-instagram-und-youtube-vor">Weiterlesen bei der Presse →</a></p><hr>
+  <p><strong>Warum es zählt:</strong> Großbritannien setzt hier ein Signal für andere Länder, darunter die EU. Sollte das Verbot funktionieren, könnte Österreich und die EU ähnliche Regelungen erwägen. Das würde das Geschäftsmodell dieser Plattformen massiv treffen und Regeln für Tech-Konzerne neu definieren. (Digitales) <a class="source-link" href="https://www.diepresse.com/30269127/verboten-fuer-kinder-unter-16-briten-gehen-rigoros-gegen-tiktok-instagram-und-youtube-vor">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-15|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 105 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
   <hr>
-  <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
 </div>
 </div>
 <nav class="tabbar">
@@ -396,6 +409,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';

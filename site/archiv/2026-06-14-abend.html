@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -344,13 +356,14 @@
   </div><hr>
   <h2>Schweiz lehnt Bevölkerungsobergrenze deutlich ab</h2>
   <p><strong>Was ist neu:</strong> Die Schweiz hat sich beim Referendum gegen eine vom nationalpopulistischen Milieu vorangetriebene strikte Obergrenze für die Einwohnerzahl ausgesprochen. Die Befürworter einer maximalen Bevölkerung zeichneten sich am Sonntag als klare Verlierer ab. Das Votum ist weltweit einzigartig — kein anderes Land hat seine Bevölkerungsgröße per Verfassungsreferendum festschreiben wollen. Hintergrund ist ein vieldiskutierter Begriff des „Dichtestress&quot;, der auf verhaltensbiologischen Experimenten aus amerikanischen Laboren basiert und in der Schweizer Politikdebatte zentrales Argument der Gegner von Migration und Wachstum war.</p>
-  <p><strong>Warum es zählt:</strong> Das Ergebnis zeigt, dass Schweizer Wähler trotz wachsender Migrations- und Integrationsdiskurse rechtsnationale Bevölkerungspolitik ablehnen. Für Österreich relevant: Die Schweiz ist Referenzland für konservative Migrationspolitik — dieses Votum signalisiert, dass auch dort eine Grenze für restriktive Maßnahmen besteht. Es schwächt zugleich die wissenschaftliche Legitimation von „Überbevölkerungs&quot;-Argumenten. <a class="source-link" href="https://www.diepresse.com/30228134/schweiz-darf-mehr-als-zehn-millionen-einwohner-haben">Weiterlesen bei der Presse →</a></p><hr>
+  <p><strong>Warum es zählt:</strong> Das Ergebnis zeigt, dass Schweizer Wähler trotz wachsender Migrations- und Integrationsdiskurse rechtsnationale Bevölkerungspolitik ablehnen. Für Österreich relevant: Die Schweiz ist Referenzland für konservative Migrationspolitik — dieses Votum signalisiert, dass auch dort eine Grenze für restriktive Maßnahmen besteht. Es schwächt zugleich die wissenschaftliche Legitimation von „Überbevölkerungs&quot;-Argumenten. <a class="source-link" href="https://www.diepresse.com/30228134/schweiz-darf-mehr-als-zehn-millionen-einwohner-haben">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-14|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Schulbibliothek wird nach tödlicher Attacke auf Lehrerin umgebaut</h2>
   <p><strong>Was ist neu:</strong> Nach dem Femizid an einer Lehrerin, der sich am Freitag in einer oberösterreichischen Schulbibliothek ereignet haben soll, wird der Raum umgebaut. Der Ort ist zentral gelegen und Schüler müssten ihn regelmäßig passieren. Die betroffene Volks- und Mittelschule bleiben nächste Woche noch mit reduziertem Betrieb geöffnet.</p>
-  <p><strong>Warum es zählt:</strong> Die Entscheidung der Schule zeigt, wie ein Schultrauma durch räumliche Umgestaltung adressiert werden soll — ein Ansatz, der die Rückkehr zur Normalität für Schüler und Lehrkörper ermöglichen soll. Gleichzeitig dokumentiert der Fall erneut geschlechtsspezifische Gewalt im Arbeitsumfeld. <a class="source-link" href="https://www.diepresse.com/30227031/schulbibliothek-wird-nach-femizid-in-oberoesterreich-umgebaut">Weiterlesen bei der Presse →</a></p><hr>
+  <p><strong>Warum es zählt:</strong> Die Entscheidung der Schule zeigt, wie ein Schultrauma durch räumliche Umgestaltung adressiert werden soll — ein Ansatz, der die Rückkehr zur Normalität für Schüler und Lehrkörper ermöglichen soll. Gleichzeitig dokumentiert der Fall erneut geschlechtsspezifische Gewalt im Arbeitsumfeld. <a class="source-link" href="https://www.diepresse.com/30227031/schulbibliothek-wird-nach-femizid-in-oberoesterreich-umgebaut">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-14|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
   <hr>
-  <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a></p>
 </div>
 </div>
 <nav class="tabbar">
@@ -396,6 +409,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';

@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -344,10 +356,12 @@
   </div><hr>
   <h2>Flughafen Wien lockert Flüssigkeits-Beschränkungen deutlich</h2>
   <p><strong>Was ist neu:</strong> Die Sicherheitsmaßnahmen am Flughafen Wien werden gelockert: Bessere Scanner ermöglichen es, dass Reisende künftig mehr als die bisherigen 100 Milliliter Flüssigkeiten im Handgepäck mitnehmen dürfen. Parallel hat die EU eine Verbesserung der Fluggastrechte beschlossen. Die neuen Regeln gelten bereits.</p>
-  <p><strong>Warum es zählt:</strong> Für dich als Pendler:in oder Urlauber:in bedeutet das konkrete Erleichterung: Kosmetika, Zahnpasta und Getränke lassen sich künftig weniger restriktiv packen. Das spart Zeit beim Check-in und Stress vor der Abreise. Die EU-weite Änderung der Fluggastrechte schärft zudem deinen Schutz bei Verspätungen und Ausfällen nach. <span class="ressort" style="--h:25">Wien/Lokales</span> <a class="source-link" href="https://www.diepresse.com/30635783/kann-ich-jetzt-mehr-als-100-milliliter-im-flieger-mitnehmen-was-reisende-wissen-sollten">Weiterlesen bei der Presse →</a></p><h2>Budget-Debatte: Agenda Austria warnt vor zu optimistischen Annahmen</h2>
+  <p><strong>Warum es zählt:</strong> Für dich als Pendler:in oder Urlauber:in bedeutet das konkrete Erleichterung: Kosmetika, Zahnpasta und Getränke lassen sich künftig weniger restriktiv packen. Das spart Zeit beim Check-in und Stress vor der Abreise. Die EU-weite Änderung der Fluggastrechte schärft zudem deinen Schutz bei Verspätungen und Ausfällen nach. <span class="ressort" style="--h:25">Wien/Lokales</span> <a class="source-link" href="https://www.diepresse.com/30635783/kann-ich-jetzt-mehr-als-100-milliliter-im-flieger-mitnehmen-was-reisende-wissen-sollten">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-17|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Budget-Debatte: Agenda Austria warnt vor zu optimistischen Annahmen</h2>
   <p>Die Denkfabrik Agenda Austria kritisiert vor der heutigen Prognose des Fiskalrats die Grundlagen des Budgets: Es fehle ein „Risikoszenario&quot; und ein finanzieller Puffer für den Fall, dass die Wirtschaft weniger wächst als geplant. Die Regierung plane mit zu rosigen Zahlen.</p>
-  <p><strong>Warum es zählt:</strong> Das Budget ist deine finanzielle Sicherheit — es entscheidet über Steuern, Sozialleistungen und öffentliche Investitionen. Wenn die Annahmen zu optimistisch sind und die Wirtschaft schwächelt, drohen später Sparmaßnahmen oder höhere Abgaben. (Politik)</p><hr>
-  <div class="done">✅ <em>Du bist informiert — Lesezeit ca. 75 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
+  <p><strong>Warum es zählt:</strong> Das Budget ist deine finanzielle Sicherheit — es entscheidet über Steuern, Sozialleistungen und öffentliche Investitionen. Wenn die Annahmen zu optimistisch sind und die Wirtschaft schwächelt, drohen später Sparmaßnahmen oder höhere Abgaben. (Politik)</p>
+<div class="article-fb" data-key="2026-06-17|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 75 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>
@@ -395,6 +409,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';

@@ -185,7 +185,19 @@
       background: var(--surface); border-radius: 18px; padding: 16px 20px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
       font: 600 13px var(--sans); color: #1f8a5b;
+      display: flex; align-items: center; gap: 8px;
     }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
     /* ── Archiv ── */
     .archiv-grid {
       display: flex; flex-direction: column; gap: 8px;
@@ -340,6 +352,7 @@
 <div class="wrap">
 <h1>Archiv</h1>
 <div class="archiv-grid">
+<a class="archiv-card" href="2026-06-19-mittag.html"><span class="archiv-date">Fr 19. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-19-morgen.html"><span class="archiv-date">Fr 19. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-18-abend.html"><span class="archiv-date">Do 18. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
 <a class="archiv-card" href="2026-06-18-nachmittag.html"><span class="archiv-date">Do 18. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
@@ -406,6 +419,15 @@
     document.querySelectorAll('.story-card').forEach(function(card){
       var h2=card.querySelector('h2');
       if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
       // Body-Wrapper für alles nach h2
       var body=document.createElement('div');
       body.className='story-body';
