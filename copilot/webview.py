@@ -675,30 +675,28 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
-    # Rückbau einer früheren, wieder verworfenen Variante: Ressort-Pill/Quell-Link
-    # standen kurzzeitig in einem eigenen <div class="article-foot">; bereits
-    # veröffentlichte Archiv-Seiten tragen das noch. Mehrfache Rebuilds mit der
-    # alten (nicht-idempotenten) Variante haben dabei teils kaputte Duplikate
-    # hinterlassen (<div class="article-foot"></p> gefolgt vom echten Wrapper) —
-    # die zuerst entfernen, dann den verbleibenden echten Wrapper in den
-    # vorherigen Absatz zurückschmelzen. Gruppe 1 darf kein </p> verschlucken,
-    # sonst frisst der Lazy-Match sich bei fehlendem Treffer durch den ganzen
-    # Rest des Dokuments (inkl. <h2>-Überschriften).
-    content = re.sub(
-        r'(?:<div class="article-foot">\s*</p>\s*)+(?=<div class="article-foot">)',
-        "", content,
-    )
-    content = re.sub(
-        r'<p>((?:(?!</p>).)*)</p>\s*(?:<p>\s*</p>\s*)?<div class="article-foot">(.*?)</div>',
-        r'<p>\1 \2</p>',
-        content, flags=re.DOTALL,
-    )
     # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
     # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
     if 'class="ressort"' not in content:
         content = re.sub(
             r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
         )
+    # Nummerierte Emojis + optionale Topic-Emojis am Anfang von h2-Titeln entfernen
+    # z.B. "1️⃣ 🌍 EU verlängert…" → "EU verlängert…"
+    content = re.sub(
+        r'(<h2>)\s*\d[^\w\s]*\s*(?:[^\x00-\x7F]\S*\s*)?',
+        r'\1',
+        content,
+    )
+    # Nummern-Emojis aus "Heute wichtig"-Einträgen entfernen
+    content = re.sub(
+        r'(<div class="highlights">)(.*?)(</div>)',
+        lambda m: m.group(1)
+            + re.sub(r'\d[^\w\s]*\s*(?:[^\x00-\x7F]\S*\s*)?', '', m.group(2))
+            + m.group(3),
+        content,
+        flags=re.DOTALL,
+    )
     # Quell-Links als rote Primary-Pill auszeichnen.
     content = re.sub(
         r'<a href="([^"]+)">→ Artikel</a>',
@@ -1245,9 +1243,10 @@ def _audio_player(src: str) -> str:
 
 
 def _insert_after_header(content: str, snippet: str) -> str:
-    """Fügt `snippet` direkt nach dem Seitenkopf ein (Fallback: nach </h1>, sonst voran)."""
+    """Fügt `snippet` direkt INNERHALB des Seitenkopfes ein (vor </header>).
+    So bleibt Streak/Hinweis-Zeile Teil der Header-Karte statt darunter zu floaten."""
     if "</header>" in content:
-        return content.replace("</header>", "</header>\n" + snippet, 1)
+        return content.replace("</header>", snippet + "\n</header>", 1)
     if "</h1>" in content:
         return content.replace("</h1>", "</h1>\n" + snippet, 1)
     return snippet + content
