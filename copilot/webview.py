@@ -151,10 +151,13 @@ _PAGE_TEMPLATE = """\
                font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
                vertical-align: middle; }
     /* ── Quell-Link als Primary-Pill ── */
-    .source-link { display: inline-block; margin-top: 4px; background: var(--accent);
+    .source-link { display: inline-block; background: var(--accent);
                    color: #ffffff; border-radius: 999px; padding: 5px 15px;
                    font-family: var(--sans); font-size: 12px; font-weight: 600;
                    letter-spacing: 0.04em; text-decoration: none; }
+    /* ── Ressort-Pill + Quell-Link: eigene Zeile statt am Fließtext zu hängen ── */
+    .article-foot { display: flex; align-items: center; flex-wrap: wrap;
+                     gap: 10px; margin: 14px 0 28px; }
     .source-link:hover { background: #284f6f; color: #ffffff;
                          text-decoration: none; }
     .byline-source { font-family: var(--sans); font-size: 12px; font-style: italic;
@@ -517,6 +520,15 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
         r'<a href="([^"]+)">→ Artikel</a>',
         r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
         content,
+    )
+    # Ressort-Pill + Quell-Link aus dem Fließtext lösen: bisher hängen sie als
+    # inline-block-Elemente am Ende des Absatzes und werden dadurch auf der
+    # letzten Textzeile nach links gequetscht (viel Leerraum rechts). Eigene
+    # Zeile (Flex-Reihe) macht die Platzierung bewusst statt zufällig.
+    content = re.sub(
+        r'<p>(.*?)\s*(<span class="ressort".*?</a>)\s*</p>',
+        r'<p>\1</p>\n<div class="article-foot">\2</div>',
+        content, flags=re.DOTALL,
     )
     # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
     if datum:
