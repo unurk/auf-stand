@@ -681,6 +681,23 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
     # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
     if 'class="ressort"' not in content:
+        # Reihenfolge normalisieren: das Modell hält sich nicht immer ans
+        # Prompt-Format „(Ressort) [→ Artikel]" — manchmal steht der Link
+        # zuerst. Ohne diese Normalisierung würde die Ressort-Klammer als
+        # nackter Text hinter dem Quell-Link hängen bleiben (gleicher
+        # „nach links gequetscht"-Effekt wie unten behoben). Zwei Varianten:
+        # frisch generierter Roh-Inhalt (Link noch „→ Artikel") und bereits
+        # gerenderte Archiv-Seiten beim Rebuild (Link schon zur Pill umgebaut).
+        content = re.sub(
+            r'<a href="([^"]+)">→ Artikel</a>\s*(\([^)]{2,60}\))',
+            r'\2 <a href="\1">→ Artikel</a>',
+            content,
+        )
+        content = re.sub(
+            r'(<a class="source-link"[^>]*>Weiterlesen bei der Presse →</a>)\s*(\([^)]{2,60}\))',
+            lambda m: _meta_tag(re.match(r"\(([^)]{2,60})\)", m.group(2))) + m.group(1),
+            content,
+        )
         content = re.sub(
             r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
         )
