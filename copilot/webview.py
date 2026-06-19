@@ -675,6 +675,24 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
+    # Rückbau einer früheren, wieder verworfenen Variante: Ressort-Pill/Quell-Link
+    # standen kurzzeitig in einem eigenen <div class="article-foot">; bereits
+    # veröffentlichte Archiv-Seiten tragen das noch. Mehrfache Rebuilds mit der
+    # alten (nicht-idempotenten) Variante haben dabei teils kaputte Duplikate
+    # hinterlassen (<div class="article-foot"></p> gefolgt vom echten Wrapper) —
+    # die zuerst entfernen, dann den verbleibenden echten Wrapper in den
+    # vorherigen Absatz zurückschmelzen. Gruppe 1 darf kein </p> verschlucken,
+    # sonst frisst der Lazy-Match sich bei fehlendem Treffer durch den ganzen
+    # Rest des Dokuments (inkl. <h2>-Überschriften).
+    content = re.sub(
+        r'(?:<div class="article-foot">\s*</p>\s*)+(?=<div class="article-foot">)',
+        "", content,
+    )
+    content = re.sub(
+        r'<p>((?:(?!</p>).)*)</p>\s*(?:<p>\s*</p>\s*)?<div class="article-foot">(.*?)</div>',
+        r'<p>\1 \2</p>',
+        content, flags=re.DOTALL,
+    )
     # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
     # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
     if 'class="ressort"' not in content:
