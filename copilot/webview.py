@@ -229,9 +229,6 @@ _PAGE_TEMPLATE = """\
       transition: filter .15s;
     }
     .source-link:hover { filter: brightness(.9); text-decoration: none; }
-    /* ── Ressort-Pill + Quell-Link: eigene Zeile statt am Fließtext zu hängen ── */
-    .article-foot { display: flex; align-items: center; flex-wrap: wrap;
-                     gap: 10px; margin: 14px 16px 28px; }
     .byline-source { font: italic 12px var(--sans); color: var(--muted); white-space: nowrap; }
     .reporters {
       font: 400 13px var(--sans); color: var(--muted);
@@ -689,15 +686,6 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
         r'<a href="([^"]+)">→ Artikel</a>',
         r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
         content,
-    )
-    # Ressort-Pill + Quell-Link aus dem Fließtext lösen: bisher hängen sie als
-    # inline-block-Elemente am Ende des Absatzes und werden dadurch auf der
-    # letzten Textzeile nach links gequetscht (viel Leerraum rechts). Eigene
-    # Zeile (Flex-Reihe) macht die Platzierung bewusst statt zufällig.
-    content = re.sub(
-        r'<p>(.*?)\s*(<span class="ressort".*?</a>)\s*</p>',
-        r'<p>\1</p>\n<div class="article-foot">\2</div>',
-        content, flags=re.DOTALL,
     )
     # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
     if datum:
