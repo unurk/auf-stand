@@ -217,6 +217,7 @@ _PAGE_TEMPLATE = """\
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -457,6 +458,7 @@ __CONTENT__
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }
@@ -582,12 +584,19 @@ def _ressort_tag_str(name: str) -> str:
     return f'<span class="ressort" style="--h:{hue}">{name}</span>'
 
 
-def _meta_tag(m: re.Match) -> str:
-    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile."""
-    ressort, _, bericht = m.group(1).partition("·")
+def _meta_tag(raw: str) -> str:
+    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile.
+
+    raw ist der Klammer-Inhalt ohne Quell-Link. Toleriert ein verlinktes Ressort
+    (``<a …>Politik</a>``) und liefert "" bei leerem Inhalt (idempotent).
+    """
+    ressort_part, _, bericht = raw.partition("·")
+    ressort = re.sub(r"<[^>]+>", "", ressort_part).strip()
+    if not ressort:
+        return ""
     out = _ressort_tag_str(ressort)
     if "Bericht:" in bericht:
-        name = bericht.split("Bericht:", 1)[1].strip()
+        name = re.sub(r"<[^>]+>", "", bericht.split("Bericht:", 1)[1]).strip()
         if name:
             out += f' <span class="byline-source">Bericht: {name}</span>'
     return out + " "
@@ -728,12 +737,38 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
-    # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
-    # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
-    if 'class="ressort"' not in content:
-        content = re.sub(
-            r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
-        )
+    # Etwaige nicht-konvertierte Markdown-Quell-Links (ältere Archivseiten) nachziehen,
+    # damit die Anker-Form unten greift.
+    content = re.sub(
+        r'\[→ Artikel\]\(([^)]+)\)', r'<a href="\1">→ Artikel</a>', content
+    )
+    # Quell-Links als Pill auszeichnen — bewusst VOR der Ressort-Extraktion, damit
+    # frische out/-Seiten und bereits gerenderte Archivseiten dieselbe Anker-Form
+    # (source-link) tragen und die Erkennung idempotent ist.
+    content = re.sub(
+        r'<a href="([^"]+)">→ Artikel</a>',
+        r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
+        content,
+    )
+    # Meta-Klammer „(Ressort · Bericht: Name)" am Punktende → Ressort-Pill (wird per JS
+    # über den Titel gehoben), Autor als Quellenzeile. Toleriert beide Modell-Varianten:
+    # Ressort als Klartext ODER als Link, Quell-Link innerhalb ODER nach der Klammer.
+    # Anker ist der zuvor umgebaute source-link.
+    _src = r'<a class="source-link"[^>]*>.*?</a>'
+    # Form A — Quell-Link INNERHALB der Klammer: (<meta> <source-link>)
+    content = re.sub(
+        rf'\(\s*([^()]*?)\s*({_src})\s*\)',
+        lambda m: _meta_tag(m.group(1)) + m.group(2),
+        content,
+        flags=re.DOTALL,
+    )
+    # Form B — Klammer direkt VOR dem Quell-Link: (<meta>) <source-link>
+    content = re.sub(
+        rf'\(\s*([^()]*?)\s*\)\s*(?={_src})',
+        lambda m: _meta_tag(m.group(1)),
+        content,
+        flags=re.DOTALL,
+    )
     # Nummerierte Emojis + optionale Topic-Emojis am Anfang von h2-Titeln entfernen
     # z.B. "1️⃣ 🌍 EU verlängert…" → "EU verlängert…"
     content = re.sub(
@@ -750,12 +785,6 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
             + m.group(3),
         content,
         flags=re.DOTALL,
-    )
-    # Quell-Links als Pill auszeichnen.
-    content = re.sub(
-        r'<a href="([^"]+)">→ Artikel</a>',
-        r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
-        content,
     )
     # E-Paper-Paragraph (📰) entfernen — steht bereits in der Tab-Leiste.
     content = re.sub(r'\s*<p>[^<]*📰.*?</p>', '', content, flags=re.DOTALL)

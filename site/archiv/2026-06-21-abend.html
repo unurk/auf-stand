@@ -163,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -357,12 +358,12 @@
   </div><hr>
   <h2>Deutschland plant Pensionsalter 68 — Reformdruck wächst auch in Österreich</h2>
   <p><strong>Was ist neu:</strong> Die deutsche Regierung will das gesetzliche Pensionsalter schrittweise von 67 auf 68 Jahre erhöhen — bis 2051 sollen die neuen Regelungen vollständig greifen. Das ist eine strukturelle Reaktion auf die demografische Alterung und die Finanzierungskrise der Rentensysteme. Deutschland geht damit einen Weg, den mehrere europäische Länder bereits gegangen sind.</p>
-  <p><strong>Warum es zählt:</strong> Österreich steht unter dem gleichen demografischen und fiskalischen Druck. Dein Pensionssystem ist längerfristig untefinanziert — Reformdebatten in Österreich werden sich an Deutschland orientieren. Die Entscheidung zeigt, dass auch konservative Regierungen nicht mehr um Erhöhungen herum kommen. Rechne damit, dass ähnliche Vorschläge in den nächsten Jahren auch in Wien lauter werden. (<a href="https://www.diepresse.com/31865736/rente-mit-63-vor-dem-ende-deutschland-plant-hoeheres-pensionsalter">Politik</a> <a class="source-link" href="https://www.diepresse.com/31865736/rente-mit-63-vor-dem-ende-deutschland-plant-hoeheres-pensionsalter">Weiterlesen bei der Presse →</a>)</p>
+  <p><strong>Warum es zählt:</strong> Österreich steht unter dem gleichen demografischen und fiskalischen Druck. Dein Pensionssystem ist längerfristig untefinanziert — Reformdebatten in Österreich werden sich an Deutschland orientieren. Die Entscheidung zeigt, dass auch konservative Regierungen nicht mehr um Erhöhungen herum kommen. Rechne damit, dass ähnliche Vorschläge in den nächsten Jahren auch in Wien lauter werden. <span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://www.diepresse.com/31865736/rente-mit-63-vor-dem-ende-deutschland-plant-hoeheres-pensionsalter">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-21|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Europa fürchtet KI-Abhängigkeit von den USA — Kontrollverlust über kritische Infrastruktur</h2>
   <p><strong>Was ist neu:</strong> Ein Streit zwischen der US-Regierung und dem KI-Unternehmen Anthropic hat ein strukturelles Problem offenbart: Europa hat keine eigene KI-Infrastruktur und ist damit vollständig von amerikanischen Anbietern abhängig. Die USA könnten theoretisch KI-Dienste „abdrehen&quot; — Europa hätte dann keine Alternative.</p>
-  <p><strong>Warum es zählt:</strong> Das ist nicht nur ein technologisches, sondern ein sicherheitspolitisches und wirtschaftliches Risiko. Wenn deine Arbeit, deine Unternehmensplanung oder öffentliche Dienste von Systemen abhängen, die eine fremde Regierung kontrolliert, verlierst du strategische Autonomie. Der Artikel deutet an, dass Europa handeln muss — aber bislang tut es das nicht mit der nötigen Geschwindigkeit. (<a href="https://www.diepresse.com/31557118/europas-angst-vor-dem-ki-blackout-was-passiert-wenn-amerika-die-ki-abdreht">Technologie</a> <a class="source-link" href="https://www.diepresse.com/31557118/europas-angst-vor-dem-ki-blackout-was-passiert-wenn-amerika-die-ki-abdreht">Weiterlesen bei der Presse →</a>)</p>
+  <p><strong>Warum es zählt:</strong> Das ist nicht nur ein technologisches, sondern ein sicherheitspolitisches und wirtschaftliches Risiko. Wenn deine Arbeit, deine Unternehmensplanung oder öffentliche Dienste von Systemen abhängen, die eine fremde Regierung kontrolliert, verlierst du strategische Autonomie. Der Artikel deutet an, dass Europa handeln muss — aber bislang tut es das nicht mit der nötigen Geschwindigkeit. <span class="ressort" style="--h:24">Technologie</span> <a class="source-link" href="https://www.diepresse.com/31557118/europas-angst-vor-dem-ki-blackout-was-passiert-wenn-amerika-die-ki-abdreht">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-21|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
   <hr>
 </div>
 </div>
@@ -415,6 +416,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }

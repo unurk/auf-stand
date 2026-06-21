@@ -163,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -358,7 +359,7 @@
   <h2>EU-Parlament erlaubt „Tofu-Wurst&quot; und „Seitan-Burger&quot;</h2>
   <p><strong>Was ist neu:</strong> Das EU-Parlament hat sich auf eine Kompromisslösung geeinigt, die allgemein gehaltene Bezeichnungen für vegane Fleischersatzprodukte erlaubt. Damit können Hersteller ihre pflanzlichen Produkte künftig mit etablierten Namen wie „Wurst&quot;, „Steak&quot; oder „Burger&quot; versehen — unter Bedingungen, die Verbraucher:innen vor Irreführung schützen sollen.</p>
   <p><strong>Warum es zählt:</strong> Der Streit darüber, ob vegane Produkte tierische Bezeichnungen tragen dürfen, war in der EU heftig umstritten — Landwirte und die Fleischindustrie wollten solche Namen blockieren, während Hersteller von Fleischersatz auf Marktzugang drängten. Die Einigung schafft nun Klarheit für den österreichischen Einzelhandel und die Lebensmittelindustrie: vegane Produkte können unter verständlichen Kategorien verkauft werden, was den Markt belebt und Verbraucher:innen die Orientierung erleichtert.</p>
-  <p>(International · <a class="source-link" href="https://www.diepresse.com/30544735/ja-zur-tofu-wurst-nein-zum-seitan-steak">Weiterlesen bei der Presse →</a>)</p>
+  <p><span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/30544735/ja-zur-tofu-wurst-nein-zum-seitan-steak">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-16|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Ölpreis fällt nach Iran-Einigung, bleibt aber angespannt</h2>
   <p><strong>Was ist neu:</strong> Die jüngste Iran-Einigung hat den Ölpreis um knapp 5 Prozent gesenkt. Experten rechnen aber damit, dass die Preise noch monatelang unter Druck bleiben — nicht nur wegen schwacher Nachfrage in China und OPEC-Förderdrosselungen, sondern auch weil regionale Unsicherheiten fortbestehen.</p>
   <p><strong>Warum es zählt:</strong> Während die Entspannung im Nahen Osten kurzfristig Entspannung bringt, bedeutet die Prognose für Österreichs Energiekosten: Mit stabilen, aber nicht fallenden Preisen solltest du mittelfristig rechnen. Das wirkt sich auf Heizkosten und Strompreise aus, die ohnehin unter Druck stehen.</p>
@@ -416,6 +417,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }

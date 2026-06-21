@@ -163,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -371,7 +372,7 @@
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (17.06.) hat sich die Entspannung fortgesetzt — erste iranische Rohölexporte per Schiff sind wieder unterwegs. Der Ölpreis fiel um knapp 5 %. Experten warnen aber vor anhaltenden Spannungen wegen schwacher China-Nachfrage, OPEC-Drosselungen und regionalen Risiken.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>
@@ -425,6 +426,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }

@@ -163,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -358,15 +359,15 @@
   </div><hr>
   <h2>SpaceX startet an der Börse – zwei Billionen Dollar Bewertung</h2>
   <p><strong>Was ist neu:</strong> SpaceX ist heute an die Wall Street gegangen. Die Aktie wurde mit 150 Dollar platziert. Das Unternehmen wurde zeitweise mit mehr als zwei Billionen Dollar bewertet – ein historisches Volumen für einen Börsengang im Raumfahrtsektor.</p>
-  <p><strong>Warum es zählt:</strong> Der Gang an die Börse signalisiert, dass private Raumfahrt endgültig aus der Nische in den Mainstream-Kapitalmarkt gelangt ist. Für Sparer und Pensionsfonds eröffnet sich ein neues Investitionsfeld; gleichzeitig wird Elons Einfluss auf globale Infrastrukturen – von Satellitenkommunikation bis Raumtransport – weiter konzentriert. (Wirtschaft) [→ Artikel](https://www.diepresse.com/29948135/spacex-mit-raketenstart-an-der-wall-street)</p>
+  <p><strong>Warum es zählt:</strong> Der Gang an die Börse signalisiert, dass private Raumfahrt endgültig aus der Nische in den Mainstream-Kapitalmarkt gelangt ist. Für Sparer und Pensionsfonds eröffnet sich ein neues Investitionsfeld; gleichzeitig wird Elons Einfluss auf globale Infrastrukturen – von Satellitenkommunikation bis Raumtransport – weiter konzentriert. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/29948135/spacex-mit-raketenstart-an-der-wall-street">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-12|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Dritte Anklage gegen René Benko – Vermögensschädigung vorgeworfen</h2>
   <p><strong>Was ist neu:</strong> Die Wirtschafts- und Korruptionsstaatsanwaltschaft erhebt die dritte Anklage gegen Signa-Gründer René Benko. Diesmal geht es um eine „wahrheitswidrige Garantie&quot; und darum, dass Benko eine Stiftung des Investors Hans Peter Haselsteiner um fünf Millionen Euro geschädigt haben soll, indem er Vermögenswerte vor Gläubigern verbarg.</p>
-  <p><strong>Warum es zählt:</strong> Mit jeder neuen Anklage wächst die rechtliche Belastung für Benko und die Komplexität des Signa-Imperiums. Für Investoren und Gläubiger wird die Frage drängender, wie viel von den versprochenen Vermögenswerten noch zu retten ist. (Recht) [→ Artikel](https://www.diepresse.com/30093583/wksta-erhebt-weitere-anklage-gegen-rene-benko)</p>
+  <p><strong>Warum es zählt:</strong> Mit jeder neuen Anklage wächst die rechtliche Belastung für Benko und die Komplexität des Signa-Imperiums. Für Investoren und Gläubiger wird die Frage drängender, wie viel von den versprochenen Vermögenswerten noch zu retten ist. <span class="ressort" style="--h:35">Recht</span> <a class="source-link" href="https://www.diepresse.com/30093583/wksta-erhebt-weitere-anklage-gegen-rene-benko">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-12|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Erste Arbeitslosenentlastung seit drei Jahren in Salzburg</h2>
   <p><strong>Was ist neu:</strong> Die Arbeitslosenzahl ist in Salzburg im Mai erstmals seit 39 Monaten gefallen – konkret um 26 Personen weniger als im Mai 2025.</p>
-  <p><strong>Warum es zählt:</strong> Das AMS deutet dies als Zeichen für einen möglichen konjunkturellen Aufschwung, nachdem die Arbeitslosigkeit über drei Jahre hinweg gestiegen war. Das hat unmittelbare Relevanz für deine Jobaussichten und das Vertrauen in den Arbeitsmarkt. (Wirtschaft) [→ Artikel](https://salzburg.orf.at/stories/3358273/)</p>
+  <p><strong>Warum es zählt:</strong> Das AMS deutet dies als Zeichen für einen möglichen konjunkturellen Aufschwung, nachdem die Arbeitslosigkeit über drei Jahre hinweg gestiegen war. Das hat unmittelbare Relevanz für deine Jobaussichten und das Vertrauen in den Arbeitsmarkt. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://salzburg.orf.at/stories/3358273/">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-12|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
 </div>
@@ -420,6 +421,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }

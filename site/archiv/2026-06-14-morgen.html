@@ -163,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -359,17 +360,17 @@
   <h2>Väterkarenz bleibt in Österreich die Ausnahme</h2>
   <p><strong>Was ist neu:</strong> Während in Island rund 90 Prozent der Väter Elternkarenz nehmen, sind es in Österreich nur 16 Prozent. Eine aktuelle Auswertung des Momentum Instituts zeigt: Selbst wenn Väter sich für Karenz entscheiden – wie Peter Knap, der 16 Monate bei seiner Tochter zuhause blieb – riskieren sie berufliche Konsequenzen. Knap verlor seinen Job und arbeitet heute in Teilzeit. In der Steiermark liegt die Quote etwas höher, aber auch dort bleibt die gleichmäßige Aufteilung der Sorgearbeit eine Herausforderung.</p>
   <p><strong>Warum es zählt:</strong> Die Zahlen zeigen ein strukturelles Problem: Obwohl es das Recht gibt, wird Väterkarenz als Karriererisiko wahrgenommen. Das prägt nicht nur einzelne Familien, sondern auch den Arbeitsmarkt und die Rollenerwartungen in der Gesellschaft. Für dich als berufstätige Frau bedeutet das: Wenn Väter systematisch nicht in Karenz gehen, bleibt die Doppelbelastung vieler Mütter faktisch bestehen — unabhängig von Gesetzen.</p>
-  <p>(Politik/Familie) <a class="source-link" href="https://www.diepresse.com/27277693/die-vaeterkarenz-hat-mich-meinen-job-gekostet">Weiterlesen bei der Presse →</a></p>
+  <p><span class="ressort" style="--h:245">Politik/Familie</span> <a class="source-link" href="https://www.diepresse.com/27277693/die-vaeterkarenz-hat-mich-meinen-job-gekostet">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-14|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>USA und Iran signalisieren baldige Einigung</h2>
   <p><strong>Was ist neu:</strong> Die USA, Iran und Vermittler Pakistan sprechen von der zeitnahen Unterzeichnung eines Abkommens. US-Präsident Donald Trump kündigte an, die Vereinbarung bereits am Sonntag zu finalisieren.</p>
   <p><strong>Warum es zählt:</strong> Ein USA-Iran-Deal hätte geopolitische Folgen — von Energiemärkten über Sanktionsregime bis zu regionalen Konflikten. Ob das Abkommen tatsächlich zustande kommt und was es enthält, wird sich heute zeigen.</p>
-  <p>(International) <a class="source-link" href="https://www.diepresse.com/30223994/hoffnung-auf-baldige-unterzeichnung-eines-usa-iran-deals">Weiterlesen bei der Presse →</a></p>
+  <p><span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/30223994/hoffnung-auf-baldige-unterzeichnung-eines-usa-iran-deals">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-14|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>EU-Frühstücksrichtlinie: Marmelade ist wieder Marmelade</h2>
   <p><strong>Was ist neu:</strong> Die EU hat ihre Regelung gelockert — ab sofort darf auch Marmelade aus anderen Früchten als Zitrusfrüchten als „Marmelade&quot; bezeichnet werden. Bisher war das rechtlich nicht zulässig.</p>
   <p><strong>Warum es zählt:</strong> Eine kleine, aber symbolische Änderung: Die EU nimmt sich selbst weniger ernst und verzichtet auf übertriebene Regulierung. Im Supermarkt ändert sich für dich konkret wenig, aber es zeigt einen Trend zu mehr Pragmatismus in der Regelwelt.</p>
-  <p>(Wirtschaft) <a class="source-link" href="https://www.diepresse.com/30222255/marmelade-darf-nun-wieder-marmelade-heissen">Weiterlesen bei der Presse →</a></p>
+  <p><span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/30222255/marmelade-darf-nun-wieder-marmelade-heissen">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-14|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächstes Update: heute 16:00.</em></p>
   <hr>
@@ -424,6 +425,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }
