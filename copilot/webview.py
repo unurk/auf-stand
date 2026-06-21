@@ -139,7 +139,9 @@ _PAGE_TEMPLATE = """\
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -191,8 +193,6 @@ _PAGE_TEMPLATE = """\
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -208,16 +208,16 @@ _PAGE_TEMPLATE = """\
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -303,9 +303,9 @@ _PAGE_TEMPLATE = """\
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -551,13 +551,14 @@ def _ressort_tag_str(name: str) -> str:
     return f'<span class="ressort" style="--h:{hue}">{name}</span>'
 
 
-def _meta_tag(m: re.Match) -> str:
-    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile."""
-    ressort, _, bericht = m.group(1).partition("·")
+def _ressort_meta(meta: str) -> str:
+    """„Ressort · Bericht: Name" → Ressort-Pill + optionale Quellenzeile."""
+    ressort, _, bericht = meta.partition("·")
     out = _ressort_tag_str(ressort)
     if "Bericht:" in bericht:
-        name = bericht.split("Bericht:", 1)[1].strip()
-        if name:
+        name = bericht.split("Bericht:", 1)[1].strip(" ·")
+        # Platzhalter wie „[Autor nicht angegeben]" nicht als Quellenzeile rendern.
+        if name and "[" not in name and "nicht angegeben" not in name.lower():
             out += f' <span class="byline-source">Bericht: {name}</span>'
     return out + " "
 
@@ -666,7 +667,9 @@ def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | 
 
 def _add_article_feedback(content: str, datum: str, edition: str) -> str:
     """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel ein."""
-    content = re.sub(r'\n?<div class="article-fb".*?</div>', "", content)
+    # Bestehende Leiste entfernen — toleriert auch einen historisch fehlerhaften
+    # Abschluss mit </p> statt </div>, damit kein doppelter Balken zurückbleibt.
+    content = re.sub(r'\n?<div class="article-fb".*?</(?:div|p)>', "", content)
     idx = 0
 
     def _insert(m: re.Match) -> str:
@@ -675,8 +678,8 @@ def _add_article_feedback(content: str, datum: str, edition: str) -> str:
         idx += 1
         bar = (
             f'\n<div class="article-fb" data-key="{key}">'
-            f'<button class="fb-btn" data-vote="up">Relevant</button>'
-            f'<button class="fb-btn" data-vote="down">Weniger</button>'
+            f'<button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button>'
+            f'<button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button>'
             f"</div>"
         )
         return m.group(0).rstrip() + bar
@@ -686,8 +689,48 @@ def _add_article_feedback(content: str, datum: str, edition: str) -> str:
     return re.sub(r"<h2>(?!Deine Themen).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
 
 
+def _clean_done_box(m: re.Match) -> str:
+    """Normalisiert die „Du bist informiert"-Box auf genau ein ✓ und das Kern-Signal.
+
+    Robust gegen mehrfach angehäufte Häkchen aus früheren Builds und idempotent:
+    entfernt vorhandene done-check-Spans, <em>-Tags und ✅, kürzt den redundanten
+    Lesezeit-/„Nächstes Lagebild"-Zusatz (steht bereits in Byline bzw. .next-edition).
+    """
+    inner = m.group(1)
+    inner = re.sub(r'<span class="done-check">✓</span>', "", inner)
+    inner = re.sub(r"</?em>", "", inner)
+    inner = inner.replace("✅", "")
+    # Zusatz nach „— Lesezeit …" bzw. „Nächstes Lagebild …" abschneiden.
+    inner = re.split(r"\s*[—–-]\s*Lesezeit", inner)[0]
+    inner = re.split(r"\s*Nächstes Lagebild", inner)[0]
+    inner = inner.strip().rstrip(" .—–-").strip()
+    if not inner:
+        inner = "Du bist informiert"
+    return f'<div class="done"><span class="done-check">✓</span> {inner}.</div>'
+
+
+def _lesezeit_seconds(content: str) -> int | None:
+    """Liest die Lesezeit (Sekunden) aus dem Roh-Inhalt oder einer bestehenden Byline.
+
+    Auf frischem Inhalt steht „Lesezeit ca. 90 Sekunden" in der Done-Box; nach einem
+    Re-Build ist die Done-Box bereits bereinigt, dann wird der Wert aus der Byline
+    („ca. 1,5 Min." / „ca. 80 Sek.") zurückgewonnen — so bleibt die Lesezeit erhalten.
+    """
+    m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
+    if m:
+        return int(m.group(1))
+    m = re.search(r'class="byline">[^<]*ca\.\s*([\d,]+)\s*(Min|Sek)', content)
+    if m:
+        val = float(m.group(1).replace(",", "."))
+        return int(round(val * 60)) if m.group(2) == "Min" else int(round(val))
+    return None
+
+
 def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     """Verleiht dem Roh-Inhalt Die-Presse-Charakter (Pills, Kicker, Highlight-Box)."""
+    # Lesezeit früh sichern — die Done-Box-Normalisierung weiter unten entfernt den
+    # Quelltext „Lesezeit ca. … Sekunden", aus dem die Byline-Lesezeit berechnet wird.
+    lesezeit = _lesezeit_seconds(content)
     # Etwaigen Audio-Player aus früherem Build entfernen (wird in build_site neu,
     # mit korrektem Pfad, eingesetzt) — hält das erneute Rendern idempotent.
     content = re.sub(
@@ -697,12 +740,31 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
-    # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
-    # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
-    if 'class="ressort"' not in content:
-        content = re.sub(
-            r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
-        )
+    # Meta-Klammer „(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile.
+    # Zwei Schreibweisen, die das Modell erzeugt, werden beide erkannt; danach steht
+    # das Pill VOR dem Quell-Link (per JS über die Schlagzeile geschoben). Ohne groben
+    # Page-Guard: nach dem Umbau bleibt keine Klammer übrig → natürlich idempotent,
+    # und auch bereits gerenderte „Weiterlesen"-Links (Re-Build) werden noch gefixt.
+    # Format A: Klammer steht VOR dem Link — „(Ressort · …) <a>→ Artikel</a>".
+    content = re.sub(
+        r'\(([^)<]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)',
+        lambda m: _ressort_meta(m.group(1)),
+        content,
+    )
+    # Format B: Link steht INNERHALB der Klammer — „(Ressort · … <a>…</a>)". Greift
+    # sowohl auf den frischen „→ Artikel"-Link als auch auf den bereits umgebauten
+    # „Weiterlesen bei der Presse →"-Link (deshalb generisches <a>…</a>).
+    content = re.sub(
+        r'\(([^)<]{2,60})·\s*(<a[^>]*>[^<]*</a>)\)',
+        lambda m: _ressort_meta(m.group(1)) + m.group(2),
+        content,
+    )
+    # Bereits gerenderte Platzhalter-Quellenzeilen aus früheren Builds entfernen
+    # (z.B. „Bericht: [Autor nicht angegeben]") — selbstheilend beim Re-Build.
+    content = re.sub(
+        r'\s*<span class="byline-source">Bericht: (?:\[[^<]*|[^<]*nicht angegeben[^<]*)</span>',
+        "", content,
+    )
     # Nummerierte Emojis + optionale Topic-Emojis am Anfang von h2-Titeln entfernen
     # z.B. "1️⃣ 🌍 EU verlängert…" → "EU verlängert…"
     content = re.sub(
@@ -728,16 +790,12 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     )
     # E-Paper-Paragraph (📰) entfernen — steht bereits in der Tab-Leiste.
     content = re.sub(r'\s*<p>[^<]*📰.*?</p>', '', content, flags=re.DOTALL)
-    # Done-Box: Emoji und ungültige <em>-Tags bereinigen.
+    # Done-Box normalisieren: genau ein ✓-Häkchen, Kern-Signal „Du bist informiert".
+    # Idempotent — entfernt bereits vorhandene Häkchen/Emojis/<em> und kürzt den
+    # redundanten Zusatz (Lesezeit steht in der Byline, „Nächstes Lagebild" in
+    # .next-edition). Verhindert das Anhäufen mehrerer ✓ über wiederholte Builds.
     content = re.sub(
-        r'<div class="done">[^<]*<em>(.*?)(?:</em>)?</div>',
-        r'<div class="done"><span class="done-check">✓</span> \1</div>',
-        content, flags=re.DOTALL,
-    )
-    content = re.sub(
-        r'<div class="done">[✅\s]*(.*?)</div>',
-        r'<div class="done"><span class="done-check">✓</span> \1</div>',
-        content, flags=re.DOTALL,
+        r'<div class="done">(.*?)</div>', _clean_done_box, content, flags=re.DOTALL
     )
     # "Deine Themen" h2 bekommt eigene Klasse → kein Accordion.
     content = content.replace(
@@ -747,8 +805,6 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
     if datum:
         points = len(re.findall(r"<h2>\s*[1-9]", content))
-        m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
-        lesezeit = int(m.group(1)) if m else None
         header = _lagebild_header(datum, edition, points, lesezeit)
         if '<header class="lagebild-header">' in content:
             # Idempotent: bestehenden Header komplett ersetzen (kein Verschachteln).
@@ -1371,18 +1427,20 @@ def build_site() -> Path:
     latest_html = editions[0][1].read_text(encoding="utf-8")
     latest_d, _, latest_edition = editions[0][0]
     latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition)
-    # Reihenfolge nach dem Header: Streak-Chip, dann Audio-Player.
+    # Reihenfolge nach dem Header (von oben nach unten): Streak-Chip, dann Audio-Player.
+    # _insert_after_header setzt jeden Block direkt vor </header>, der zuletzt eingefügte
+    # landet also unten — daher hier Streak zuerst, Audio danach einfügen.
     from . import state as state_mod
-    latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
-    if (ARCHIV_DIR / latest_mp3).exists():
-        latest_content = _insert_after_header(
-            latest_content, _audio_player(f"archiv/{latest_mp3}")
-        )
     streak = state_mod.current_streak(state)
     if streak >= 2:
         latest_content = _insert_after_header(
             latest_content,
             f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n',
+        )
+    latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
+    if (ARCHIV_DIR / latest_mp3).exists():
+        latest_content = _insert_after_header(
+            latest_content, _audio_player(f"archiv/{latest_mp3}")
         )
     # Dezente Rhythmus-Zeile direkt unter dem Header (nur Startseite).
     hint = _next_edition_hint(latest_edition)

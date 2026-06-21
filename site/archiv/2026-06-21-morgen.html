@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -350,23 +350,23 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">So, 21. Jun · Morgen-Ausgabe</p><h1>Guten Morgen.</h1><p class="byline">Von der „Presse“-Redaktion · 1 Thema · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header"><p class="kicker">So, 21. Jun · Morgen-Ausgabe</p><h1>Guten Morgen.</h1><p class="byline">Von der „Presse“-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Hitze fordert Todesfälle — Hitzetelefon reaktiviert</p>
   <p>Israel intensiviert Luftschläge im Libanon — über Tote</p>
   <p>US-Chefunterhändler Vance reist zu Iran-Verhandlungen in die Schweiz</p>
   </div><hr>
-  <h2>9 hitzebedingte Todesfälle im Sommer 2025 — Hitzetelefon wieder aktiv</h2>
+  <h2>hitzebedingte Todesfälle im Sommer 2025 — Hitzetelefon wieder aktiv</h2>
   <p><strong>Was ist neu:</strong> Der Sommer 2025 war in Österreich tödlicher als erwartet: Insgesamt 449 Menschen starben an Hitzefolgen. Das österreichweite Hitzetelefon des Gesundheitsministeriums nimmt deshalb am heutigen Sonntag seinen Betrieb wieder auf und bietet Beratung für Risikopersonen, insbesondere für ältere Menschen und solche mit chronischen Erkrankungen.</p>
-  <p><strong>Warum es zählt:</strong> Die Bilanz zeigt, dass Hitzeextreme zu einem ernsthaften Gesundheitsrisiko für Österreich geworden sind. Die Reaktivierung des Hitzetelefons signalisiert, dass auch der kommende Sommer mit ähnlichen Belastungen rechnet — für dich als berufstätige Person ist es gut zu wissen, dass es diese Anlaufstelle gibt und dass Risikogruppen gezielt unterstützt werden. (Gesundheit · <a class="source-link" href="https://www.diepresse.com/31825941/449-hitzebedingte-todesfaelle-im-sommer-2025-in-oesterreich">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-21|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <p><strong>Warum es zählt:</strong> Die Bilanz zeigt, dass Hitzeextreme zu einem ernsthaften Gesundheitsrisiko für Österreich geworden sind. Die Reaktivierung des Hitzetelefons signalisiert, dass auch der kommende Sommer mit ähnlichen Belastungen rechnet — für dich als berufstätige Person ist es gut zu wissen, dass es diese Anlaufstelle gibt und dass Risikogruppen gezielt unterstützt werden. <span class="ressort" style="--h:24">Gesundheit</span> <a class="source-link" href="https://www.diepresse.com/31825941/449-hitzebedingte-todesfaelle-im-sommer-2025-in-oesterreich">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-21|morgen|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Israel intensiviert Luftkampagne im Libanon — über 100 Tote</h2>
   <p><strong>Was ist neu:</strong> Israel führt neue Luftangriffe im Libanon durch, die Bekaa-Ebene im Osten und die südliche Küstenstadt Tyros wurden getroffen. Die Bilanz: über 100 Tote bei diesen neuesten Angriffen allein.</p>
-  <p><strong>Warum es zählt:</strong> Die Eskalation zeigt, dass sich die Spannungen im Nahost-Konflikt verschärfen, auch während die USA (Vance) parallel Verhandlungen mit dem Iran führen. Das erhöht die Unsicherheit in einer bereits instabilen Region. (International · <a class="source-link" href="https://www.diepresse.com/31829427/ueber-100-tote-bei-neuen-angriffen-israels-im-libanon">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-21|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <p><strong>Warum es zählt:</strong> Die Eskalation zeigt, dass sich die Spannungen im Nahost-Konflikt verschärfen, auch während die USA (Vance) parallel Verhandlungen mit dem Iran führen. Das erhöht die Unsicherheit in einer bereits instabilen Region. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31829427/ueber-100-tote-bei-neuen-angriffen-israels-im-libanon">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-21|morgen|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Vance beginnt Iran-Verhandlungen in der Schweiz</h2>
-  <p>US-Chefunterhändler Vance ist zur Weiterführung von Gesprächen mit dem Iran in die Nähe von Luzern gereist — ungeachtet anhaltender Kämpfe im Libanon und neuer Spannungen um die Straße von Hormus, eine der wichtigsten Schifffahrtsrouten der Welt. (International · <a class="source-link" href="https://www.diepresse.com/31824909/vance-zu-iran-verhandlungen-in-der-schweiz-angekommen">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-21|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
+  <p>US-Chefunterhändler Vance ist zur Weiterführung von Gesprächen mit dem Iran in die Nähe von Luzern gereist — ungeachtet anhaltender Kämpfe im Libanon und neuer Spannungen um die Straße von Hormus, eine der wichtigsten Schifffahrtsrouten der Welt. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31824909/vance-zu-iran-verhandlungen-in-der-schweiz-angekommen">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-21|morgen|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert.</div>
   <hr>
 </div>
 </div>

@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -358,19 +358,19 @@
   <h2>Finnland erlaubt künftig Atomwaffen auf seinem Gebiet</h2>
   <p><strong>Was ist neu:</strong> Das finnische Parlament hat sein Atomwaffen-Verbot aufgehoben. Ein neues Gesetz ermöglicht künftig die Einfuhr, den Transport und den Besitz von Atomwaffen auf finnischem Staatsgebiet — eine Gesetzesänderung, die praktisch umsetzt, was bislang rechtlich ausgeschlossen war.</p>
   <p><strong>Warum es zählt:</strong> Finnland ist seit 2023 NATO-Mitglied und hat die längste Grenze zur Russischen Föderation in der EU. Die Aufhebung des Atomwaffen-Verbots signalisiert eine strategische Neuausrichtung der Sicherheitspolitik im Norden und verstärkt die militärische Präsenz der NATO direkt an Russlands Grenze — ein weiterer Schritt der Bündnisverstärkung im Angesicht des Kriegs in der Ukraine. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31135931/finnisches-parlament-hebt-atomwaffen-verbot-auf">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-17|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|abend|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Österreichs Staatsschulden steuern auf historische Höchststände zu</h2>
   <p><strong>Was ist neu:</strong> Fiskalrat und Österreichische Nationalbank schlagen Alarm: Ohne entschiedenes Gegensteuern wird Österreich die Staatsschulden auf historische Rekordhöhen treiben. Die Warnungen sind eindeutig und beziehen sich auf die gegenwärtige Fiskalpolitik, die diesen Trend nicht bremst.</p>
   <p><strong>Warum es zählt:</strong> Höhere Staatsschulden bedeuten langfristig steigende Zinskosten für den Staat — und damit weniger Spielraum für Investitionen, Bildung und soziale Leistungen. Die Warnung der beiden zentralen Institutionen signalisiert, dass die aktuelle Budgetpolitik nicht nachhaltig ist und die nächsten Jahre kritisch werden. <span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://www.diepresse.com/31025574/oesterreichs-politik-betreibt-fahrlaessige-krida">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-17|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|abend|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Wiener Mobilfunker Spusu zieht nach Deutschland — mit Preiskrieg</h2>
   <p><strong>Was ist neu:</strong> Der österreichische Anbieter Spusu expandiert nach einem zehn Jahre dauernden Rechtsstreit in den deutschen Markt — unterstützt von Botschafter Bastian Schweinsteiger und mit aggressiven Kampfpreisen. Das ist das Ergebnis eines langwierigen Streits um Marktzu­gang, den Spusu gewonnen hat.</p>
   <p><strong>Warum es zählt:</strong> Für österreichische Unternehmer bedeutet das einen Präzedenzfall: Durchhaltevermögen gegen etablierte Marktkräfte zahlt sich aus. Für deutsche Konsumenten könnte der Wettbewerb Druck auf die Preise bringen. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/30856202/angriff-aus-oesterreich-mobilfunker-spusu-klagt-sich-den-weg-nach-deutschland-frei">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-17|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-17|abend|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand hat sich die Entspannung fortgesetzt — erste iranische Rohölexporte per Schiff seit der US-Blockade vor zwei Monaten sind angekommen. Der Ölpreis ist um knapp 5 % gefallen. Allerdings bleiben Experten skeptisch: Er dürfte noch monatelang angespannt bleiben wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionaler Spannungen.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 120 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>

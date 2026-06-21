@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -358,17 +358,17 @@
   <h2>Trump und Iran verkünden historischen Friedensdeal</h2>
   <p><strong>Was ist neu:</strong> Nach Jahren der Konfrontation haben die USA und der Iran sich auf einen Friedensvertrag geeinigt. Die Straße von Hormuz, eine der weltweit wichtigsten Handelsrouten, soll für den Schiffsverkehr wieder freigegeben werden. Alle gegenseitigen Angriffe sollen sofort enden. Das Weiße Haus spricht von einem „historischen&quot; Abkommen. Parallel greift Israel den Libanon an — ein Zeichen dafür, dass die regionale Lage trotz des Iran-Deals angespannt bleibt.</p>
   <p><strong>Warum es zählt:</strong> Eine Entspannung zwischen Iran und USA könnte Energiepreise stabilisieren und die globale Handelssicherheit erhöhen. Österreichs Energieimporte und Lieferketten sind davon abhängig. Allerdings ist der schwierigste Teil des Deals noch nicht verhandelt — die Umsetzung wird zeigen, ob die Einigung haltbar ist. (International) <a class="source-link" href="https://www.diepresse.com/30260668/schiffe-der-welt-startet-eure-motoren-trump-und-iran-verkuenden-frieden-israel-greift-libanon-an">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|morgen|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>AT&amp;S erhöht Prognose nach AMD-Vereinbarung</h2>
   <p><strong>Was ist neu:</strong> Der steirische Leiterplattenhersteller AT&amp;S hat sich mit seinem Großkunden AMD auf den Ausbau des Werks in Malaysia geeinigt und erhöht daraufhin seine Gewinnprognose. Die Aktie ist auf ein Rekordhoch gesprungen.</p>
   <p><strong>Warum es zählt:</strong> Das zeigt Rückenwind für Österreichs Tech-Industrie trotz schwieriger globaler Bedingungen. AT&amp;S ist einer der wichtigsten österreichischen Exportkonzerne — solche Aufträge sichern Arbeitsplätze und Steuereinnahmen. (Wirtschaft) <a class="source-link" href="https://www.diepresse.com/30271301/ats-baut-produktion-aus-aktie-schnellt-auf-rekordhoch">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|morgen|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>USA sperren KI-Zugang — Europa unter Druck</h2>
   <p>Die US-Regierung ordnete KI-Entwickler Anthropic an, den weltweiten Zugang zu den fortschrittlichsten Modellen „Fable 5&quot; und „Mythos 5&quot; zu sperren. Die EU reagiert alarmiert und sieht darin eine protektionistische Maßnahme. Österreichs Unternehmen und Start-ups könnten von dieser digitalen Fragmentierung betroffen sein. (Technologie) <a class="source-link" href="https://www.diepresse.com/30265780/us-regierung-kappt-weltweiten-zugang-zu-neuen-anthropic-ki-modellen-eu-reagiert-alarmiert">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|morgen|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Altersteilzeit: Neuer Deckel bei 5.200 Euro</h2>
   <p>Österreichs Koalition einigt sich auf Kürzungen bei der Altersteilzeit — künftig liegt die Obergrenze bei 5.200 Euro, dauerhaft weniger als bisher. Die SPÖ will die Pläne noch entschärfen. (Politik) <a class="source-link" href="https://www.diepresse.com/30297884/neuer-deckel-bei-5200-euro-dauerhaft-weniger-geld-das-wird-neu-bei-der-altersteilzeit">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-15|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-15|morgen|3"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 135 Sekunden. Nächstes Update: heute 16:00.</em></p>
   <hr>
 </div>

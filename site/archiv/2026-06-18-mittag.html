@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -358,19 +358,19 @@
   <h2>Österreich verliert im internationalen Standortwettbewerb weiter an Boden</h2>
   <p><strong>Was ist neu:</strong> Im renommierten IMD-Wettbewerbsranking 2026 fällt Österreich auf Platz 29 zurück — ein kontinuierlicher Abstieg. Das Ranking bewertet Länder nach ihrer wirtschaftlichen Wettbewerbsfähigkeit anhand von Faktoren wie Infrastruktur, Arbeitskräfte, Innovation und Stabilität. Österreich verliert damit sowohl regional als auch global an Attraktivität für Investitionen und qualifizierte Fachkräfte.</p>
   <p><strong>Warum es zählt:</strong> Ein schlechter Platz im IMD-Ranking signalisiert potenziellen Investoren und Talenten, dass der Standort an Zukunftsfähigkeit verliert. Das hat konkrete Folgen: weniger Unternehmensgründungen, Brain Drain von hochqualifizierten Arbeitskräften und geringere Steuereinnahmen. Für Deine berufliche Perspektive und die Lohnentwicklung bedeutet das mittelfristig Druck — der Wettbewerb um gute Jobs wird intensiver, während die Wertschöpfung nicht proportional mitwächst. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/31147636/oesterreich-rutscht-im-wettbewerbsranking-weiter-ab">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-18|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-18|mittag|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Mietpreise wachsen stärker als Einkommen — 4,8 Prozent Anstieg im Jahresvergleich</h2>
   <p><strong>Was ist neu:</strong> Laut Statistik Austria kostet eine durchschnittliche Mietwohnung im ersten Quartal 2026 inklusive Betriebskosten nun 10,50 Euro pro Quadratmeter — ein Plus von 4,8 Prozent gegenüber dem Vorjahresquartal. Der Anstieg setzt sich damit fort, nachdem bereits die Vorjahre von Mietdynamik geprägt waren.</p>
   <p><strong>Warum es zählt:</strong> Diese Steigerungsrate übersteigt typischerweise die durchschnittliche Lohnsteigerung — Deine Kaufkraft sinkt faktisch, wenn Miete schneller wächst als Dein Gehalt. Das schränkt Spielraum für Ersparnisse, Altersvorsorge und andere Ausgaben ein. Besonders für junge Berufstätige und Familien mit Wohnungswechsel wird das relevant. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/31207134/mieten-legten-im-ersten-quartal-deutlich-zu">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-18|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-18|mittag|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Ukraine fliegt größten Drohnenangriff des Jahres — russische Raffinerie zerstört, Flugverkehr lahmgelegt</h2>
   <p><strong>Was ist neu:</strong> Die Ukraine hat am Morgen einen der größten Drohnenangriffe auf russisches Territorium in diesem Jahr geflogen. Das Ziel war eine strategische Raffinerie; mehrere Flugverkehrswege wurden lahm gelegt. Russland antwortete mit Raketenangriffen. Die Eskalation zeigt: Trotz diplomatischer Bemühungen intensiviert sich der bewaffnete Konflikt.</p>
   <p><strong>Warum es zählt:</strong> Solche Anschläge auf Energieinfrastruktur verschärfen die europäische Energielage indirekt — knappere russische Exporte können Ölpreise unter Druck setzen oder stabilisieren, was Deine Heiz- und Stromkosten mittelbar berührt. Zudem signalisiert die Eskalation: Ein rasches Kriegsende ist nicht absehbar. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31142779/ukrainischer-drohnenangriff-auf-russland-setzt-raffinerie-in-brand-und-legt-flugverkehr-lahm">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-18|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-18|mittag|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (17.06.) haben sich erste iranische Rohölexporte per Schiff fortgesetzt — die ersten Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber vor anhaltender Spannung wegen schwacher Nachfrage in China, OPEC-Drosselungen und regionalen Spannungen.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 150 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>

@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -358,15 +358,15 @@
   <h2>G7 einigt sich auf Energiesanktionen gegen Russland</h2>
   <p><strong>Was ist neu:</strong> Die G7-Staaten haben sich nach Angaben aus Diplomatenkreisen auf neue Sanktionen gegen Russlands Öl- und Gassektor verständigt. Die Maßnahmen sollen die Finanzierungsmöglichkeiten des Kriegs weiter einschränken und sind Teil einer koordinierten Strategie, um Putins Spielraum zu begrenzen.</p>
   <p><strong>Warum es zählt:</strong> Für Österreich als energieabhängige Volkswirtschaft bedeuten härtere Sanktionen gegen russische Energieträger längerfristig Druck auf Strompreise und Versorgungssicherheit — auch wenn die unmittelbare Wirkung begrenzt ist. Gleichzeitig festigt die G7-Einigung den westlichen Kurs gegen Russland, was außenpolitisch relevant bleibt. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/30641314/g7-staaten-beraten-ueber-strengere-energiesanktionen-gegen-russland">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>EU verbietet Begriffe wie „veganes Huhn&quot;</h2>
   <p><strong>Was ist neu:</strong> Das EU-Parlament hat beschlossen, dass Fleischbegriffe künftig nur für tierische Produkte gelten dürfen — „veganes Huhn&quot; oder „Seitan-Steak&quot; sind damit nicht mehr zulässig. Die Regelung gilt vorerst bis Ende 2027.</p>
   <p><strong>Warum es zählt:</strong> Für Hersteller von Fleischersatzprodukten wird es teurer, neue Namen zu entwickeln und Verpackungen umzustellen. Für dich als Konsument:in ändert sich die Einkaufslogik — Alternativprodukte werden weniger unmittelbar erkennbar sein. Die Lobby der klassischen Fleischwirtschaft setzt sich durch, während die Debatte über Verbrauchertransparenz noch nicht zu Ende ist. <span class="ressort" style="--h:24">EU-Politik</span> <a class="source-link" href="https://www.diepresse.com/30638799/veganes-huhn-und-seitan-steak-werden-verboten-eu-parlament-schuetzt-fleischbegriffe">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Regierung plant Wirtschaftsprojekte vor Naturschutz</h2>
   <p><strong>Was ist neu:</strong> Die österreichische Regierung plant, „strategische Projekte&quot; der Wirtschaft künftig zu priorisieren und damit implizit Umweltschutzauflagen zu lockern — etwa für bedrohte Arten wie die Haselmaus. Das ist Teil eines Pakets von 117 Maßnahmen gegen De-Industrialisierung, zieht aber fünf Monate später zwischen Politik und Wirtschaft sehr unterschiedliche Bilanzen.</p>
   <p><strong>Warum es zählt:</strong> Dieser Kurs signalisiert eine Verschiebung: Wirtschaftsinteressen sollen künftig leichter über Naturschutzgesetze hinweggehen können. Das beschleunigt manche Großprojekte, erhöht aber das Risiko von Umweltschäden und längerfristigen Rechtsstreitigkeiten. Für deine Region vor Ort kann das konkret bedeuten, dass Schutzgebiete unter Druck geraten. <span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://www.diepresse.com/30549181/harte-zeiten-fuer-haselmaus-und-co-regierung-plant-vorrang-fuer-strategische-projekte-der-wirtschaft">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-16|nachmittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-16|nachmittag|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand hat die Iran-Einigung den Ölpreis um knapp 5 % gesenkt. Experten rechnen aber damit, dass er noch monatelang angespannt bleibt — wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und bestehender regionaler Unsicherheiten.</p>
   <hr>

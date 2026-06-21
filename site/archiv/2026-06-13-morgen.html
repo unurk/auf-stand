@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -359,17 +359,17 @@
   <p><strong>Was ist neu:</strong> Österreichs Wirtschaftsminister Wolfgang Hattmannsdorfer hat in einem Interview klare Prioritäten gesetzt: Die Senkung der Strompreise rangiert für ihn deutlich vor Naturschutzmaßnahmen. Er argumentiert, dass Österreich für mehr Wettbewerbsfähigkeit einen „Schulterschluss&quot; braucht – zentral dafür seien die kommenden Lohnverhandlungen und der schnellere Ausbau erneuerbarer Energien.</p>
   <p><strong>Warum es zählt:</strong> Das signalisiert eine Verschiebung in der Regierungspolitik. Für deine Stromrechnung und dein Portemonnaie könnte das bedeuten: Es wird Druck auf Energiepreise geben. Gleichzeitig zeigt sich ein Konflikt zwischen Wachstumspolitik und Naturschutz, der auch Genehmigungsverfahren für Energieprojekte beschleunigen könnte.</p>
   <p>(Wirtschaft) [→ Artikel](https://www.diepresse.com/29884706/hattmannsdorfer-die-haselmaus-ist-nicht-wichtiger-als-guenstige-strompreise)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Kassenärzte in Tirol: 45 Prozent haben Patientenstopp</h2>
   <p><strong>Was ist neu:</strong> Fast jede zweite Kassenordination in Tirol nimmt derzeit keine neuen Patientinnen und Patienten mehr auf — eine aktuelle Erhebung zeigt, dass Tirol damit über dem österreichischen Durchschnitt liegt. Bestimmte Fachrichtungen sind besonders betroffen.</p>
   <p><strong>Warum es zählt:</strong> Das macht es für dich als Patientin schwerer, überhaupt noch einen Kassenarzt zu finden. Der Zugang zur medizinischen Versorgung wird knapper, was längere Wartezeiten und Druck auf Privatordinationen bedeutet.</p>
   <p>(Gesundheit) [→ Artikel](https://tirol.orf.at/stories/3358320/)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Salzburg: SPÖ wählt Peter Eder zum neuen Parteichef</h2>
   <p><strong>Was ist neu:</strong> Nach fast zwei Jahren interimistischer Führung durch ein Trio bekommt die Salzburger SPÖ heute einen neuen alleinigen Vorsitzenden: Arbeiterkammerpräsident Peter Eder wird auf dem Landesparteitag in St. Johann gewählt.</p>
   <p><strong>Warum es zählt:</strong> Das klärt die personelle Situation vor wichtigen politischen Entscheidungen in Salzburg und gibt der SPÖ wieder klare Führungsstrukturen.</p>
   <p>(Politik) [→ Artikel](https://salzburg.orf.at/stories/3358304/)</p>
-<div class="article-fb" data-key="2026-06-13|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-13|morgen|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächstes Update: heute 16:00.</em></p>
 </div>
 </div>

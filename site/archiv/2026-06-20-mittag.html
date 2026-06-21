@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -360,22 +360,22 @@
   <p><strong>Warum es zählt:</strong> Die Digitalisierung ist für deine berufliche Zukunft und die Wettbewerbsfähigkeit Österreichs zentral — von Breitbandausbau über E-Government bis zu KI-Kompetenzen. Dass der Staat hier wieder investiert, statt zu sparen, deutet darauf hin, dass Regierung und Parlament die Dringlichkeit erkannt haben. Konkret: Bessere digitale Services, schnelleres Internet in ländlichen Regionen, stärkere Tech-Kompetenzen in der Verwaltung.</p>
   <p>(Digitales, Politik)</p>
   <p><a class="source-link" href="https://www.diepresse.com/31757204/mittel-fuer-digitalisierung-steigen-wieder">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-20|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-20|mittag|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Libanon-Luftangriff gefährdet fragile Waffenruhe</h2>
   <p><strong>Was ist neu:</strong> Trotz eines am Mittwoch unterzeichneten Rahmenabkommens zwischen USA und Iran sind am Samstag fünf Menschen bei einem israelischen Luftangriff im Libanon getötet worden. Das Abkommen sollte die Lage stabilisieren — nun zeigt sich, wie zerbrechlich diese Vereinbarung ist.</p>
   <p><strong>Warum es zählt:</strong> Die Eskalation im Libanon gefährdet nicht nur die Region, sondern auch fragile internationale Diplomatie. Für dich als österreichische Bürgerin bedeutet das: geopolitische Unsicherheit mit möglichen Folgen für Energiepreise, Flüchtlingsbewegungen und europäische Außenpolitik. Der Luftangriff signalisiert, dass lokale Akteure das Abkommen nicht automatisch befolgen.</p>
   <p>(International)</p>
   <p><a class="source-link" href="https://www.diepresse.com/31763091/trotz-waffenruhe-fuenf-tote-bei-israelischem-luftangriff-im-libanon">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-20|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-20|mittag|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Wien: Höhere Parkgebühren für SUV in Prüfung</h2>
   <p>SPÖ-Stadträtin Ulli Sima lässt derzeit prüfen, ob Wien höhere Parkgebühren für große SUV einführen kann. Die Regelung könnte Pendler wie dich betreffen — je nach Fahrzeugtyp und künftigem Tarifmodell möglicherweise mit höheren Kosten rechnen.</p>
   <p>(Wien/Lokales)</p>
   <p><a class="source-link" href="https://www.diepresse.com/31395431/hoehere-parkgebuehren-fuer-suv-in-wien-stadtraetin-sima-laesst-pruefen">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-06-20|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-20|mittag|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>Zu deinen verfolgten Themen — US-Zölle, Mietrecht, US-Börsen, EZB-Zinsen, Inflation, österreichische Innenpolitik, EU-Politik, Arbeitsmarkt, Klimapolitik, KI, Ukraine-Krieg, österreichische Unternehmen, Migration, Gesundheitssystem — gibt es in den heutigen Meldungen keine materiellen Änderungen. Kein Handlungsbedarf.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 120 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert.</div>
   <hr>
 </div>
 </div>

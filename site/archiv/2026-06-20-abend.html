@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -357,16 +357,16 @@
   </div><hr>
   <h2>Iran erklärt Hormuz-Straße für gesperrt — große Risiken für Ölhandel</h2>
   <p><strong>Was ist neu:</strong> Der Iran hat am Samstag die strategisch kritische Straße von Hormuz für „gesperrt&quot; erklärt und begründet das mit israelischen Angriffen im Südlibanon, die es als Verstoß gegen das Rahmenabkommen mit den USA zur Kriegsbeendigung wertet. Die USA lehnen diese Erklärung ab. Die Hormuz-Straße ist einer der weltweit wichtigsten Engpässe für Ölexporte — rund ein Drittel des seewärts transportierten Erdöls passiert sie täglich.</p>
-  <p><strong>Warum es zählt:</strong> Sollte der Iran Schiffe praktisch blockieren, würde das Ölpreise massiv unter Druck setzen oder treiben, je nachdem, wie ernst die Blockade gemeint ist. Für die österreichische Importwirtschaft und Verbraucher bedeutet das unmittelbare Preisrisiken bei Heiz- und Kraftstoffen. Gleichzeitig signalisiert Irans Schritt eine gefährliche Eskalationsdynamik zwischen regionalen Akteuren und den USA — ein Risiko, das Märkte verunsichert. (International · <a class="source-link" href="https://www.diepresse.com/31783389/iran-erklaert-strasse-von-hormuz-fuer-gesperrt-usa-weisen-das-zurueck">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-20|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <p><strong>Warum es zählt:</strong> Sollte der Iran Schiffe praktisch blockieren, würde das Ölpreise massiv unter Druck setzen oder treiben, je nachdem, wie ernst die Blockade gemeint ist. Für die österreichische Importwirtschaft und Verbraucher bedeutet das unmittelbare Preisrisiken bei Heiz- und Kraftstoffen. Gleichzeitig signalisiert Irans Schritt eine gefährliche Eskalationsdynamik zwischen regionalen Akteuren und den USA — ein Risiko, das Märkte verunsichert. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/31783389/iran-erklaert-strasse-von-hormuz-fuer-gesperrt-usa-weisen-das-zurueck">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-20|abend|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Österreich erlebt bisher wärmsten Tag des Jahres</h2>
   <p><strong>Was ist neu:</strong> Am Samstag wurde in Bad Deutsch-Altenburg eine Temperatur von 36 Grad gemessen — das ist heuer der österreichweit höchste Stand. Gleichzeitig verbietet Frankreich wegen der Hitze den Alkoholausschank beim landesweiten Musikfestival „Fête de la Musique&quot;.</p>
-  <p><strong>Warum es zählt:</strong> Die Marke signalisiert ein Hitzemuster, das sich durch den Sommer fortsetzen könnte und Energiekosten (Kühlung), Landwirtschaft und öffentliche Gesundheit belastet. (Wien/Lokales · <a class="source-link" href="https://www.diepresse.com/31812453/bisher-hoechste-temperatur-des-jahres-in-oesterreich-gemessen">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-20|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+  <p><strong>Warum es zählt:</strong> Die Marke signalisiert ein Hitzemuster, das sich durch den Sommer fortsetzen könnte und Energiekosten (Kühlung), Landwirtschaft und öffentliche Gesundheit belastet. <span class="ressort" style="--h:25">Wien/Lokales</span> <a class="source-link" href="https://www.diepresse.com/31812453/bisher-hoechste-temperatur-des-jahres-in-oesterreich-gemessen">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-20|abend|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Unwetter in der Steiermark — Straßenbahnen stehen, Fest abgesagt</h2>
-  <p>Im Mürztal und in Graz sorgte ein Unwetter für zahlreiche Feuerwehreinsätze. In Graz blieben Straßenbahnen stehen, das Augartenfest wurde abgesagt. (Wien/Lokales · <a class="source-link" href="https://www.diepresse.com/31798658/unwetter-sorgen-im-muerztal-und-in-graz-fuer-zahlreiche-feuerwehreinsaetze">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-06-20|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
+  <p>Im Mürztal und in Graz sorgte ein Unwetter für zahlreiche Feuerwehreinsätze. In Graz blieben Straßenbahnen stehen, das Augartenfest wurde abgesagt. <span class="ressort" style="--h:25">Wien/Lokales</span> <a class="source-link" href="https://www.diepresse.com/31798658/unwetter-sorgen-im-muerztal-und-in-graz-fuer-zahlreiche-feuerwehreinsaetze">Weiterlesen bei der Presse →</a></p>
+<div class="article-fb" data-key="2026-06-20|abend|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert.</div>
   <hr>
 </div>
 </div>

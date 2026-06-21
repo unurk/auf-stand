@@ -85,7 +85,9 @@
       margin: 0 0 10px; font-weight: 600; color: var(--text);
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
-    strong {
+    /* Kicker-Label-Stil nur für die redaktionellen „Was ist neu:/Heute wichtig:"-Marker,
+       nicht für jede Fettung im Fließtext. */
+    .story-body strong, .highlights strong {
       font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
@@ -137,8 +139,6 @@
       background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
       margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
     }
-    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
-    h2 { margin: 28px 0 10px; }
     /* ── Accordion (Story-Karten) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
@@ -154,16 +154,16 @@
     }
     .story-body { max-height: 0; opacity: 0; overflow: hidden;
       transition: max-height .3s ease, opacity .2s ease; }
-    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+    .story-card.open .story-body { max-height: 4000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
     /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
     .story-body p > strong:first-child {
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
-    /* ── Ressort-Tag ── */
+    /* ── Ressort-Tag (farbcodiert je Ressort über --h, siehe _RESSORT_HUE) ── */
     .ressort {
-      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      display: inline-block;
+      background: oklch(0.95 0.04 var(--h, 245)); color: oklch(0.48 0.15 var(--h, 245));
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
       letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
     }
@@ -249,9 +249,9 @@
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       background: #eef2f7; border: none; border-radius: 999px;
-      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      padding: 8px 18px; font: 600 16px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
     .fb-btn:hover { filter: brightness(.97); }
@@ -358,15 +358,15 @@
   <h2>SpaceX startet an der Börse – zwei Billionen Dollar Bewertung</h2>
   <p><strong>Was ist neu:</strong> SpaceX ist heute an die Wall Street gegangen. Die Aktie wurde mit 150 Dollar platziert. Das Unternehmen wurde zeitweise mit mehr als zwei Billionen Dollar bewertet – ein historisches Volumen für einen Börsengang im Raumfahrtsektor.</p>
   <p><strong>Warum es zählt:</strong> Der Gang an die Börse signalisiert, dass private Raumfahrt endgültig aus der Nische in den Mainstream-Kapitalmarkt gelangt ist. Für Sparer und Pensionsfonds eröffnet sich ein neues Investitionsfeld; gleichzeitig wird Elons Einfluss auf globale Infrastrukturen – von Satellitenkommunikation bis Raumtransport – weiter konzentriert. (Wirtschaft) [→ Artikel](https://www.diepresse.com/29948135/spacex-mit-raketenstart-an-der-wall-street)</p>
-<div class="article-fb" data-key="2026-06-12|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-12|abend|0"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Dritte Anklage gegen René Benko – Vermögensschädigung vorgeworfen</h2>
   <p><strong>Was ist neu:</strong> Die Wirtschafts- und Korruptionsstaatsanwaltschaft erhebt die dritte Anklage gegen Signa-Gründer René Benko. Diesmal geht es um eine „wahrheitswidrige Garantie&quot; und darum, dass Benko eine Stiftung des Investors Hans Peter Haselsteiner um fünf Millionen Euro geschädigt haben soll, indem er Vermögenswerte vor Gläubigern verbarg.</p>
   <p><strong>Warum es zählt:</strong> Mit jeder neuen Anklage wächst die rechtliche Belastung für Benko und die Komplexität des Signa-Imperiums. Für Investoren und Gläubiger wird die Frage drängender, wie viel von den versprochenen Vermögenswerten noch zu retten ist. (Recht) [→ Artikel](https://www.diepresse.com/30093583/wksta-erhebt-weitere-anklage-gegen-rene-benko)</p>
-<div class="article-fb" data-key="2026-06-12|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-12|abend|1"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <h2>Erste Arbeitslosenentlastung seit drei Jahren in Salzburg</h2>
   <p><strong>Was ist neu:</strong> Die Arbeitslosenzahl ist in Salzburg im Mai erstmals seit 39 Monaten gefallen – konkret um 26 Personen weniger als im Mai 2025.</p>
   <p><strong>Warum es zählt:</strong> Das AMS deutet dies als Zeichen für einen möglichen konjunkturellen Aufschwung, nachdem die Arbeitslosigkeit über drei Jahre hinweg gestiegen war. Das hat unmittelbare Relevanz für deine Jobaussichten und das Vertrauen in den Arbeitsmarkt. (Wirtschaft) [→ Artikel](https://salzburg.orf.at/stories/3358273/)</p>
-<div class="article-fb" data-key="2026-06-12|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-06-12|abend|2"><button class="fb-btn" data-vote="up" aria-label="Relevant">👍</button><button class="fb-btn" data-vote="down" aria-label="Weniger relevant">👎</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächste Ausgabe: morgen 7:00.</em></p>
 </div>
 </div>
