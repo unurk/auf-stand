@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="">
   <link rel="manifest" href="../manifest.webmanifest">
   <script src="../push-config.js"></script>
   <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
@@ -370,7 +371,7 @@
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (16.06.) haben erste iranische Rohölexporte per Schiff die Lage leicht entspannt — erste Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber: Er bleibt noch monatelang angespannt wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionaler Unsicherheiten.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>
@@ -472,6 +473,29 @@
       navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('../version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>

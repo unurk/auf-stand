@@ -59,6 +59,7 @@ _PAGE_TEMPLATE = """\
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="__EDITION__">
   <link rel="manifest" href="__ROOT__manifest.webmanifest">
   <script src="__ROOT__push-config.js"></script>
   <link rel="icon" href="__ROOT__favicon-32.png" sizes="32x32" type="image/png">
@@ -504,6 +505,29 @@ __CONTENT__
       navigator.serviceWorker.register('__ROOT__sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('__ROOT__version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>
@@ -511,14 +535,21 @@ __CONTENT__
 """
 
 
-def _render_page(title: str, content: str, active: str, root: str = "") -> str:
-    """Füllt das Page-Template mit Inhalt und aktivem Tab."""
+def _render_page(
+    title: str, content: str, active: str, root: str = "", edition_id: str = ""
+) -> str:
+    """Füllt das Page-Template mit Inhalt und aktivem Tab.
+
+    edition_id markiert (nur auf der Startseite) die angezeigte Ausgabe, damit der
+    Client beim Öffnen gegen version.json auf eine neuere Ausgabe prüfen kann.
+    """
     nav = {"lagebild": "", "dossier": "", "archiv": ""}
     if active in nav:
         nav[active] = "active"
     return (
         _PAGE_TEMPLATE
         .replace("__TITLE__", title)
+        .replace("__EDITION__", edition_id)
         .replace("__ROOT__", root)
         .replace("__NAV_LAGEBILD__", nav["lagebild"])
         .replace("__NAV_DOSSIER__", nav["dossier"])
@@ -1189,7 +1220,7 @@ _MANIFEST = {
 # Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
 # damit ein Deploy alte Caches verdrängt.
 _SERVICE_WORKER = """\
-const CACHE = 'copilot-v2';
+const CACHE = 'copilot-v3';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './die-presse-logo.png'];
 
@@ -1223,8 +1254,9 @@ self.addEventListener('fetch', function(e){
     }));
     return;
   }
-  // Eigene Seiten: network-first, Cache als Offline-Fallback.
-  e.respondWith(fetch(req).then(function(res){
+  // Eigene Seiten: network-first, Cache als Offline-Fallback. {cache:'reload'}
+  // umgeht den HTTP-Cache, damit eine Navigation immer die frische Seite holt.
+  e.respondWith(fetch(req, {cache: 'reload'}).then(function(res){
     if(res && res.ok){
       var copy = res.clone();
       caches.open(CACHE).then(function(c){ c.put(req, copy); });
@@ -1388,8 +1420,21 @@ def build_site() -> Path:
     hint = _next_edition_hint(latest_edition)
     if hint:
         latest_content = _insert_after_header(latest_content, hint)
+    # Versions-Marker für den Client-Frische-Check (installierte PWA lädt bei neuer
+    # Ausgabe automatisch neu). Bewusst winzig und ohne HTTP-Cache abrufbar.
+    from datetime import datetime, timezone
+    edition_id = f"{latest_d.isoformat()}-{latest_edition}"
+    (SITE_DIR / "version.json").write_text(
+        json.dumps(
+            {"edition": edition_id, "built": datetime.now(timezone.utc).isoformat()},
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
     title = _label(latest_d, latest_edition)
-    index_html = _render_page(title, latest_content, "lagebild")
+    index_html = _render_page(title, latest_content, "lagebild", edition_id=edition_id)
     index.write_text(index_html, encoding="utf-8")
 
     print(f"Web-App gebaut: {index} ({len(editions)} Ausgabe(n) im Archiv)")

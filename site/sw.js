@@ -1,4 +1,4 @@
-const CACHE = 'copilot-v2';
+const CACHE = 'copilot-v3';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './die-presse-logo.png'];
 
@@ -32,8 +32,9 @@ self.addEventListener('fetch', function(e){
     }));
     return;
   }
-  // Eigene Seiten: network-first, Cache als Offline-Fallback.
-  e.respondWith(fetch(req).then(function(res){
+  // Eigene Seiten: network-first, Cache als Offline-Fallback. {cache:'reload'}
+  // umgeht den HTTP-Cache, damit eine Navigation immer die frische Seite holt.
+  e.respondWith(fetch(req, {cache: 'reload'}).then(function(res){
     if(res && res.ok){
       var copy = res.clone();
       caches.open(CACHE).then(function(c){ c.put(req, copy); });

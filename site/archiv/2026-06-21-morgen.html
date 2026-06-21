@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="">
   <link rel="manifest" href="../manifest.webmanifest">
   <script src="../push-config.js"></script>
   <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
@@ -366,7 +367,7 @@
   <h2>Vance beginnt Iran-Verhandlungen in der Schweiz</h2>
   <p>US-Chefunterhändler Vance ist zur Weiterführung von Gesprächen mit dem Iran in die Nähe von Luzern gereist — ungeachtet anhaltender Kämpfe im Libanon und neuer Spannungen um die Straße von Hormus, eine der wichtigsten Schifffahrtsrouten der Welt. (International · <a class="source-link" href="https://www.diepresse.com/31824909/vance-zu-iran-verhandlungen-in-der-schweiz-angekommen">Weiterlesen bei der Presse →</a>)</p>
 <div class="article-fb" data-key="2026-06-21|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
 </div>
 </div>
@@ -467,6 +468,29 @@
       navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('../version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>

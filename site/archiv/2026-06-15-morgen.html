@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="">
   <link rel="manifest" href="../manifest.webmanifest">
   <script src="../push-config.js"></script>
   <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
@@ -470,6 +471,29 @@
       navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('../version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>

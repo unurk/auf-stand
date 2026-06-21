@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="2026-06-21-abend">
   <link rel="manifest" href="manifest.webmanifest">
   <script src="push-config.js"></script>
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
@@ -350,9 +351,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">So, 21. Jun · Abend-Ausgabe</p><h1>Guten Abend.</h1><p class="byline">Von der „Presse“-Redaktion · ca. 2 Min.</p><div class="streak">🔥 10 Tage in Folge informiert</div>
-
-<p class="next-edition">Nächstes Lagebild: morgen 06:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p>
+<header class="lagebild-header"><p class="kicker">So, 21. Jun · Abend-Ausgabe</p><h1>Guten Abend.</h1><p class="byline">Von der „Presse“-Redaktion · ca. 2 Min.</p><p class="next-edition">Nächstes Lagebild: morgen 06:00 Uhr · Die Presse kuratiert um 6, 11, 16 &amp; 20 Uhr</p>
 </header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Deutschland hebt Pensionsalter auf Jahre an — Reformdruck wächst auch in Österreich</p>
   <p>Europa warnt vor KI-Abhängigkeit von den USA — wer kontrolliert die Infrastruktur?</p>
@@ -364,7 +363,7 @@
   <p><strong>Was ist neu:</strong> Ein Streit zwischen der US-Regierung und dem KI-Unternehmen Anthropic hat ein strukturelles Problem offenbart: Europa hat keine eigene KI-Infrastruktur und ist damit vollständig von amerikanischen Anbietern abhängig. Die USA könnten theoretisch KI-Dienste „abdrehen&quot; — Europa hätte dann keine Alternative.</p>
   <p><strong>Warum es zählt:</strong> Das ist nicht nur ein technologisches, sondern ein sicherheitspolitisches und wirtschaftliches Risiko. Wenn deine Arbeit, deine Unternehmensplanung oder öffentliche Dienste von Systemen abhängen, die eine fremde Regierung kontrolliert, verlierst du strategische Autonomie. Der Artikel deutet an, dass Europa handeln muss — aber bislang tut es das nicht mit der nötigen Geschwindigkeit. (<a href="https://www.diepresse.com/31557118/europas-angst-vor-dem-ki-blackout-was-passiert-wenn-amerika-die-ki-abdreht">Technologie</a> <a class="source-link" href="https://www.diepresse.com/31557118/europas-angst-vor-dem-ki-blackout-was-passiert-wenn-amerika-die-ki-abdreht">Weiterlesen bei der Presse →</a>)</p>
 <div class="article-fb" data-key="2026-06-21|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
   <hr>
 </div>
 </div>
@@ -465,6 +464,29 @@
       navigator.serviceWorker.register('sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>
