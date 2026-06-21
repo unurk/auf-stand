@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
+  <meta name="edition" content="">
   <link rel="manifest" href="../manifest.webmanifest">
   <script src="../push-config.js"></script>
   <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
@@ -162,6 +163,7 @@
       display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
     }
     /* ── Ressort-Tag ── */
+    .tag-row { margin: 0 0 8px; }
     .ressort {
       display: inline-block; background: var(--accent-soft); color: var(--accent);
       border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
@@ -358,17 +360,17 @@
   <h2>Hattmannsdorfer: Stromkosten, nicht Naturschutz, sind Matchentscheidung</h2>
   <p><strong>Was ist neu:</strong> Österreichs Wirtschaftsminister Wolfgang Hattmannsdorfer hat in einem Interview klare Prioritäten gesetzt: Die Senkung der Strompreise rangiert für ihn deutlich vor Naturschutzmaßnahmen. Er argumentiert, dass Österreich für mehr Wettbewerbsfähigkeit einen „Schulterschluss&quot; braucht – zentral dafür seien die kommenden Lohnverhandlungen und der schnellere Ausbau erneuerbarer Energien.</p>
   <p><strong>Warum es zählt:</strong> Das signalisiert eine Verschiebung in der Regierungspolitik. Für deine Stromrechnung und dein Portemonnaie könnte das bedeuten: Es wird Druck auf Energiepreise geben. Gleichzeitig zeigt sich ein Konflikt zwischen Wachstumspolitik und Naturschutz, der auch Genehmigungsverfahren für Energieprojekte beschleunigen könnte.</p>
-  <p>(Wirtschaft) [→ Artikel](https://www.diepresse.com/29884706/hattmannsdorfer-die-haselmaus-ist-nicht-wichtiger-als-guenstige-strompreise)</p>
+  <p><span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/29884706/hattmannsdorfer-die-haselmaus-ist-nicht-wichtiger-als-guenstige-strompreise">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-13|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Kassenärzte in Tirol: 45 Prozent haben Patientenstopp</h2>
   <p><strong>Was ist neu:</strong> Fast jede zweite Kassenordination in Tirol nimmt derzeit keine neuen Patientinnen und Patienten mehr auf — eine aktuelle Erhebung zeigt, dass Tirol damit über dem österreichischen Durchschnitt liegt. Bestimmte Fachrichtungen sind besonders betroffen.</p>
   <p><strong>Warum es zählt:</strong> Das macht es für dich als Patientin schwerer, überhaupt noch einen Kassenarzt zu finden. Der Zugang zur medizinischen Versorgung wird knapper, was längere Wartezeiten und Druck auf Privatordinationen bedeutet.</p>
-  <p>(Gesundheit) [→ Artikel](https://tirol.orf.at/stories/3358320/)</p>
+  <p><span class="ressort" style="--h:24">Gesundheit</span> <a class="source-link" href="https://tirol.orf.at/stories/3358320/">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-13|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <h2>Salzburg: SPÖ wählt Peter Eder zum neuen Parteichef</h2>
   <p><strong>Was ist neu:</strong> Nach fast zwei Jahren interimistischer Führung durch ein Trio bekommt die Salzburger SPÖ heute einen neuen alleinigen Vorsitzenden: Arbeiterkammerpräsident Peter Eder wird auf dem Landesparteitag in St. Johann gewählt.</p>
   <p><strong>Warum es zählt:</strong> Das klärt die personelle Situation vor wichtigen politischen Entscheidungen in Salzburg und gibt der SPÖ wieder klare Führungsstrukturen.</p>
-  <p>(Politik) [→ Artikel](https://salzburg.orf.at/stories/3358304/)</p>
+  <p><span class="ressort" style="--h:245">Politik</span> <a class="source-link" href="https://salzburg.orf.at/stories/3358304/">Weiterlesen bei der Presse →</a></p>
 <div class="article-fb" data-key="2026-06-13|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
   <p>✅ <em>Du bist auf Stand — Lesezeit ca. 90 Sekunden. Nächstes Update: heute 16:00.</em></p>
 </div>
@@ -422,6 +424,7 @@
       var ressort=card.querySelector('.ressort');
       if(ressort){
         var tagWrap=document.createElement('div');
+        tagWrap.className='tag-row';
         tagWrap.appendChild(ressort);
         h2.parentNode.insertBefore(tagWrap,h2);
       }
@@ -470,6 +473,29 @@
       navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
+  // Frische-Check: beim Öffnen/Zurückkehren prüfen, ob eine neuere Ausgabe vorliegt.
+  // Eine installierte PWA wird beim Resume nur fortgesetzt (keine Navigation), darum
+  // hier aktiv nachsehen und bei neuer Ausgabe neu laden. Nur die Startseite trägt
+  // eine Edition (meta[name=edition]); Archiv-/Dossier-Seiten bleiben unberührt.
+  (function(){
+    var meta = document.querySelector('meta[name="edition"]');
+    var current = meta && meta.content;
+    if(!current) return;
+    var last = 0;
+    function check(){
+      if(document.visibilityState !== 'visible') return;
+      var now = Date.now();
+      if(now - last < 30000) return;   // Drossel: max. alle 30 s
+      last = now;
+      fetch('../version.json?ts=' + now, {cache:'no-store'})
+        .then(function(r){ return r.json(); })
+        .then(function(v){ if(v && v.edition && v.edition !== current){ location.reload(); } })
+        .catch(function(){});
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', check);
+    check();
+  })();
 })();
 </script>
 </body>
