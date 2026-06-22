@@ -72,26 +72,32 @@ jobs:
           #     damit selbst ein verspäteter Cron den AKTUELL richtigen Block trifft.
           # Der Block-Guard in main.py liefert je Tag und Block nur einmal aus (idempotent),
           # auch wenn externer Trigger und interner Cron beide feuern.
+          # Ausgabe AUFLÖSEN (in RESOLVED), nach $GITHUB_ENV exportieren und nur den
+          # Text erzeugen. Das langsame Audio (TTS) läuft erst NACH dem Text-Deploy
+          # (eigener Schritt unten, nutzt $RESOLVED_EDITION), damit die Webapp nicht
+          # hinter dem Telegram-Text zurückbleibt.
           EDITION="${{ github.event.inputs.edition }}"
           case "$EDITION" in
             morgen|mittag|nachmittag|abend|woche)
-              python -m copilot.main "$EDITION" ;;
+              RESOLVED="$EDITION" ;;
             *)
               if [ "${{ github.event.schedule }}" = "0 7 * * 6" ]; then
-                python -m copilot.main woche
+                RESOLVED="woche"
               else
                 HOUR=$(date -u +%H)
                 if [ "$HOUR" -le "08" ]; then
-                  python -m copilot.main morgen
+                  RESOLVED="morgen"
                 elif [ "$HOUR" -le "13" ]; then
-                  python -m copilot.main mittag
+                  RESOLVED="mittag"
                 elif [ "$HOUR" -le "17" ]; then
-                  python -m copilot.main nachmittag
+                  RESOLVED="nachmittag"
                 else
-                  python -m copilot.main abend
+                  RESOLVED="abend"
                 fi
               fi ;;
           esac
+          echo "RESOLVED_EDITION=$RESOLVED" >> "$GITHUB_ENV"
+          python -m copilot.main "$RESOLVED"
 
       - name: Rückkanal beantworten
         if: always()
@@ -100,8 +106,11 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python -m copilot.main rueckkanal
 
-      - name: Web-Ansicht bauen und committen
-        id: site
+      # ── 1. Zyklus: TEXT sofort bauen + deployen ──────────────────────────────
+      # Bewusst VOR der Audio-Erzeugung: die Webapp geht mit dem Lagebild-Text live,
+      # Sekunden nach dem Telegram-Text — statt erst nach der langsamen TTS zu warten.
+      - name: Web-Ansicht bauen und committen (Text)
+        id: site-text
         if: always() && github.ref == 'refs/heads/master'
         env:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
@@ -127,6 +136,54 @@ jobs:
       # Sonst würden die vielen Wiederhol-Cron-Läufe (alle 30 Min) zig leere
       # Deploys/Tag auslösen; bei unveränderter Seite bedient Pages weiter den
       # letzten Stand.
+      - name: GitHub Pages hochladen (Text)
+        uses: actions/upload-pages-artifact@v3
+        if: always() && github.ref == 'refs/heads/master' && steps.site-text.outputs.changed == 'true'
+        with:
+          path: site
+
+      - name: GitHub Pages deployen (Text)
+        id: pages-text
+        uses: actions/deploy-pages@v4
+        if: always() && github.ref == 'refs/heads/master' && steps.site-text.outputs.changed == 'true'
+
+      # ── Audio (TTS) NACH dem Text-Deploy ─────────────────────────────────────
+      # Langsam (OpenAI-Call + Upload). Liest das bereits geschriebene out/<datum>-
+      # <edition>.md, vertont es und schickt die mp3 an Telegram. No-Op bei woche /
+      # ohne OPENAI_API_KEY.
+      - name: Audio erzeugen und senden
+        if: always()
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python -m copilot.main audio --edition "$RESOLVED_EDITION"
+
+      # ── 2. Zyklus: Audio-Player nachreichen ──────────────────────────────────
+      # build_site kopiert die neue mp3 ins Archiv und fügt den Audio-Player ein →
+      # Diff → zweiter Deploy. Ohne Audio (kein Diff) wird dieser Zyklus übersprungen.
+      - name: Web-Ansicht bauen und committen (Audio)
+        id: site
+        if: always() && github.ref == 'refs/heads/master'
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+        run: |
+          python -m copilot.main site
+          if [ -n "$(git status --porcelain site)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add site
+            git commit -m "site: Audio vom $(date -u +%F)"
+            for i in 1 2 3 4; do
+              git push origin HEAD:master && break
+              sleep $((2 ** i))
+              git pull --rebase origin master
+            done
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Keine Änderung an site/ — kein zweiter Deploy."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: GitHub Pages hochladen
         uses: actions/upload-pages-artifact@v3
         if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'

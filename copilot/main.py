@@ -161,19 +161,10 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         article_headings=article_headings or None,
     )
 
-    # Audio-Ausgabe: das Lagebild zum Hören (best-effort, blockiert nie den Versand).
-    if tts.tts_configured(config):
-        try:
-            mp3 = tts.generate_lagebild_audio(lagebild, edition, config)
-            if mp3:
-                telegram.send_audio(
-                    mp3,
-                    "Dein Lagebild zum Hören",
-                    config.get("telegram_chat_ids", []),
-                    title=edition_config.get("label", edition),
-                )
-        except Exception as exc:
-            print(f"Audio-Schritt übersprungen: {exc}")
+    # Audio-Ausgabe (TTS) läuft bewusst NICHT hier: sie ist langsam (OpenAI-Call +
+    # Upload) und würde den Web-Deploy hinter dem Telegram-Text aufhalten. Sie wird
+    # nach dem Text-Deploy als eigener Schritt erzeugt (siehe cmd_audio) — symmetrisch
+    # zu Telegrams Muster „Text zuerst, Audio danach".
 
     # Web-Push an PWA-Abonnenten (nur wenn VAPID konfiguriert ist).
     if webpush.webpush_configured():
@@ -222,11 +213,45 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
     return 0
 
 
+def cmd_audio(edition: str | None, config: dict) -> int:
+    """Erzeugt aus dem in diesem Lauf geschriebenen Lagebild die Audio-Ausgabe.
+
+    Läuft NACH dem Text-Deploy (eigener Workflow-Schritt), damit die langsame
+    TTS-Erzeugung die Webapp nicht hinter dem Telegram-Text aufhält. No-Op, wenn
+    keine Ausgabe geschrieben wurde, die Ausgabe unbekannt ist oder TTS aus ist.
+    """
+    editions = config.get("editions", {})
+    if not edition or edition not in editions:
+        print(f"Audio: keine gültige Ausgabe ('{edition}') — übersprungen.")
+        return 0
+    md_path = render.OUT_DIR / f"{datetime.now():%Y-%m-%d}-{edition}.md"
+    if not md_path.exists():
+        print(f"Audio: keine Ausgabe-Datei {md_path.name} — nichts zu vertonen.")
+        return 0
+    if not tts.tts_configured(config):
+        print("Audio: TTS nicht konfiguriert (OPENAI_API_KEY/tts.enabled) — übersprungen.")
+        return 0
+    try:
+        lagebild = md_path.read_text(encoding="utf-8")
+        mp3 = tts.generate_lagebild_audio(lagebild, edition, config)
+        if mp3:
+            telegram.send_audio(
+                mp3,
+                "Dein Lagebild zum Hören",
+                config.get("telegram_chat_ids", []),
+                title=editions[edition].get("label", edition),
+            )
+    except Exception as exc:
+        print(f"Audio-Schritt übersprungen: {exc}")
+    return 0
+
+
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
+    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "audio", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
+    parser.add_argument("--edition", help="Ausgabe für audio (morgen|mittag|nachmittag|abend)")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
         "--keep-seen", action="store_true",
@@ -241,6 +266,8 @@ def main() -> int:
             return cmd_feeds(config)
         if args.command == "catchup":
             return cmd_catchup(config, args.dry_run)
+        if args.command == "audio":
+            return cmd_audio(args.edition, config)
         if args.command == "woche":
             from . import quittung
             return quittung.cmd_woche(config)
