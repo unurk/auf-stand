@@ -728,16 +728,20 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
     )
     # E-Paper-Paragraph (📰) entfernen — steht bereits in der Tab-Leiste.
     content = re.sub(r'\s*<p>[^<]*📰.*?</p>', '', content, flags=re.DOTALL)
-    # Done-Box: Emoji und ungültige <em>-Tags bereinigen.
+    # Done-Box: auf genau EIN ✓ normalisieren. Idempotent — egal ob die Box roh aus
+    # render.py kommt (✅/<em>) oder schon gerendert ist (ein/mehrere done-check-Spans):
+    # erst alle vorhandenen Häkchen/Marker entfernen, dann genau eines voranstellen.
+    # (Verhindert das frühere Anwachsen der Spans bei jedem build_site-Lauf, das den
+    # changed-Gate aushebelte und mehrere ✓ nebeneinander anzeigte.)
+    def _normalize_done(m: re.Match) -> str:
+        inner = m.group(1)
+        inner = re.sub(r'<span class="done-check">✓</span>\s*', "", inner)
+        inner = re.sub(r"^[✅\s]*", "", inner)
+        inner = re.sub(r"^<em>(.*?)</em>$", r"\1", inner.strip(), flags=re.DOTALL)
+        return f'<div class="done"><span class="done-check">✓</span> {inner.strip()}</div>'
+
     content = re.sub(
-        r'<div class="done">[^<]*<em>(.*?)(?:</em>)?</div>',
-        r'<div class="done"><span class="done-check">✓</span> \1</div>',
-        content, flags=re.DOTALL,
-    )
-    content = re.sub(
-        r'<div class="done">[✅\s]*(.*?)</div>',
-        r'<div class="done"><span class="done-check">✓</span> \1</div>',
-        content, flags=re.DOTALL,
+        r'<div class="done">(.*?)</div>', _normalize_done, content, flags=re.DOTALL
     )
     # "Deine Themen" h2 bekommt eigene Klasse → kein Accordion.
     content = content.replace(
