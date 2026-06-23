@@ -15,30 +15,36 @@
   <meta name="application-name" content="Copilot">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Meine Themen · Die Presse · Copilot</title>
   <style>
-    /* Copilot · Die Presse — Design B (Modern Clean)
-       Schriften: Source Serif 4 (Headlines), Libre Franklin (UI + Text).
-       Akzent: #1e5fd6 (Presse-Blau). Hintergrund: #eef1f5 mit weißen Karten. */
+    /* Copilot · Die Presse — Richtung C „Briefing-Timeline" (Light, Presse-Stil)
+       Schriften: Newsreader (editoriale Serif für Schlagzeilen), Archivo (UI + Text).
+       Akzent: tiefes Redaktions-Blau #2d4f9e als sparsamer Akzent; klares Weiß,
+       Haarlinien statt verspielter Karten; Streak in Bernstein. */
     :root {
-      --bg: #eef1f5; --surface: #ffffff; --border: #e6eaf0;
-      --text: #16202b; --fg: #3a444f; --muted: #7c8aa0;
-      --accent: #1e5fd6; --accent-soft: rgba(30,95,214,.10);
-      --accent-shadow: rgba(30,95,214,.50);
-      --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-      --sans: 'Libre Franklin', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --bg: #ffffff; --surface: #ffffff; --surface-tint: #f6f7f9;
+      --border: rgba(0,0,0,.10); --border-soft: rgba(0,0,0,.07);
+      --card-border: rgba(0,0,0,.06);
+      --text: #16233a; --text-alt: #1c2b3d; --text-body: #22304a;
+      --fg: #566173; --muted: #6a7382; --dim: #97a0ab;
+      --accent: #2d4f9e; --accent-soft: rgba(45,79,158,.10);
+      --accent-shadow: rgba(45,79,158,.45);
+      --streak: #c8791b; --streak-text: #a8650f;
+      --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+      --sans: 'Archivo', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: -webkit-fill-available; }
     body {
-      background: #dfe3e8; color: var(--text); font-family: var(--sans);
+      background: #e7e5df; color: var(--text); font-family: var(--sans);
       -webkit-font-smoothing: antialiased;
       display: flex; flex-direction: column;
       height: 100vh; height: -webkit-fill-available; overflow: hidden;
     }
     /* ── App-Shell (zentrierte Handy-Säule) ── */
     .app {
+      position: relative;
       max-width: 430px; width: 100%; margin: 0 auto; background: var(--bg);
       display: flex; flex-direction: column;
       height: 100vh; height: -webkit-fill-available; overflow: hidden;
@@ -47,107 +53,159 @@
     .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    /* ── Topbar (ersetzt Masthead) ── */
+    /* ── Topbar (Masthead im Presse-Stil) ── */
     .topbar {
-      background: var(--surface); box-shadow: 0 1px 0 var(--border);
+      background: var(--surface); border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
     .brandrow {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 22px 14px;
+      padding: 12px 22px 12px;
     }
     .wordmark-text {
-      font-family: var(--serif); font-weight: 700; font-size: 19px;
-      letter-spacing: -.01em; color: var(--text);
+      font-family: var(--serif); font-weight: 600; font-size: 23px;
+      letter-spacing: .2px; color: var(--text-alt);
     }
     .copilot-pill {
-      display: inline-flex; align-items: center; padding: 5px 11px;
-      border-radius: 999px; font: 700 10px var(--sans);
-      letter-spacing: .1em; text-transform: uppercase;
+      display: inline-flex; align-items: center; padding: 5px 12px;
+      border-radius: 20px; font: 700 10px var(--sans);
+      letter-spacing: .14em; text-transform: uppercase;
       background: var(--accent-soft); color: var(--accent);
     }
-    .progress-track { height: 2px; background: var(--bg); }
+    .progress-track { height: 2px; background: var(--surface-tint); }
     .progress-bar {
       height: 100%; border-radius: 0 2px 2px 0;
       background: var(--accent); width: 0; transition: width .12s linear;
     }
     /* ── Masthead ausblenden (Topbar übernimmt) ── */
     .masthead { display: none; }
-    /* ── Layout ── */
-    .wrap { padding: 6px 0 16px; }
+    /* ── Layout (Platz unten für die schwebende Tableiste) ── */
+    .wrap { padding: 4px 0 116px; }
     /* ── Typografie ── */
     h1 {
-      font-family: var(--serif); font-size: 1.9rem; line-height: 1.14;
-      margin: 0 0 12px; font-weight: 600; color: var(--text); letter-spacing: -.015em;
+      font-family: var(--serif); font-size: 2.5rem; line-height: 1.0;
+      margin: 0 0 12px; font-weight: 500; color: var(--text); letter-spacing: -.5px;
     }
     h2 {
-      font-family: var(--serif); font-size: 1.25rem; line-height: 1.25;
-      margin: 0 0 10px; font-weight: 600; color: var(--text);
+      font-family: var(--serif); font-size: 1.5rem; line-height: 1.14;
+      margin: 0 0 10px; font-weight: 500; color: var(--text); letter-spacing: -.3px;
     }
     p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
     strong {
-      font-family: var(--sans); font-size: 10.5px; letter-spacing: .08em;
+      font-family: var(--sans); font-size: 11px; letter-spacing: .14em;
       text-transform: uppercase; color: var(--accent); font-weight: 700;
     }
     em { font-style: italic; color: var(--muted); }
     hr { border: none; border-top: 1px solid var(--border); margin: 0; }
-    /* ── Lagebild-Kopf als Karte ── */
+    /* ── Lagebild-Kopf (randlos, editorial) ── */
     .lagebild-header {
-      background: var(--surface); border-radius: 18px; padding: 20px;
-      margin: 8px 16px 6px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 24px 22px 0; margin: 0;
     }
     .kicker {
-      font: 600 11px var(--sans); letter-spacing: .04em; text-transform: uppercase;
-      color: var(--accent); margin: 0 0 10px;
+      font: 700 11.5px var(--sans); letter-spacing: .16em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 14px;
     }
-    .lagebild-header h1 { margin: 0 0 12px; }
-    .next-edition { font: 400 12px var(--sans); color: var(--muted); margin: 8px 0 0; }
-    /* ── Byline ── */
+    .lagebild-header h1 { margin: 0; }
+    .next-edition { font: 400 13px var(--sans); color: var(--muted); margin: 12px 0 0; }
+    /* ── Byline (Rule darüber, wie im Presse-Feed) ── */
     .byline {
-      font: 500 13px var(--sans); color: var(--muted);
-      padding-top: 10px; border-top: 1px solid var(--border); margin: 10px 0 0;
+      font: 400 14px var(--sans); color: var(--muted);
+      padding-top: 16px; border-top: 1px solid var(--border); margin: 20px 0 0;
     }
-    /* ── Streak ── */
+    /* ── Streak (Bernstein-Akzent) ── */
     .streak {
       display: inline-flex; align-items: center; gap: 6px;
-      font: 600 12px var(--sans); color: #c47d1a;
-      background: #fff3e0; border-radius: 999px;
-      padding: 5px 13px; margin: 10px 0 0;
+      font: 700 12px var(--sans); color: var(--streak-text);
+      background: rgba(200,121,27,.12); border: 1px solid rgba(200,121,27,.25);
+      border-radius: 20px; padding: 5px 12px; margin: 12px 0 0;
     }
-    /* ── Audio-Player ── */
+    /* ── Briefing-Timeline (Richtung C: der Kuratierungs-Takt als Held) ── */
+    .timeline {
+      background: var(--surface-tint); border-radius: 18px;
+      padding: 18px 20px 16px; margin: 22px 0 6px;
+    }
+    .tl-label {
+      font: 700 11px var(--sans); letter-spacing: .16em; text-transform: uppercase;
+      color: var(--dim); margin: 0 0 18px;
+    }
+    .tl-track {
+      position: relative; display: flex; justify-content: space-between;
+      align-items: center; margin: 0 8px;
+    }
+    .tl-track::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 50%;
+      height: 2px; background: var(--border); transform: translateY(-50%);
+    }
+    .tl-fill {
+      position: absolute; left: 0; top: 50%; height: 2px;
+      background: var(--accent); transform: translateY(-50%);
+      transition: width .4s ease;
+    }
+    .tl-node {
+      position: relative; z-index: 1; width: 26px; height: 26px;
+      border-radius: 50%; background: #fff; border: 2px solid var(--border);
+      color: var(--dim); font: 700 10.5px var(--sans);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tl-node.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .tl-node.now {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 0 0 6px var(--accent-soft); transform: scale(1.14);
+    }
+    .tl-caption { font: 400 13px var(--sans); color: var(--muted); margin: 18px 0 0; text-align: center; }
+    .tl-caption b { color: var(--accent); font-weight: 700; }
+    /* ── Audio-Player (Inset) ── */
     .audio-player {
-      background: var(--surface); border-radius: 14px; padding: 16px 18px;
-      margin: 6px 16px; box-shadow: 0 8px 20px -14px rgba(22,32,43,.22);
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 14px 16px; margin: 6px 22px; box-shadow: none;
     }
     .audio-player .audio-label {
-      display: block; font: 600 11px var(--sans); letter-spacing: .08em;
+      display: block; font: 700 11px var(--sans); letter-spacing: .12em;
       text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
     }
     .audio-player audio { width: 100%; height: 40px; }
-    /* ── Heute-wichtig-Box als Karte ── */
+    /* ── „Heute wichtig" als nummerierte editoriale Liste (Richtung C) ── */
     .highlights {
-      background: var(--surface); border-radius: 18px; padding: 18px 20px;
-      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 28px 22px 0; margin: 0; counter-reset: hl;
     }
-    .highlights strong { display: block; margin-bottom: 10px; }
-    .highlights p { margin: 0 0 7px; font-size: 14px; line-height: 1.45; color: var(--fg); }
-    .highlights p:last-child { margin-bottom: 0; }
-    /* ── Story-Karten (h2 + Body bis zur nächsten hr) ── */
+    /* Label-Zeile („Heute wichtig:") als dezentes Sektions-Label + Rule darunter */
+    .highlights p:has(strong) {
+      margin: 0; padding: 0 0 4px; border-bottom: 1px solid var(--border);
+    }
+    .highlights p:has(strong) strong {
+      display: block; color: var(--dim); font-size: 11.5px; letter-spacing: .16em;
+    }
+    /* Eintragszeilen: blaue 01/02/03 + Serif-Schlagzeile, Haarlinien dazwischen */
+    .highlights p:not(:has(strong)) {
+      counter-increment: hl; position: relative;
+      margin: 0; padding: 16px 0 16px 34px;
+      border-bottom: 1px solid var(--border-soft);
+      font-family: var(--serif); font-size: 18px; line-height: 1.3; color: var(--text-body);
+    }
+    .highlights p:not(:has(strong))::before {
+      content: counter(hl, decimal-leading-zero);
+      position: absolute; left: 0; top: 18px;
+      font: 700 12px var(--sans); color: var(--accent); letter-spacing: .5px;
+    }
+    .highlights p:not(:has(strong)):last-child { border-bottom: none; }
+    /* ── Story-Sektionen (randlos, durch Haarlinien getrennt — Presse-Feed) ── */
     .story-card {
-      background: var(--surface); border-radius: 18px; padding: 18px 20px 16px;
-      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 24px 22px 8px; margin: 0; border-top: 1px solid var(--border);
     }
     /* Fallback: h2 außerhalb story-card (dossier/archiv) */
     h2 { margin: 28px 0 10px; }
-    /* ── Accordion (Story-Karten) ── */
+    /* ── Accordion (Story-Sektionen) ── */
     .story-head {
       display: flex; gap: 12px; align-items: flex-start;
-      cursor: pointer; padding: 0 0 14px;
+      cursor: pointer; padding: 0 0 12px;
     }
     .story-head h2 { flex: 1; margin: 0; padding: 0; }
     .story-head .chev {
       flex: none; width: 27px; height: 27px; border-radius: 50%;
-      background: #f1f4f8; color: #7c8aa0;
+      background: var(--surface-tint); color: var(--dim);
       font-family: var(--serif); font-size: 17px;
       display: flex; align-items: center; justify-content: center;
       line-height: 1; flex-shrink: 0; margin-top: 2px;
@@ -156,10 +214,10 @@
       transition: max-height .3s ease, opacity .2s ease; }
     .story-card.open .story-body { max-height: 2000px; opacity: 1;
       transition: max-height .45s ease, opacity .35s ease; }
-    .story-card { padding: 18px 20px 16px; }
-    /* ── „Was ist neu / Warum es zählt" als Kicker-Label über dem Text ── */
+    .story-body p { color: var(--fg); }
+    /* ── „Was ist neu / Warum es zählt" als WARUM-Mikrozeile (Richtung C) ── */
     .story-body p > strong:first-child {
-      display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .1em;
+      display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: .14em;
     }
     /* ── Ressort-Tag ── */
     .ressort {
@@ -178,17 +236,17 @@
     .byline-source { font: italic 12px var(--sans); color: var(--muted); white-space: nowrap; }
     .reporters {
       font: 400 13px var(--sans); color: var(--muted);
-      margin: 6px 16px 0; padding-top: 14px; border-top: 1px solid var(--border);
+      margin: 6px 22px 0; padding-top: 14px; border-top: 1px solid var(--border);
     }
-    /* ── Done-Box ── */
+    /* ── Done-Box („Du bist informiert ✓") ── */
     .done {
-      background: var(--surface); border-radius: 18px; padding: 16px 20px;
-      margin: 6px 16px; box-shadow: 0 10px 28px -16px rgba(22,32,43,.28);
-      font: 600 13px var(--sans); color: #1f8a5b;
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 16px 18px; margin: 18px 22px 6px; box-shadow: none;
+      font: 600 13px var(--sans); color: #1f7a52;
       display: flex; align-items: center; gap: 8px;
     }
     .done-check {
-      width: 20px; height: 20px; border-radius: 50%; background: #1f8a5b;
+      width: 20px; height: 20px; border-radius: 50%; background: #1f7a52;
       color: #fff; display: inline-flex; align-items: center; justify-content: center;
       font-size: 12px; flex-shrink: 0;
     }
@@ -204,17 +262,18 @@
       margin: 8px 16px 0;
     }
     .archiv-card {
-      display: block; background: var(--surface); border-radius: 14px;
-      padding: 15px 18px; box-shadow: 0 8px 22px -14px rgba(22,32,43,.25);
-      border: 1.5px solid var(--border); transition: border-color .15s;
+      display: block; background: var(--surface); border-radius: 16px;
+      padding: 15px 18px; box-shadow: 0 1px 3px rgba(22,32,43,.05);
+      border: 1px solid var(--card-border); transition: border-color .15s;
     }
     .archiv-card:hover { border-color: var(--accent); text-decoration: none; }
     .archiv-date { display: block; font: 600 14px var(--sans); color: var(--text); margin-bottom: 3px; }
     .archiv-label { display: block; font: 400 12px var(--sans); color: var(--muted); }
     /* ── Dossier / Themen ── */
     .dossier-topic {
-      background: var(--surface); border-radius: 14px; padding: 18px 20px;
-      margin: 6px 16px; box-shadow: 0 8px 22px -14px rgba(22,32,43,.25);
+      background: var(--surface); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 18px 20px;
+      margin: 8px 16px; box-shadow: 0 1px 3px rgba(22,32,43,.05);
     }
     .dossier-topic h2 {
       margin: 0 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px;
@@ -230,27 +289,31 @@
       color: var(--muted); font-style: italic; padding: 32px 16px;
       text-align: center; font: 400 15px var(--sans);
     }
-    /* ── Tab-Leiste (sticky unten) ── */
+    /* ── Tab-Leiste (schwebende Pille — wie in der Presse-App) ── */
     .tabbar {
-      background: var(--surface); border-top: 1px solid var(--border);
-      display: flex; z-index: 20; padding: 8px 4px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
-      flex-shrink: 0;
+      position: absolute; left: 14px; right: 14px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      height: 66px; border-radius: 30px; z-index: 30;
+      background: rgba(255,255,255,.82);
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 24px -8px rgba(0,0,0,.18);
+      display: flex; padding: 0 6px;
     }
     .tab {
       flex: 1; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 3px; color: var(--muted);
-      font: 500 10px var(--sans); letter-spacing: .02em; text-transform: uppercase;
-      transition: color .15s; border-top: 2px solid transparent; padding-top: 6px;
+      justify-content: center; gap: 3px; color: #8a929e;
+      font: 600 10px var(--sans); letter-spacing: .04em; text-transform: uppercase;
+      transition: color .15s;
     }
     .tab:hover { color: var(--text); text-decoration: none; }
     .tab svg { width: 22px; height: 22px; }
-    .tab.active { color: var(--accent); font-weight: 700; border-top-color: var(--accent); }
+    .tab.active { color: var(--accent); font-weight: 700; }
     /* ── Artikel-Feedback ── */
     .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
     .fb-btn {
       display: inline-flex; align-items: center; gap: 5px;
-      background: #eef2f7; border: none; border-radius: 999px;
+      background: var(--surface-tint); border: 1px solid var(--card-border); border-radius: 999px;
       padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
       color: var(--muted); transition: all .15s; line-height: 1;
     }
@@ -292,7 +355,7 @@
       user-select: none; background: var(--surface);
     }
     .as-toggle-card.selected {
-      border-color: rgba(30,95,214,.35); background: var(--accent-soft);
+      border-color: rgba(45,79,158,.35); background: var(--accent-soft);
     }
     .as-card-check {
       width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
@@ -323,7 +386,7 @@
       margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);
     }
     .as-cmd-box {
-      background: #f1f4f8; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface-tint); border: 1px solid var(--border); border-radius: 10px;
       padding: 14px; margin: 10px 0 16px; font-family: monospace; font-size: 13px;
       color: var(--accent); white-space: pre-wrap; line-height: 1.7;
     }
@@ -361,21 +424,21 @@
   <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">
     Tippe auf ein Thema, um es auszuwählen oder abzuwählen.
   </p>
-  <div class="as-toggle-card" data-name="US-Zölle und Folgen für die österreichische Exportwirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Zölle und Folgen für die österreichische Exportwirtschaft</div><div class="as-card-q">Macht dir die mögliche Eskalation im Iran-Konflikt Sorgen um Österreichs Exportchancen?</div></div></div>
-<div class="as-toggle-card" data-name="Mietrecht und Wohnkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Mietrecht und Wohnkosten in Österreich</div><div class="as-card-q">Interessiert dich, wie sich die politischen Debatten auf deine Miete auswirken?</div></div></div>
-<div class="as-toggle-card" data-name="US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber</div><div class="as-card-q">Willst du wissen, warum dieser Börsensommer besonders turbulent werden könnte?</div></div></div>
-<div class="as-toggle-card" data-name="EZB-Zinsentscheidungen und Folgen für Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EZB-Zinsentscheidungen und Folgen für Österreich</div><div class="as-card-q">Beunruhigt dich die aktuelle Zins-Debatte in der Fed und deren Auswirkungen?</div></div></div>
-<div class="as-toggle-card" data-name="Energiepreise und Stromkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Energiepreise und Stromkosten in Österreich</div><div class="as-card-q">Interessiert dich das Grazer Mini-Atomkraftwerk als neue Energielösung?</div></div></div>
-<div class="as-toggle-card" data-name="Inflation und Kaufkraft in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Inflation und Kaufkraft in Österreich</div><div class="as-card-q">Freut dich, dass Benzinpreise wieder sinken und näher am Vor-Krisen-Niveau sind?</div></div></div>
-<div class="as-toggle-card" data-name="Österreichische Innenpolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Innenpolitik</div><div class="as-card-q">Finde ich es problematisch, dass die Neos einen U-Ausschuss boykottieren?</div></div></div>
-<div class="as-toggle-card" data-name="EU-Politik und Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EU-Politik und Österreich</div><div class="as-card-q">Besorgt dich die politische Instabilität in Rumänien für die EU-Stabilität?</div></div></div>
-<div class="as-toggle-card" data-name="Arbeitsmarkt und Beschäftigung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Arbeitsmarkt und Beschäftigung</div><div class="as-card-q">Macht dir der massive Stellenabbau bei Oracle Angst um deine Karriere?</div></div></div>
-<div class="as-toggle-card" data-name="Klimapolitik und Umwelt Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Klimapolitik und Umwelt Österreich</div><div class="as-card-q">Beunruhigt dich die aktuelle Hitzewelle über Europa?</div></div></div>
-<div class="as-toggle-card" data-name="Künstliche Intelligenz und Digitalisierung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Künstliche Intelligenz und Digitalisierung</div><div class="as-card-q">Interessiert dich, wie KI-Infrastruktur die Wirtschaft umgestaltet?</div></div></div>
-<div class="as-toggle-card" data-name="Ukraine-Krieg und Sicherheitspolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Ukraine-Krieg und Sicherheitspolitik</div><div class="as-card-q">Überrascht dich, dass Honduras ukrainische Drohnen-Technologie nutzt?</div></div></div>
-<div class="as-toggle-card" data-name="Österreichische Unternehmen und Wirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Unternehmen und Wirtschaft</div><div class="as-card-q">Willst du wissen, wie Österreich im Verteidigungssektor mitverdienen kann?</div></div></div>
-<div class="as-toggle-card" data-name="Migration und Integration in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Migration und Integration in Österreich</div><div class="as-card-q">Interessiert dich die aktuelle Debatte über Migration und Integration?</div></div></div>
-<div class="as-toggle-card" data-name="Gesundheitssystem und Medizin Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Gesundheitssystem und Medizin Österreich</div><div class="as-card-q">Freust du dich, dass die Überweisungspflicht zum Facharzt wohl nicht kommt?</div></div></div>
+  <div class="as-toggle-card" data-name="US-Zölle und Folgen für die österreichische Exportwirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Zölle und Folgen für die österreichische Exportwirtschaft</div><div class="as-card-q">Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?</div></div></div>
+<div class="as-toggle-card" data-name="Mietrecht und Wohnkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Mietrecht und Wohnkosten in Österreich</div><div class="as-card-q">Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?</div></div></div>
+<div class="as-toggle-card" data-name="US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber</div><div class="as-card-q">Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?</div></div></div>
+<div class="as-toggle-card" data-name="EZB-Zinsentscheidungen und Folgen für Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EZB-Zinsentscheidungen und Folgen für Österreich</div><div class="as-card-q">Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?</div></div></div>
+<div class="as-toggle-card" data-name="Energiepreise und Stromkosten in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Energiepreise und Stromkosten in Österreich</div><div class="as-card-q">Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?</div></div></div>
+<div class="as-toggle-card" data-name="Inflation und Kaufkraft in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Inflation und Kaufkraft in Österreich</div><div class="as-card-q">Merkst du, dass dein Geld weniger weit reicht — beim Einkauf, Restaurant oder Urlaub?</div></div></div>
+<div class="as-toggle-card" data-name="Österreichische Innenpolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Innenpolitik</div><div class="as-card-q">Interessierst du dich für die Arbeit der Bundesregierung und aktuelle Politikentscheidungen?</div></div></div>
+<div class="as-toggle-card" data-name="EU-Politik und Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">EU-Politik und Österreich</div><div class="as-card-q">Berühren EU-Entscheidungen (Regulierungen, Förderprogramme, Binnenmarkt) deinen Alltag oder Beruf?</div></div></div>
+<div class="as-toggle-card" data-name="Arbeitsmarkt und Beschäftigung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Arbeitsmarkt und Beschäftigung</div><div class="as-card-q">Interessiert dich, wie sich der Arbeitsmarkt entwickelt — z.B. wegen Job, Mitarbeitersuche oder Pensionierung?</div></div></div>
+<div class="as-toggle-card" data-name="Klimapolitik und Umwelt Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Klimapolitik und Umwelt Österreich</div><div class="as-card-q">Ist dir Klimapolitik und Umweltschutz wichtig — privat oder beruflich?</div></div></div>
+<div class="as-toggle-card" data-name="Künstliche Intelligenz und Digitalisierung" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Künstliche Intelligenz und Digitalisierung</div><div class="as-card-q">Betrifft dich KI — als Anwender, im Job, oder weil du die Entwicklung verfolgst?</div></div></div>
+<div class="as-toggle-card" data-name="Ukraine-Krieg und Sicherheitspolitik" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Ukraine-Krieg und Sicherheitspolitik</div><div class="as-card-q">Verfolgst du den Ukraine-Krieg und seine Folgen für Europa und Österreich?</div></div></div>
+<div class="as-toggle-card" data-name="Österreichische Unternehmen und Wirtschaft" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Österreichische Unternehmen und Wirtschaft</div><div class="as-card-q">Interessierst du dich für die Lage österreichischer Betriebe — als Unternehmer, Mitarbeiter oder Investor?</div></div></div>
+<div class="as-toggle-card" data-name="Migration und Integration in Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Migration und Integration in Österreich</div><div class="as-card-q">Ist das Thema Migration und Integration für dich beruflich oder gesellschaftlich relevant?</div></div></div>
+<div class="as-toggle-card" data-name="Gesundheitssystem und Medizin Österreich" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Gesundheitssystem und Medizin Österreich</div><div class="as-card-q">Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?</div></div></div>
 
   <div class="as-custom-section">
     <p style="font-size:14px;font-family:var(--sans);margin:0 0 4px;font-weight:600">Eigenes Thema hinzufügen</p>
@@ -405,35 +468,26 @@
 
 <div id="topic-list" style="display:none">
 <div class="dossier-topic" data-topic-name="US-Zölle und Folgen für die österreichische Exportwirtschaft"><h2>US-Zölle und Folgen für die österreichische Exportwirtschaft<span class="schlagwort-badge">#Zoll</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic" data-topic-name="Mietrecht und Wohnkosten in Österreich"><h2>Mietrecht und Wohnkosten in Österreich<span class="schlagwort-badge">#Miet</span></h2><p class="topic-stand">Stand: Zu deinen verfolgten Themen — US-Zölle, Mietrecht, US-Börsen, EZB-Zinsen, Inflation, österreichische Innenpolitik, EU-Politik, Arbeitsmarkt, Klimapolitik, KI, Ukraine-Krieg, österreichische Unternehmen, Migration, Gesundheitssystem — gibt es in den heutigen Meldungen keine materiellen Änderungen. Kein Handlungsbedarf.</p><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/32053751/burschenschafter-sollen-in-leoben-erst-sieg-heil-gerufen-und-dann-taxler-verpruegelt-haben" target="_blank" rel="noopener"><span class="topic-article-title">Burschenschafter sollen in Leoben erst „Sieg Heil“ gerufen und dann Taxler verprügelt haben</span><span class="topic-article-date">22.06</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"><h2>US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="topic-stand">Stand: Keine materielle Änderung seit gestern.</p><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31179112/wieso-dieser-boersensommer-turbulent-werden-koennte" target="_blank" rel="noopener"><span class="topic-article-title">Wieso dieser Börsensommer turbulent werden könnte [premium]</span><span class="topic-article-date">22.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31886956/sk-hynix-ueberholt-samsung-als-wertvollster-boersenwert-suedkoreas" target="_blank" rel="noopener"><span class="topic-article-title">SK Hynix überholt Samsung als wertvollster Börsenwert Südkoreas</span><span class="topic-article-date">22.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31714532/grazer-firma-will-kleine-atomkraftwerke-bauen-und-geht-an-die-boerse" target="_blank" rel="noopener"><span class="topic-article-title">Grazer Firma will kleine Atomkraftwerke bauen und geht an die Börse [premium]</span><span class="topic-article-date">22.06</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="EZB-Zinsentscheidungen und Folgen für Österreich"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="topic-stand">Stand: Keine materielle Änderung seit gestern.</p><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic" data-topic-name="Energiepreise und Stromkosten in Österreich"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="topic-stand">Stand: Seit deinem letzten Stand (22.06.) keine neuen Meldungen. Die Iran-USA-Gesprächsbereitschaft bleibt der Hauptfaktor für mittelfristige Ölpreisaussichten.</p><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31714532/grazer-firma-will-kleine-atomkraftwerke-bauen-und-geht-an-die-boerse" target="_blank" rel="noopener"><span class="topic-article-title">Grazer Firma will kleine Atomkraftwerke bauen und geht an die Börse [premium]</span><span class="topic-article-date">22.06</span></a></li></ul></div>
+<div class="dossier-topic" data-topic-name="Mietrecht und Wohnkosten in Österreich"><h2>Mietrecht und Wohnkosten in Österreich<span class="schlagwort-badge">#Miet</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber"><h2>US-Börsen: S&amp;P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber<span class="schlagwort-badge">#Börse</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="EZB-Zinsentscheidungen und Folgen für Österreich"><h2>EZB-Zinsentscheidungen und Folgen für Österreich<span class="schlagwort-badge">#EZB</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Energiepreise und Stromkosten in Österreich"><h2>Energiepreise und Stromkosten in Österreich<span class="schlagwort-badge">#Energie</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Inflation und Kaufkraft in Österreich"><h2>Inflation und Kaufkraft in Österreich<span class="schlagwort-badge">#Inflation</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Österreichische Innenpolitik"><h2>Österreichische Innenpolitik<span class="schlagwort-badge">#Koalition</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic" data-topic-name="EU-Politik und Österreich"><h2>EU-Politik und Österreich<span class="schlagwort-badge">#EU</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31851223/hitzewelle-rollt-ueber-europa-oesterreich-verliert-0-2-messi-schafft-wm-rekord-benzin-wird-billiger" target="_blank" rel="noopener"><span class="topic-article-title">Hitzewelle rollt über Europa • Österreich verliert 0:2, Messi schafft WM-Rekord • Benzin wird billiger</span><span class="topic-article-date">23.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31886611/defense-investor-ueber-oesterreich-man-kann-neutral-bleiben-und-trotzdem-mitverdienen" target="_blank" rel="noopener"><span class="topic-article-title">Defense-Investor über Österreich: „Man kann neutral bleiben – und trotzdem mitverdienen“ [premium]</span><span class="topic-article-date">23.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31476483/kindergeld-papa-patzte-beim-umzug-und-verliert-den-anspruch" target="_blank" rel="noopener"><span class="topic-article-title">Kindergeld: Papa patzte beim Umzug und verliert den Anspruch [premium]</span><span class="topic-article-date">23.06</span></a></li></ul></div>
+<div class="dossier-topic" data-topic-name="EU-Politik und Österreich"><h2>EU-Politik und Österreich<span class="schlagwort-badge">#EU</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Arbeitsmarkt und Beschäftigung"><h2>Arbeitsmarkt und Beschäftigung<span class="schlagwort-badge">#Arbeitsmarkt</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Klimapolitik und Umwelt Österreich"><h2>Klimapolitik und Umwelt Österreich<span class="schlagwort-badge">#Klima</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic" data-topic-name="Künstliche Intelligenz und Digitalisierung"><h2>Künstliche Intelligenz und Digitalisierung<span class="schlagwort-badge">#KI</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31476483/kindergeld-papa-patzte-beim-umzug-und-verliert-den-anspruch" target="_blank" rel="noopener"><span class="topic-article-title">Kindergeld: Papa patzte beim Umzug und verliert den Anspruch [premium]</span><span class="topic-article-date">23.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31649390/hengstschlaeger-technologie-ist-weder-moralisch-gut-noch-schlecht" target="_blank" rel="noopener"><span class="topic-article-title">Hengstschläger: „Technologie ist weder moralisch gut noch schlecht“ [premium]</span><span class="topic-article-date">22.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/31876895/china-verhaengt-sanktionen-gegen-56-us-firmen" target="_blank" rel="noopener"><span class="topic-article-title">China verhängt Sanktionen gegen 56 US-Firmen</span><span class="topic-article-date">22.06</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Ukraine-Krieg und Sicherheitspolitik"><h2>Ukraine-Krieg und Sicherheitspolitik<span class="schlagwort-badge">#Ukraine</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/32169173/honduras-setzt-im-kampf-gegen-drogen-auf-drohnen-aus-der-ukraine" target="_blank" rel="noopener"><span class="topic-article-title">Honduras setzt im Kampf gegen Drogen auf Drohnen aus der Ukraine</span><span class="topic-article-date">23.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/30857242/befindet-sich-russlands-wirtschaft-tatsaechlich-im-endstadium" target="_blank" rel="noopener"><span class="topic-article-title">Befindet sich Russlands Wirtschaft tatsächlich im Endstadium?</span><span class="topic-article-date">17.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/28090657/ist-der-ukraine-frieden-in-sicht-und-wie-gefaehrlich-wird-russlands-militaer-dann-fuer-europa" target="_blank" rel="noopener"><span class="topic-article-title">Ist der Ukraine-Frieden in Sicht? Und wie gefährlich wird Russlands Militär dann für Europa?</span><span class="topic-article-date">03.06</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Österreichische Unternehmen und Wirtschaft"><h2>Österreichische Unternehmen und Wirtschaft<span class="schlagwort-badge">#Wirtschaft</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31714532/grazer-firma-will-kleine-atomkraftwerke-bauen-und-geht-an-die-boerse" target="_blank" rel="noopener"><span class="topic-article-title">Grazer Firma will kleine Atomkraftwerke bauen und geht an die Börse [premium]</span><span class="topic-article-date">22.06</span></a></li>
-<li class="topic-article"><a href="https://www.diepresse.com/30857242/befindet-sich-russlands-wirtschaft-tatsaechlich-im-endstadium" target="_blank" rel="noopener"><span class="topic-article-title">Befindet sich Russlands Wirtschaft tatsächlich im Endstadium?</span><span class="topic-article-date">17.06</span></a></li></ul></div>
+<div class="dossier-topic" data-topic-name="Künstliche Intelligenz und Digitalisierung"><h2>Künstliche Intelligenz und Digitalisierung<span class="schlagwort-badge">#KI</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Ukraine-Krieg und Sicherheitspolitik"><h2>Ukraine-Krieg und Sicherheitspolitik<span class="schlagwort-badge">#Ukraine</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
+<div class="dossier-topic" data-topic-name="Österreichische Unternehmen und Wirtschaft"><h2>Österreichische Unternehmen und Wirtschaft<span class="schlagwort-badge">#Wirtschaft</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
 <div class="dossier-topic" data-topic-name="Migration und Integration in Österreich"><h2>Migration und Integration in Österreich<span class="schlagwort-badge">#Migration</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
-<div class="dossier-topic" data-topic-name="Gesundheitssystem und Medizin Österreich"><h2>Gesundheitssystem und Medizin Österreich<span class="schlagwort-badge">#Gesundheit</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.diepresse.com/31876453/fpoe-will-studierende-kuenftig-laenger-arbeiten-lassen" target="_blank" rel="noopener"><span class="topic-article-title">FPÖ will Studierende künftig länger arbeiten lassen</span><span class="topic-article-date">22.06</span></a></li></ul></div>
+<div class="dossier-topic" data-topic-name="Gesundheitssystem und Medizin Österreich"><h2>Gesundheitssystem und Medizin Österreich<span class="schlagwort-badge">#Gesundheit</span></h2><p class="dossier-empty">Keine aktuellen Artikel zu diesem Thema.</p></div>
   <button class="reset-link" onclick="asReset()">Themen-Auswahl bearbeiten</button>
 </div>
 
 <script>
 (function(){
-var TOPICS=[{"name": "US-Zölle und Folgen für die österreichische Exportwirtschaft", "kw": "Zoll", "q": "Macht dir die mögliche Eskalation im Iran-Konflikt Sorgen um Österreichs Exportchancen?"}, {"name": "Mietrecht und Wohnkosten in Österreich", "kw": "Miet", "q": "Interessiert dich, wie sich die politischen Debatten auf deine Miete auswirken?"}, {"name": "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber", "kw": "Börse", "q": "Willst du wissen, warum dieser Börsensommer besonders turbulent werden könnte?"}, {"name": "EZB-Zinsentscheidungen und Folgen für Österreich", "kw": "EZB", "q": "Beunruhigt dich die aktuelle Zins-Debatte in der Fed und deren Auswirkungen?"}, {"name": "Energiepreise und Stromkosten in Österreich", "kw": "Energie", "q": "Interessiert dich das Grazer Mini-Atomkraftwerk als neue Energielösung?"}, {"name": "Inflation und Kaufkraft in Österreich", "kw": "Inflation", "q": "Freut dich, dass Benzinpreise wieder sinken und näher am Vor-Krisen-Niveau sind?"}, {"name": "Österreichische Innenpolitik", "kw": "Koalition", "q": "Finde ich es problematisch, dass die Neos einen U-Ausschuss boykottieren?"}, {"name": "EU-Politik und Österreich", "kw": "EU", "q": "Besorgt dich die politische Instabilität in Rumänien für die EU-Stabilität?"}, {"name": "Arbeitsmarkt und Beschäftigung", "kw": "Arbeitsmarkt", "q": "Macht dir der massive Stellenabbau bei Oracle Angst um deine Karriere?"}, {"name": "Klimapolitik und Umwelt Österreich", "kw": "Klima", "q": "Beunruhigt dich die aktuelle Hitzewelle über Europa?"}, {"name": "Künstliche Intelligenz und Digitalisierung", "kw": "KI", "q": "Interessiert dich, wie KI-Infrastruktur die Wirtschaft umgestaltet?"}, {"name": "Ukraine-Krieg und Sicherheitspolitik", "kw": "Ukraine", "q": "Überrascht dich, dass Honduras ukrainische Drohnen-Technologie nutzt?"}, {"name": "Österreichische Unternehmen und Wirtschaft", "kw": "Wirtschaft", "q": "Willst du wissen, wie Österreich im Verteidigungssektor mitverdienen kann?"}, {"name": "Migration und Integration in Österreich", "kw": "Migration", "q": "Interessiert dich die aktuelle Debatte über Migration und Integration?"}, {"name": "Gesundheitssystem und Medizin Österreich", "kw": "Gesundheit", "q": "Freust du dich, dass die Überweisungspflicht zum Facharzt wohl nicht kommt?"}];
+var TOPICS=[{"name": "US-Zölle und Folgen für die österreichische Exportwirtschaft", "kw": "Zoll", "q": "Bist du beruflich oder privat von Exporten, Zöllen oder internationaler Wirtschaftspolitik betroffen?"}, {"name": "Mietrecht und Wohnkosten in Österreich", "kw": "Miet", "q": "Wohnst du zur Miete oder planst du in den nächsten Jahren eine Immobilie zu kaufen oder mieten?"}, {"name": "US-Börsen: S&P 500, Nasdaq, Dow Jones — Kursrichtung und Treiber", "kw": "Börse", "q": "Hast du Aktien, ETFs oder ein Wertpapierdepot — oder interessierst du dich für Börsenentwicklungen?"}, {"name": "EZB-Zinsentscheidungen und Folgen für Österreich", "kw": "EZB", "q": "Betrifft dich der Leitzins direkt — z.B. über einen Kredit, ein Sparbuch oder Wohnbaufinanzierung?"}, {"name": "Energiepreise und Stromkosten in Österreich", "kw": "Energie", "q": "Spielen Strom- und Energiekosten eine spürbare Rolle in deinem Haushalt oder Unternehmen?"}, {"name": "Inflation und Kaufkraft in Österreich", "kw": "Inflation", "q": "Merkst du, dass dein Geld weniger weit reicht — beim Einkauf, Restaurant oder Urlaub?"}, {"name": "Österreichische Innenpolitik", "kw": "Koalition", "q": "Interessierst du dich für die Arbeit der Bundesregierung und aktuelle Politikentscheidungen?"}, {"name": "EU-Politik und Österreich", "kw": "EU", "q": "Berühren EU-Entscheidungen (Regulierungen, Förderprogramme, Binnenmarkt) deinen Alltag oder Beruf?"}, {"name": "Arbeitsmarkt und Beschäftigung", "kw": "Arbeitsmarkt", "q": "Interessiert dich, wie sich der Arbeitsmarkt entwickelt — z.B. wegen Job, Mitarbeitersuche oder Pensionierung?"}, {"name": "Klimapolitik und Umwelt Österreich", "kw": "Klima", "q": "Ist dir Klimapolitik und Umweltschutz wichtig — privat oder beruflich?"}, {"name": "Künstliche Intelligenz und Digitalisierung", "kw": "KI", "q": "Betrifft dich KI — als Anwender, im Job, oder weil du die Entwicklung verfolgst?"}, {"name": "Ukraine-Krieg und Sicherheitspolitik", "kw": "Ukraine", "q": "Verfolgst du den Ukraine-Krieg und seine Folgen für Europa und Österreich?"}, {"name": "Österreichische Unternehmen und Wirtschaft", "kw": "Wirtschaft", "q": "Interessierst du dich für die Lage österreichischer Betriebe — als Unternehmer, Mitarbeiter oder Investor?"}, {"name": "Migration und Integration in Österreich", "kw": "Migration", "q": "Ist das Thema Migration und Integration für dich beruflich oder gesellschaftlich relevant?"}, {"name": "Gesundheitssystem und Medizin Österreich", "kw": "Gesundheit", "q": "Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?"}];
 var PREF_KEY='copilot_prefs';
 var CUSTOM_KEY='copilot_custom';
 var OLD_PREF_KEY='auf_stand_prefs';
