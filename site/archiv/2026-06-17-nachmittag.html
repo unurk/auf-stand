@@ -433,7 +433,7 @@
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (16.06.) haben erste iranische Rohölexporte per Schiff die Lage leicht entspannt — erste Lieferungen seit der US-Blockade vor zwei Monaten. Der Ölpreis ist um knapp 5 % gefallen. Experten warnen aber: Er bleibt noch monatelang angespannt wegen schwacher Nachfrage in China, OPEC-Förderdrosselungen und regionaler Unsicherheiten.</p>
   <hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
   <hr>
   <p>📰 <strong>Die Presse — E-Paper</strong> · <a href="https://www.diepresse.com/epaper">Aktuelle Ausgabe öffnen →</a>
 </div>
@@ -455,6 +455,52 @@
       pb.style.width=(max>0?Math.round(sa.scrollTop/max*100):0)+'%';
     },{passive:true});
   }
+  // Briefing-Timeline live an die echte Wiener Uhrzeit koppeln: aktiver Knoten
+  // + mitlaufender Countdown zur nächsten Ausgabe (06/11/16/20). Die im Build
+  // erzeugte Version ist der No-JS-Fallback; hier wird sie zur Laufzeit aktuell.
+  (function(){
+    var tl=document.querySelector('.timeline');
+    if(!tl) return;
+    var fill=tl.querySelector('.tl-fill');
+    var nodes=tl.querySelectorAll('.tl-node');
+    var cap=tl.querySelector('.tl-caption');
+    var SLOTS=[6,11,16,20];
+    function viennaNow(){
+      try{
+        var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Vienna',hour12:false,
+          hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(new Date());
+        var h=0,m=0,s=0;
+        p.forEach(function(x){ if(x.type==='hour')h=+x.value;
+          else if(x.type==='minute')m=+x.value; else if(x.type==='second')s=+x.value; });
+        return (h%24)*60+m+s/60;
+      }catch(e){ var d=new Date(); return d.getHours()*60+d.getMinutes()+d.getSeconds()/60; }
+    }
+    function fmtDur(mins){
+      mins=Math.max(0,Math.ceil(mins));
+      if(mins<1) return 'gleich';
+      var h=Math.floor(mins/60), m=mins%60;
+      if(h>0) return 'in '+h+' Std'+(m>0?' '+m+' Min':'');
+      return 'in '+m+' Min';
+    }
+    function pad(n){ return (n<10?'0':'')+n; }
+    function update(){
+      var now=viennaNow(), cur=-1, i;
+      for(i=0;i<SLOTS.length;i++){ if(now>=SLOTS[i]*60) cur=i; }
+      var nextIdx, when, until, prog;
+      if(cur===-1){ nextIdx=0; when='heute'; until=SLOTS[0]*60-now; prog=0; }
+      else if(cur===SLOTS.length-1){ nextIdx=0; when='morgen'; until=(24*60-now)+SLOTS[0]*60; prog=1; }
+      else { nextIdx=cur+1; when='heute'; until=SLOTS[nextIdx]*60-now;
+        prog=(cur+(now-SLOTS[cur]*60)/(SLOTS[nextIdx]*60-SLOTS[cur]*60))/(SLOTS.length-1); }
+      for(i=0;i<nodes.length;i++){
+        nodes[i].className='tl-node'+(i<cur?' done':(i===cur?' now':''));
+      }
+      if(fill) fill.style.width=Math.round(Math.max(0,Math.min(1,prog))*100)+'%';
+      if(cap) cap.innerHTML='Nächste Aktualisierung <b>'+fmtDur(until)+'</b> · '
+        +when+' '+pad(SLOTS[nextIdx])+':00 Uhr';
+    }
+    update();
+    setInterval(update,30000);
+  })();
   // Story-Sektionen in Karten verpacken (h2…hr → .story-card)
   (function(){
     var wrap=document.querySelector('.wrap');
