@@ -2,17 +2,20 @@ name: NYT Briefing
 
 on:
   schedule:
-    # Selbe Fenster wie die Presse-Ausgabe (Wien-Takt), robuste Mehrfach-Crons.
-    # Der Block-Guard in main.py stellt sicher, dass je Tag nur eine Ausgabe
-    # pro Block erscheint, auch wenn mehrere Cron-Läufe feuern.
-    - cron: "*/30 4-6 * * *"    # morgen     (~06:00 Wien)
-    - cron: "*/30 9-11 * * *"   # mittag     (~11:00 Wien)
-    - cron: "*/30 14-16 * * *"  # nachmittag (~16:00 Wien)
-    - cron: "*/30 18-20 * * *"  # abend      (~20:00 Wien)
+    # Wie lagebild.yml: mehrere Versuche im 15-Min-Takt, beginnend ~40 min VOR dem
+    # Slot, damit die Ausgabe im Normalfall vor der Kuratierungszeit erzeugt und
+    # deployt ist; die Webapp enthüllt sie dann punktgenau (06/11/16/20). Minuten
+    # bewusst NICHT auf :00 (GitHubs Top-of-Hour-Stau meiden). Fenster decken
+    # Sommer- wie Winterzeit ab; die genaue Ausgabe wählt `auto` aus der Wiener
+    # Uhrzeit. Der Block-Guard in main.py liefert je Tag und Block nur einmal aus.
+    - cron: "2,17,32,47 3-5 * * *"     # morgen     (Slot 04:00 Sommer / 05:00 Winter UTC)
+    - cron: "2,17,32,47 8-10 * * *"    # mittag     (Slot 09:00 / 10:00 UTC)
+    - cron: "2,17,32,47 13-15 * * *"   # nachmittag (Slot 14:00 / 15:00 UTC)
+    - cron: "2,17,32,47 17-19 * * *"   # abend      (Slot 18:00 / 19:00 UTC)
   workflow_dispatch:       # Manueller Start (GitHub UI) und externer Trigger (cron-job.org)
     inputs:
       edition:
-        description: "Welche Ausgabe? auto = nach Wall-Clock-Uhrzeit"
+        description: "Welche Ausgabe? auto = nach Wiener Uhrzeit"
         type: choice
         default: auto
         options: [auto, morgen, mittag, nachmittag, abend]
@@ -53,21 +56,15 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
           mkdir -p data out out/nyt
+          # Expliziter edition-Input (UI/extern) hat Vorrang; sonst wählt `auto` die
+          # fällige Ausgabe zeitzonensicher aus der WIENER Uhrzeit (mit Vorlauf),
+          # nicht aus der UTC-Stunde. Vor dem Morgen-Fenster ist `auto` ein No-op.
           EDITION="${{ github.event.inputs.edition }}"
           case "$EDITION" in
             morgen|mittag|nachmittag|abend)
               python -m copilot.main "$EDITION" --config config.nyt.yaml ;;
             *)
-              HOUR=$(date -u +%H)
-              if [ "$HOUR" -le "08" ]; then
-                python -m copilot.main morgen --config config.nyt.yaml
-              elif [ "$HOUR" -le "13" ]; then
-                python -m copilot.main mittag --config config.nyt.yaml
-              elif [ "$HOUR" -le "17" ]; then
-                python -m copilot.main nachmittag --config config.nyt.yaml
-              else
-                python -m copilot.main abend --config config.nyt.yaml
-              fi ;;
+              python -m copilot.main auto --config config.nyt.yaml ;;
           esac
 
       - name: NYT-State sichern
