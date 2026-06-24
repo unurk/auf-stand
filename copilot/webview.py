@@ -5,8 +5,9 @@ import html as _html
 import json
 import re
 import shutil
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import yaml
 
@@ -31,6 +32,9 @@ _EDITION_LABEL_EN = {
 }
 # Presse-Kuratierungszeiten je Ausgabe (für die dezente Rhythmus-Anzeige).
 _EDITION_TIME = {"morgen": "06:00", "mittag": "11:00", "nachmittag": "16:00", "abend": "20:00"}
+# Zeitzone des Publikums: Veröffentlichungs-Zeitpunkte werden hierin verankert,
+# damit der Browser DST-sicher den richtigen absoluten Moment vergleichen kann.
+_VIENNA = ZoneInfo("Europe/Vienna")
 _EDITION_ORDER = ["morgen", "mittag", "nachmittag", "abend"]
 _EDITIONS_RE = "morgen|mittag|nachmittag|abend|catchup"
 _FILENAME_RE = re.compile(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})\.html$")
@@ -515,11 +519,8 @@ __CONTENT__
   // + mitlaufender Countdown zur nächsten Ausgabe (06/11/16/20). Die im Build
   // erzeugte Version ist der No-JS-Fallback; hier wird sie zur Laufzeit aktuell.
   (function(){
-    var tl=document.querySelector('.timeline');
-    if(!tl) return;
-    var fill=tl.querySelector('.tl-fill');
-    var nodes=tl.querySelectorAll('.tl-node');
-    var cap=tl.querySelector('.tl-caption');
+    var tls=document.querySelectorAll('.timeline');
+    if(!tls.length) return;
     var SLOTS=[6,11,16,20];
     function viennaNow(){
       try{
@@ -539,43 +540,74 @@ __CONTENT__
       return 'in '+m+' Min';
     }
     function pad(n){ return (n<10?'0':'')+n; }
-    function update(){
+    var WHEN_TODAY='heute', WHEN_TMRW='morgen', CAP_PREFIX='Nächste Aktualisierung', CAP_AT=' ', CAP_SUFFIX=' Uhr';
+    function paint(tl){
+      var fill=tl.querySelector('.tl-fill');
+      var nodes=tl.querySelectorAll('.tl-node');
+      var cap=tl.querySelector('.tl-caption');
       var now=viennaNow(), cur=-1, i;
       for(i=0;i<SLOTS.length;i++){ if(now>=SLOTS[i]*60) cur=i; }
       var nextIdx, when, until, prog;
-      if(cur===-1){ nextIdx=0; when='heute'; until=SLOTS[0]*60-now; prog=0; }
-      else if(cur===SLOTS.length-1){ nextIdx=0; when='morgen'; until=(24*60-now)+SLOTS[0]*60; prog=1; }
-      else { nextIdx=cur+1; when='heute'; until=SLOTS[nextIdx]*60-now;
+      if(cur===-1){ nextIdx=0; when=WHEN_TODAY; until=SLOTS[0]*60-now; prog=0; }
+      else if(cur===SLOTS.length-1){ nextIdx=0; when=WHEN_TMRW; until=(24*60-now)+SLOTS[0]*60; prog=1; }
+      else { nextIdx=cur+1; when=WHEN_TODAY; until=SLOTS[nextIdx]*60-now;
         prog=(cur+(now-SLOTS[cur]*60)/(SLOTS[nextIdx]*60-SLOTS[cur]*60))/(SLOTS.length-1); }
       for(i=0;i<nodes.length;i++){
         nodes[i].className='tl-node'+(i<cur?' done':(i===cur?' now':''));
       }
       if(fill) fill.style.width=Math.round(Math.max(0,Math.min(1,prog))*100)+'%';
-      if(cap) cap.innerHTML='Nächste Aktualisierung <b>'+fmtDur(until)+'</b> · '
-        +when+' '+pad(SLOTS[nextIdx])+':00 Uhr';
+      if(cap) cap.innerHTML=CAP_PREFIX+' <b>'+fmtDur(until)+'</b> · '+when+CAP_AT+pad(SLOTS[nextIdx])+':00'+CAP_SUFFIX;
     }
+    function update(){ for(var i=0;i<tls.length;i++) paint(tls[i]); }
     update();
     setInterval(update,30000);
   })();
-  // Story-Sektionen in Karten verpacken (h2…hr → .story-card)
+  // Taktgenaue Enthüllung: die neueste Ausgabe wird erst zu ihrem Slot (06/11/16/20)
+  // sichtbar; bis dahin bleibt der Vorgänger stehen. data-publish trägt den absoluten
+  // (zeitzonensicheren) Moment, daher reicht ein Vergleich mit Date.now().
   (function(){
-    var wrap=document.querySelector('.wrap');
-    if(!wrap) return;
-    var nodes=Array.from(wrap.childNodes);
-    var card=null;
-    nodes.forEach(function(n){
-      var tag=n.nodeType===1?n.tagName:'';
-      if(tag==='H2'){
-        card=document.createElement('div');
-        card.className='story-card';
-        n.parentNode.insertBefore(card,n);
-        card.appendChild(n);
-      } else if(tag==='HR'){
-        card=null;
-        wrap.removeChild(n);
-      } else if(card){
-        card.appendChild(n);
+    var eds=Array.prototype.slice.call(document.querySelectorAll('.edition'));
+    if(eds.length<2) return;  // Archiv/Einzelausgabe: nichts zu enthüllen
+    eds.sort(function(a,b){ return Date.parse(b.dataset.publish)-Date.parse(a.dataset.publish); });
+    var timer=null;
+    function reveal(){
+      var now=Date.now(), live=-1, i;
+      for(i=0;i<eds.length;i++){ if(Date.parse(eds[i].dataset.publish)<=now){ live=i; break; } }
+      if(live===-1) live=eds.length-1;  // alle noch in der Zukunft → älteste zeigen
+      for(i=0;i<eds.length;i++){ eds[i].style.display=(i===live?'':'none'); }
+      // exakt auf die nächste Slot-Sekunde planen (statt nur aufs 30-s-Intervall warten)
+      if(live>0){
+        var until=Date.parse(eds[live-1].dataset.publish)-now;
+        if(timer) clearTimeout(timer);
+        timer=setTimeout(reveal, Math.max(0, Math.min(until+50, 86400000)));
       }
+    }
+    reveal();
+    setInterval(reveal, 30000);  // Sicherheitsnetz (Tab-Schlaf, verpasste Timer)
+  })();
+  // Story-Sektionen in Karten verpacken (h2…hr → .story-card).
+  // Pro Ausgabe-Container (.edition) getrennt, damit die zwei eingebetteten
+  // Ausgaben sich nicht vermischen; Archiv-Seiten haben nur .wrap.
+  (function(){
+    var scopes=Array.prototype.slice.call(document.querySelectorAll('.edition'));
+    if(!scopes.length){ var w=document.querySelector('.wrap'); if(w) scopes=[w]; }
+    scopes.forEach(function(wrap){
+      var nodes=Array.from(wrap.childNodes);
+      var card=null;
+      nodes.forEach(function(n){
+        var tag=n.nodeType===1?n.tagName:'';
+        if(tag==='H2'){
+          card=document.createElement('div');
+          card.className='story-card';
+          n.parentNode.insertBefore(card,n);
+          card.appendChild(n);
+        } else if(tag==='HR'){
+          card=null;
+          wrap.removeChild(n);
+        } else if(card){
+          card.appendChild(n);
+        }
+      });
     });
   })();
   // Accordion: Story-Karten auf-/zuklappbar machen
@@ -681,28 +713,18 @@ _NYT_PAGE_TEMPLATE = (
         "<a href=\"__ROOT__../\" class=\"tab\">__ICON_PRESSE__<span>Presse</span></a>"
     )
     # JS timeline: German → English countdown strings
+    # Timeline-Texte (Countdown + Untertitel) auf Englisch. Die Sprach-Unterschiede
+    # stecken in einer Konstanten-Zeile + fmtDur — daher genügen wenige Ersetzungen.
+    .replace(
+        "var WHEN_TODAY='heute', WHEN_TMRW='morgen', CAP_PREFIX='Nächste Aktualisierung', CAP_AT=' ', CAP_SUFFIX=' Uhr';",
+        "var WHEN_TODAY='today', WHEN_TMRW='tomorrow', CAP_PREFIX='Next update', CAP_AT=' at ', CAP_SUFFIX='';"
+    )
     .replace("if(mins<1) return 'gleich';", "if(mins<1) return 'now';")
     .replace(
         "if(h>0) return 'in '+h+' Std'+(m>0?' '+m+' Min':'');",
         "if(h>0) return 'in '+h+' hr'+(h>1?'s':'')+(m>0?' '+m+' min':'');"
     )
     .replace("return 'in '+m+' Min';", "return 'in '+m+' min';")
-    .replace(
-        "if(cur===-1){ nextIdx=0; when='heute'; until=SLOTS[0]*60-now; prog=0; }",
-        "if(cur===-1){ nextIdx=0; when='today'; until=SLOTS[0]*60-now; prog=0; }"
-    )
-    .replace(
-        "else if(cur===SLOTS.length-1){ nextIdx=0; when='morgen'; until=(24*60-now)+SLOTS[0]*60; prog=1; }",
-        "else if(cur===SLOTS.length-1){ nextIdx=0; when='tomorrow'; until=(24*60-now)+SLOTS[0]*60; prog=1; }"
-    )
-    .replace(
-        "else { nextIdx=cur+1; when='heute'; until=SLOTS[nextIdx]*60-now;",
-        "else { nextIdx=cur+1; when='today'; until=SLOTS[nextIdx]*60-now;"
-    )
-    .replace(
-        "if(cap) cap.innerHTML='Nächste Aktualisierung <b>'+fmtDur(until)+'</b> · '\n        +when+' '+pad(SLOTS[nextIdx])+':00 Uhr';",
-        "if(cap) cap.innerHTML='Next update <b>'+fmtDur(until)+'</b> · '\n        +when+' at '+pad(SLOTS[nextIdx])+':00';"
-    )
 )
 
 
@@ -1185,6 +1207,22 @@ def _extract_body(html: str, datum: str = "", edition: str = "", lang: str = "de
                 return _enhance_content(html[content_start:c].strip(), datum, edition, lang)
             i = c + 6
     return "<p>Kein Inhalt verfügbar.</p>"
+
+
+def _publish_instant(d: date, edition: str) -> datetime:
+    """Absoluter Veröffentlichungs-Zeitpunkt einer Ausgabe (Europe/Vienna).
+
+    Datum aus dem Dateinamen + fester Slot-Zeit (06/11/16/20). Über ZoneInfo
+    erhält der ISO-String den für dieses Datum korrekten Offset (+02:00 Sommer,
+    +01:00 Winter). Ausgaben ohne festen Slot (z. B. catchup) gelten ab
+    Tagesbeginn als veröffentlicht (also nie unter Embargo).
+    """
+    slot = _EDITION_TIME.get(edition)
+    if slot:
+        hh, mm = (int(x) for x in slot.split(":"))
+    else:
+        hh, mm = 0, 0
+    return datetime(d.year, d.month, d.day, hh, mm, tzinfo=_VIENNA)
 
 
 def _parse(path: Path) -> tuple[date, int, str] | None:
@@ -1829,6 +1867,56 @@ def _prune_old_audio(archiv_dir: Path, days: int = 14) -> None:
             mp3.unlink()
 
 
+def _index_edition_body(
+    archiv_dir: Path, d: date, edition: str, streak: int = 0,
+    lang: str = "de", with_audio: bool = True,
+) -> str:
+    """Dekorierter Body einer Ausgabe für die Startseite (Header + Audio + Timeline)."""
+    raw = (archiv_dir / f"{d.isoformat()}-{edition}.html").read_text(encoding="utf-8")
+    content = _extract_body(raw, d.isoformat(), edition, lang)
+    if with_audio:
+        mp3 = f"{d.isoformat()}-{edition}.mp3"
+        if (archiv_dir / mp3).exists():
+            content = _insert_after_header(content, _audio_player(f"archiv/{mp3}"))
+    if streak >= 2:
+        content = _insert_after_header(
+            content, f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n'
+        )
+    timeline = _timeline_panel(edition, lang)
+    if timeline:
+        content = _insert_after_header(content, timeline)
+    else:
+        hint = _next_edition_hint(edition, lang)
+        if hint:
+            content = _insert_after_header(content, hint)
+    return content
+
+
+def _wrap_editions_for_reveal(items: list[tuple[date, str, str]], lang: str = "de") -> str:
+    """Bettet bis zu zwei Ausgaben als taktgenau enthüllbare Container ein.
+
+    `items` = (datum, edition, dekorierter_body), NEUESTE zuerst. Jede Ausgabe
+    trägt ihren absoluten Veröffentlichungs-Zeitpunkt (`data-publish`). Ist die
+    neueste noch unter Embargo (Slot in der Zukunft), bleibt sie verborgen und der
+    Vorgänger ist sichtbar; das Reveal-JS schaltet zur Slot-Sekunde exakt um.
+    Der hier gesetzte Anfangszustand ist der No-JS-/Erst-Render-Fallback.
+    """
+    if not items:
+        return ""
+    now = datetime.now(_VIENNA)
+    pubs = [_publish_instant(d, edition) for (d, edition, _c) in items]
+    # Sichtbar = neueste Ausgabe, deren Slot bereits erreicht ist (sonst älteste).
+    live = next((i for i, p in enumerate(pubs) if p <= now), len(items) - 1)
+    parts = []
+    for i, (d, edition, content) in enumerate(items):
+        style = "" if i == live else ' style="display:none"'
+        parts.append(
+            f'<div class="edition" data-publish="{pubs[i].isoformat()}"{style}>\n'
+            f"{content}\n</div>"
+        )
+    return "\n".join(parts)
+
+
 def _build_presse_site() -> Path:
     """Baut die deutsche Presse-Edition (site/)."""
     state: dict = {}
@@ -1882,31 +1970,20 @@ def _build_presse_site() -> Path:
 
     build_archiv_index(editions)
 
-    latest_html = editions[0][1].read_text(encoding="utf-8")
-    latest_d, _, latest_edition = editions[0][0]
-    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition, "de")
-    latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
-    if (archiv_dir / latest_mp3).exists():
-        latest_content = _insert_after_header(
-            latest_content, _audio_player(f"archiv/{latest_mp3}")
-        )
     from . import state as state_mod
     streak = state_mod.current_streak(state)
-    if streak >= 2:
-        latest_content = _insert_after_header(
-            latest_content,
-            f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n',
-        )
-    timeline = _timeline_panel(latest_edition, "de")
-    if timeline:
-        latest_content = _insert_after_header(latest_content, timeline)
-    else:
-        hint = _next_edition_hint(latest_edition, "de")
-        if hint:
-            latest_content = _insert_after_header(latest_content, hint)
+    # Neueste Ausgabe + Vorgänger einbetten: die neueste wird ggf. erst zu ihrem
+    # Slot (06/11/16/20) enthüllt, bis dahin bleibt der Vorgänger sichtbar.
+    top = [parsed for parsed, _path in editions[:2]]
+    bodies = [
+        (d, edition, _index_edition_body(archiv_dir, d, edition, streak, "de"))
+        for (d, _rank, edition) in top
+    ]
+    index_body = _wrap_editions_for_reveal(bodies, "de")
 
+    latest_d, _, latest_edition = top[0]
     title = _label(latest_d, latest_edition, "de")
-    index_html = _render_page(title, latest_content, "lagebild")
+    index_html = _render_page(title, index_body, "lagebild")
     index.write_text(index_html, encoding="utf-8")
 
     print(f"Web-App gebaut: {index} ({len(editions)} Ausgabe(n) im Archiv)")
@@ -1964,19 +2041,17 @@ def _build_nyt_site(config: dict) -> Path:
 
     build_archiv_index(editions, lang=lang, site_dir=site_dir, epaper_url=epaper_url)
 
-    latest_html = editions[0][1].read_text(encoding="utf-8")
-    latest_d, _, latest_edition = editions[0][0]
-    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition, lang)
-    timeline = _timeline_panel(latest_edition, lang)
-    if timeline:
-        latest_content = _insert_after_header(latest_content, timeline)
-    else:
-        hint = _next_edition_hint(latest_edition, lang)
-        if hint:
-            latest_content = _insert_after_header(latest_content, hint)
+    # Neueste Ausgabe + Vorgänger einbetten und taktgenau enthüllen (siehe Presse).
+    top = [parsed for parsed, _path in editions[:2]]
+    bodies = [
+        (d, edition, _index_edition_body(archiv_dir, d, edition, 0, lang, with_audio=False))
+        for (d, _rank, edition) in top
+    ]
+    index_body = _wrap_editions_for_reveal(bodies, lang)
 
+    latest_d, _, latest_edition = top[0]
     title = _label(latest_d, latest_edition, lang)
-    index_html = _render_nyt_page(title, latest_content, "lagebild", epaper_url=epaper_url)
+    index_html = _render_nyt_page(title, index_body, "lagebild", epaper_url=epaper_url)
     index.write_text(index_html, encoding="utf-8")
 
     print(f"NYT site built: {index} ({len(editions)} edition(s) in archive)")

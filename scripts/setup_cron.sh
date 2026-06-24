@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
-# Richtet die verlässlichen Trigger für Copilot auf cron-job.org ein.
+# OPTIONAL: Richtet zusätzliche, besonders pünktliche Trigger auf cron-job.org ein.
 #
-# Warum extern: GitHubs interner Schedule-Cron feuert nachweislich unpünktlich
-# (8–24 min Verspätung) und lässt die meisten Läufe ganz aus. Ein externer
-# Dienst stößt den Workflow per workflow_dispatch-API an — das startet <1 min.
+# Nicht mehr erforderlich: Der Workflow erzeugt die Ausgaben seit dem „Früher
+# Trigger + exakte Enthüllung"-Umbau bereits repo-only zuverlässig — die GitHub-
+# Crons feuern früh & häufig vor dem Slot, und die Webapp enthüllt das Lagebild
+# punktgenau zur Kuratierungszeit. cron-job.org ist nur ein optionaler Booster,
+# falls man die Erzeugung noch enger an den Slot legen will.
+#
+# Warum extern dennoch nützlich: GitHubs interner Schedule-Cron feuert unpünktlich
+# (Verspätung bis zu Stunden). Ein externer Dienst stößt den Workflow per
+# workflow_dispatch-API an — das startet <1 min.
 #
 # Legt FÜNF Jobs an (vier Tagesausgaben + Wochen-Quittung), je in der Zeitzone
 # Europe/Vienna (damit ganzjährig pünktlich, kein Sommer-/Winterzeit-Drift).
-# Jeder Job benennt die Ausgabe explizit über den `edition`-Input des Workflows,
-# ist also unabhängig von der Uhrzeit-Logik. Mehrfach ausführbar (idempotent):
+# Jeder Job benennt die Ausgabe explizit über den `edition`-Input des Workflows
+# und feuert ~10 min VOR dem Slot, damit das Lagebild rechtzeitig deployt ist und
+# zur vollen Stunde enthüllt werden kann. Mehrfach ausführbar (idempotent):
 # vorhandene "Copilot · *"-Jobs werden zuerst entfernt.
 #
 # Einmalig ausführen (Secrets nur zur Laufzeit, NIE ins Repo committen):
@@ -67,10 +74,12 @@ create_job() {
     }" >/dev/null
 }
 
-echo "→ Morgen-Ausgabe      (06:00 Wien)..."; create_job "Copilot · Morgen"      6  0 "-1" morgen;     echo " OK"
-echo "→ Mittags-Ausgabe     (11:00 Wien)..."; create_job "Copilot · Mittag"     11  0 "-1" mittag;     echo " OK"
-echo "→ Nachmittags-Ausgabe (16:00 Wien)..."; create_job "Copilot · Nachmittag" 16  0 "-1" nachmittag; echo " OK"
-echo "→ Abend-Ausgabe       (20:00 Wien)..."; create_job "Copilot · Abend"      20  0 "-1" abend;      echo " OK"
+# Feuert jeweils ~10 min vor dem Slot (05:50/10:50/15:50/19:50), damit die Ausgabe
+# vor der Kuratierungszeit deployt ist; die Webapp enthüllt sie dann punktgenau.
+echo "→ Morgen-Ausgabe      (05:50 → Slot 06:00 Wien)..."; create_job "Copilot · Morgen"      5 50 "-1" morgen;     echo " OK"
+echo "→ Mittags-Ausgabe     (10:50 → Slot 11:00 Wien)..."; create_job "Copilot · Mittag"     10 50 "-1" mittag;     echo " OK"
+echo "→ Nachmittags-Ausgabe (15:50 → Slot 16:00 Wien)..."; create_job "Copilot · Nachmittag" 15 50 "-1" nachmittag; echo " OK"
+echo "→ Abend-Ausgabe       (19:50 → Slot 20:00 Wien)..."; create_job "Copilot · Abend"      19 50 "-1" abend;      echo " OK"
 echo "→ Wochen-Quittung     (Sa 09:00 Wien)..."; create_job "Copilot · Woche"    9  0 "6"  woche;      echo " OK"
 
 echo ""

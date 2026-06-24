@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import yaml
 from dotenv import load_dotenv
@@ -41,6 +42,41 @@ def cmd_feeds(config: dict) -> int:
         )
         return 1
     return 0
+
+
+# Vorlauf: Wie viele Minuten VOR dem Slot bereits erzeugt werden darf. So ist das
+# Lagebild rechtzeitig deployt; die Webapp enthüllt es dann punktgenau zum Slot.
+AUTO_LEAD = timedelta(minutes=40)
+VIENNA = ZoneInfo("Europe/Vienna")
+
+
+def pick_auto_edition(config: dict, now: datetime | None = None) -> str | None:
+    """Wählt anhand der Wiener Uhrzeit die aktuell fällige Ausgabe.
+
+    Zeitzonensicher (Europe/Vienna, ganzjährig), unabhängig von der UTC-Uhr des
+    CI-Runners — ersetzt den früheren `date -u +%H`-Fallback im Workflow.
+
+    Zurückgegeben wird der jüngste Slot, dessen Vorlauf-Fenster (`Slot − AUTO_LEAD`)
+    bereits begonnen hat — z. B. ab 05:20 → ``morgen``, ab 10:20 → ``mittag``.
+    Vor dem ersten Slot des Tages (frühe Nacht) → ``None`` (nichts zu tun; die
+    Abend-Ausgabe des Vortags deckt diese Zeit ab). Der Block-Guard verhindert
+    weiterhin Doppelausgaben bei mehrfachen/verspäteten Läufen.
+    """
+    if now is None:
+        now = datetime.now(VIENNA)
+    chosen: str | None = None
+    for edition, cfg in config.get("editions", {}).items():
+        slot_str = cfg.get("time")
+        if not slot_str:
+            continue
+        try:
+            hh, mm = (int(x) for x in slot_str.split(":"))
+        except (ValueError, AttributeError):
+            continue
+        slot = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+        if now >= slot - AUTO_LEAD:
+            chosen = edition
+    return chosen
 
 
 def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> int:
@@ -243,7 +279,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
+    parser.add_argument("command", choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
     parser.add_argument(
         "--config", default="config.yaml",
@@ -292,7 +328,17 @@ def main() -> int:
             from . import fulltext
             fulltext.test_url(args.url)
             return 0
-        return run_edition(args.command, config, args.dry_run, args.keep_seen)
+        command = args.command
+        if command == "auto":
+            command = pick_auto_edition(config)
+            if command is None:
+                print(
+                    "Kein aktiver Ausgabe-Slot zur jetzigen Wiener Uhrzeit "
+                    "(vor dem Morgen-Fenster) — nichts zu tun."
+                )
+                return 0
+            print(f"auto → Ausgabe '{command}' (nach Wiener Uhrzeit gewählt).")
+        return run_edition(command, config, args.dry_run, args.keep_seen)
     except Exception as exc:
         telegram.send_alert(
             f"❌ Copilot: Lauf '{args.command}' fehlgeschlagen: {exc}",

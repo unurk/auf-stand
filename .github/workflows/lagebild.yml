@@ -3,16 +3,20 @@ name: Lagebild
 on:
   schedule:
     # GitHub-Actions-Crons feuern unzuverlässig (Verspätung bis zu Stunden,
-    # gelegentliches komplettes Auslassen). Darum je Ausgabe-Fenster MEHRERE
-    # Versuche im 30-Minuten-Takt — es genügt, wenn EINER feuert. Der Block-Guard
-    # in main.py liefert je Tag und Block trotzdem nur einmal aus (idempotent,
-    # kein Duplikat bei Mehrfachlauf). Die Fenster starten zur Kuratierungszeit
-    # und decken Sommer- wie Winterzeit ab (Wien = UTC+2 Sommer / UTC+1 Winter).
-    - cron: "*/30 4-6 * * *"    # morgen     (~06:00 Wien)
-    - cron: "*/30 9-11 * * *"   # mittag     (~11:00 Wien)
-    - cron: "*/30 14-16 * * *"  # nachmittag (~16:00 Wien)
-    - cron: "*/30 18-20 * * *"  # abend      (~20:00 Wien)
-    - cron: "0 7 * * 6"         # Samstag 9:00 Wien: Wochen-Quittung
+    # gelegentliches komplettes Auslassen). Strategie: je Ausgabe MEHRERE Versuche
+    # im 15-Minuten-Takt, beginnend ~40 min VOR dem Slot — so ist das Lagebild im
+    # Normalfall schon VOR der Kuratierungszeit erzeugt und deployt; die Webapp
+    # enthüllt es dann punktgenau zum Slot (06/11/16/20). Ist GitHub doch zu spät,
+    # erscheint es sofort nach dem Deploy. Der Block-Guard in main.py liefert je
+    # Tag und Block nur einmal aus (idempotent). Minuten bewusst NICHT auf :00
+    # (GitHubs Top-of-Hour-Stau meiden). Fenster decken Sommer- wie Winterzeit ab
+    # (Wien = UTC+2 Sommer / UTC+1 Winter); die genaue Ausgabe wählt `auto` aus der
+    # Wiener Uhrzeit, nicht der UTC-Stunde.
+    - cron: "2,17,32,47 3-5 * * *"     # morgen     (Slot 04:00 Sommer / 05:00 Winter UTC)
+    - cron: "2,17,32,47 8-10 * * *"    # mittag     (Slot 09:00 / 10:00 UTC)
+    - cron: "2,17,32,47 13-15 * * *"   # nachmittag (Slot 14:00 / 15:00 UTC)
+    - cron: "2,17,32,47 17-19 * * *"   # abend      (Slot 18:00 / 19:00 UTC)
+    - cron: "0 7 * * 6"                # Samstag 9:00 Wien: Wochen-Quittung
   workflow_dispatch:       # Manueller Start (GitHub UI) und externer Trigger (cron-job.org)
     inputs:
       edition:
@@ -64,14 +68,15 @@ jobs:
         run: |
           mkdir -p data out
           # Auswahl-Reihenfolge:
-          #  1) Expliziter edition-Input (externer Trigger cron-job.org / manueller UI-Lauf):
-          #     benennt die Ausgabe direkt — unabhängig von der Uhrzeit, robust gegen
-          #     Trigger-Verspätung. Gegen erlaubte Menge per case validiert (kein Injection).
+          #  1) Expliziter edition-Input (manueller UI-Lauf / externer Trigger):
+          #     benennt die Ausgabe direkt — unabhängig von der Uhrzeit. Gegen
+          #     erlaubte Menge per case validiert (kein Injection).
           #  2) Interner Samstags-Cron → woche.
-          #  3) Sonst (interne Wiederhol-Crons, UI-Lauf ohne Input): Wall-Clock-Fallback,
-          #     damit selbst ein verspäteter Cron den AKTUELL richtigen Block trifft.
+          #  3) Sonst (interne Wiederhol-Crons, UI-Lauf ohne Input): `auto` wählt die
+          #     fällige Ausgabe aus der WIENER Uhrzeit (zeitzonensicher, mit Vorlauf),
+          #     nicht aus der UTC-Stunde. Vor dem Morgen-Fenster ist `auto` ein No-op.
           # Der Block-Guard in main.py liefert je Tag und Block nur einmal aus (idempotent),
-          # auch wenn externer Trigger und interner Cron beide feuern.
+          # auch wenn mehrere Crons feuern.
           EDITION="${{ github.event.inputs.edition }}"
           case "$EDITION" in
             morgen|mittag|nachmittag|abend|woche)
@@ -80,16 +85,7 @@ jobs:
               if [ "${{ github.event.schedule }}" = "0 7 * * 6" ]; then
                 python -m copilot.main woche
               else
-                HOUR=$(date -u +%H)
-                if [ "$HOUR" -le "08" ]; then
-                  python -m copilot.main morgen
-                elif [ "$HOUR" -le "13" ]; then
-                  python -m copilot.main mittag
-                elif [ "$HOUR" -le "17" ]; then
-                  python -m copilot.main nachmittag
-                else
-                  python -m copilot.main abend
-                fi
+                python -m copilot.main auto
               fi ;;
           esac
 
