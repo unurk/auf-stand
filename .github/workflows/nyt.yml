@@ -1,0 +1,82 @@
+name: NYT Briefing
+
+on:
+  schedule:
+    # Selbe Fenster wie die Presse-Ausgabe (Wien-Takt), robuste Mehrfach-Crons.
+    # Der Block-Guard in main.py stellt sicher, dass je Tag nur eine Ausgabe
+    # pro Block erscheint, auch wenn mehrere Cron-Läufe feuern.
+    - cron: "*/30 4-6 * * *"    # morgen     (~06:00 Wien)
+    - cron: "*/30 9-11 * * *"   # mittag     (~11:00 Wien)
+    - cron: "*/30 14-16 * * *"  # nachmittag (~16:00 Wien)
+    - cron: "*/30 18-20 * * *"  # abend      (~20:00 Wien)
+  workflow_dispatch:       # Manueller Start (GitHub UI) und externer Trigger (cron-job.org)
+    inputs:
+      edition:
+        description: "Welche Ausgabe? auto = nach Wall-Clock-Uhrzeit"
+        type: choice
+        default: auto
+        options: [auto, morgen, mittag, nachmittag, abend]
+
+jobs:
+  nyt:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: NYT-State wiederherstellen
+        uses: actions/cache@v4
+        with:
+          path: data/state.nyt.json
+          key: nyt-state-${{ github.run_id }}
+          restore-keys: nyt-state-
+
+      - name: NYT-Briefing erzeugen
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          mkdir -p data out
+          EDITION="${{ github.event.inputs.edition }}"
+          case "$EDITION" in
+            morgen|mittag|nachmittag|abend)
+              python -m copilot.main "$EDITION" --config config.nyt.yaml ;;
+            *)
+              HOUR=$(date -u +%H)
+              if [ "$HOUR" -le "08" ]; then
+                python -m copilot.main morgen --config config.nyt.yaml
+              elif [ "$HOUR" -le "13" ]; then
+                python -m copilot.main mittag --config config.nyt.yaml
+              elif [ "$HOUR" -le "17" ]; then
+                python -m copilot.main nachmittag --config config.nyt.yaml
+              else
+                python -m copilot.main abend --config config.nyt.yaml
+              fi ;;
+          esac
+
+      - name: NYT-State sichern
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/state.nyt.json
+          key: nyt-state-${{ github.run_id }}
+
+      - name: Fehler melden
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id=8962080832 \
+            -d text="❌ NYT Briefing: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"
