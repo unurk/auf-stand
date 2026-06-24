@@ -21,7 +21,6 @@ self.addEventListener('fetch', function(e){
   if(req.method !== 'GET') return;
   var url = new URL(req.url);
   if(url.origin !== self.location.origin){
-    // Fremd-Assets (Google Fonts): cache-first, lange haltbar.
     e.respondWith(caches.open(CACHE).then(function(c){
       return c.match(req).then(function(hit){
         return hit || fetch(req).then(function(res){
@@ -32,7 +31,6 @@ self.addEventListener('fetch', function(e){
     }));
     return;
   }
-  // Eigene Seiten: network-first, Cache als Offline-Fallback.
   e.respondWith(fetch(req).then(function(res){
     if(res && res.ok){
       var copy = res.clone();
@@ -46,7 +44,6 @@ self.addEventListener('fetch', function(e){
   }));
 });
 
-// Web-Push: Notification anzeigen und bei Klick die PWA öffnen.
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}

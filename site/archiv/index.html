@@ -360,7 +360,7 @@
     .as-card-check {
       width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15s;
+      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15px;
     }
     .as-toggle-card.selected .as-card-check {
       background: var(--accent); border-color: var(--accent); color: #fff;
@@ -400,6 +400,11 @@
       cursor: pointer; margin-top: 20px; display: inline-block; background: none;
       border: none; padding: 0;
     }
+    /* ── Cross-link chip ── */
+    .crosslink {
+      font: 400 12px var(--sans); color: var(--muted);
+      padding: 12px 22px 0; display: block;
+    }
   </style>
 </head>
 <body>
@@ -415,46 +420,46 @@
 <div class="wrap">
 <h1>Archiv</h1>
 <div class="archiv-grid">
-<a class="archiv-card" href="2026-06-24-morgen.html"><span class="archiv-date">Mi 24. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-23-abend.html"><span class="archiv-date">Di 23. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-23-nachmittag.html"><span class="archiv-date">Di 23. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-23-mittag.html"><span class="archiv-date">Di 23. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-23-morgen.html"><span class="archiv-date">Di 23. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-22-abend.html"><span class="archiv-date">Mo 22. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-22-nachmittag.html"><span class="archiv-date">Mo 22. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-22-mittag.html"><span class="archiv-date">Mo 22. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-22-morgen.html"><span class="archiv-date">Mo 22. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-21-abend.html"><span class="archiv-date">So 21. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-21-nachmittag.html"><span class="archiv-date">So 21. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-21-mittag.html"><span class="archiv-date">So 21. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-21-morgen.html"><span class="archiv-date">So 21. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-20-abend.html"><span class="archiv-date">Sa 20. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-20-nachmittag.html"><span class="archiv-date">Sa 20. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-20-mittag.html"><span class="archiv-date">Sa 20. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-20-morgen.html"><span class="archiv-date">Sa 20. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-19-abend.html"><span class="archiv-date">Fr 19. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-19-nachmittag.html"><span class="archiv-date">Fr 19. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-19-mittag.html"><span class="archiv-date">Fr 19. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-19-morgen.html"><span class="archiv-date">Fr 19. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-18-abend.html"><span class="archiv-date">Do 18. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-18-nachmittag.html"><span class="archiv-date">Do 18. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-18-mittag.html"><span class="archiv-date">Do 18. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-18-morgen.html"><span class="archiv-date">Do 18. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-17-abend.html"><span class="archiv-date">Mi 17. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-17-nachmittag.html"><span class="archiv-date">Mi 17. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-17-mittag.html"><span class="archiv-date">Mi 17. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-17-morgen.html"><span class="archiv-date">Mi 17. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-16-abend.html"><span class="archiv-date">Di 16. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-16-nachmittag.html"><span class="archiv-date">Di 16. Jun · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-16-mittag.html"><span class="archiv-date">Di 16. Jun · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-16-morgen.html"><span class="archiv-date">Di 16. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-15-abend.html"><span class="archiv-date">Mo 15. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-15-morgen.html"><span class="archiv-date">Mo 15. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-14-abend.html"><span class="archiv-date">So 14. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-14-morgen.html"><span class="archiv-date">So 14. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-13-abend.html"><span class="archiv-date">Sa 13. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-13-morgen.html"><span class="archiv-date">Sa 13. Jun · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
-<a class="archiv-card" href="2026-06-12-abend.html"><span class="archiv-date">Fr 12. Jun · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-24-morgen.html"><span class="archiv-date">Mittwoch 24. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-23-abend.html"><span class="archiv-date">Dienstag 23. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-23-nachmittag.html"><span class="archiv-date">Dienstag 23. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-23-mittag.html"><span class="archiv-date">Dienstag 23. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-23-morgen.html"><span class="archiv-date">Dienstag 23. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-22-abend.html"><span class="archiv-date">Montag 22. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-22-nachmittag.html"><span class="archiv-date">Montag 22. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-22-mittag.html"><span class="archiv-date">Montag 22. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-22-morgen.html"><span class="archiv-date">Montag 22. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-21-abend.html"><span class="archiv-date">Sonntag 21. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-21-nachmittag.html"><span class="archiv-date">Sonntag 21. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-21-mittag.html"><span class="archiv-date">Sonntag 21. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-21-morgen.html"><span class="archiv-date">Sonntag 21. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-20-abend.html"><span class="archiv-date">Samstag 20. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-20-nachmittag.html"><span class="archiv-date">Samstag 20. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-20-mittag.html"><span class="archiv-date">Samstag 20. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-20-morgen.html"><span class="archiv-date">Samstag 20. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-19-abend.html"><span class="archiv-date">Freitag 19. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-19-nachmittag.html"><span class="archiv-date">Freitag 19. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-19-mittag.html"><span class="archiv-date">Freitag 19. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-19-morgen.html"><span class="archiv-date">Freitag 19. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-18-abend.html"><span class="archiv-date">Donnerstag 18. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-18-nachmittag.html"><span class="archiv-date">Donnerstag 18. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-18-mittag.html"><span class="archiv-date">Donnerstag 18. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-18-morgen.html"><span class="archiv-date">Donnerstag 18. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-17-abend.html"><span class="archiv-date">Mittwoch 17. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-17-nachmittag.html"><span class="archiv-date">Mittwoch 17. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-17-mittag.html"><span class="archiv-date">Mittwoch 17. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-17-morgen.html"><span class="archiv-date">Mittwoch 17. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-16-abend.html"><span class="archiv-date">Dienstag 16. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-16-nachmittag.html"><span class="archiv-date">Dienstag 16. Juni · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-16-mittag.html"><span class="archiv-date">Dienstag 16. Juni · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-16-morgen.html"><span class="archiv-date">Dienstag 16. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-15-abend.html"><span class="archiv-date">Montag 15. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-15-morgen.html"><span class="archiv-date">Montag 15. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-14-abend.html"><span class="archiv-date">Sonntag 14. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-14-morgen.html"><span class="archiv-date">Sonntag 14. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-13-abend.html"><span class="archiv-date">Samstag 13. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-13-morgen.html"><span class="archiv-date">Samstag 13. Juni · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
+<a class="archiv-card" href="2026-06-12-abend.html"><span class="archiv-date">Freitag 12. Juni · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
 </div>
 </div>
 </div>
@@ -463,6 +468,7 @@
   <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
   <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
+  <a href="../nyt/" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3c-2 3-2 15 0 18"/><path d="M12 3c2 3 2 15 0 18"/></svg><span>NYT</span></a>
 </nav>
 </div>
 <script>

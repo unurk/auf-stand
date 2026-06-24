@@ -360,7 +360,7 @@
     .as-card-check {
       width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15s;
+      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15px;
     }
     .as-toggle-card.selected .as-card-check {
       background: var(--accent); border-color: var(--accent); color: #fff;
@@ -399,6 +399,11 @@
       font: 400 12px var(--sans); color: var(--muted); text-decoration: underline;
       cursor: pointer; margin-top: 20px; display: inline-block; background: none;
       border: none; padding: 0;
+    }
+    /* ── Cross-link chip ── */
+    .crosslink {
+      font: 400 12px var(--sans); color: var(--muted);
+      padding: 12px 22px 0; display: block;
     }
   </style>
 </head>
@@ -523,7 +528,6 @@ function updateCount(){
   document.getElementById('as-count').textContent=selected.size+customTopics.length+' ausgewählt';
 }
 
-// Init: Lade gespeicherte Präferenzen
 try{
   var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
   customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
@@ -532,12 +536,10 @@ try{
 }catch(e){show('as-intro');}
 
 window.asOpen=function(){
-  // Lade bisherige Auswahl in Set
   try{
     var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
     selected=new Set(saved||[]);
   }catch(e){selected=new Set();}
-  // Karten-Zustand setzen
   document.querySelectorAll('.as-toggle-card').forEach(function(el){
     if(selected.has(el.dataset.name))el.classList.add('selected');
     else el.classList.remove('selected');
@@ -561,7 +563,6 @@ window.asAddCustom=function(){
   customTopics.push({name:name,kw:kw});
   localStorage.setItem(CUSTOM_KEY,JSON.stringify(customTopics));
   selected.add(name);
-  // Neue Toggle-Karte einfügen
   var cards=document.getElementById('as-cards');
   var section=cards.querySelector('.as-custom-section');
   var div=document.createElement('div');
@@ -578,7 +579,6 @@ window.asAddCustom=function(){
 window.asConfirm=function(){
   var prefs=Array.from(selected);
   localStorage.setItem(PREF_KEY,JSON.stringify(prefs));
-  // Telegram-Befehle zusammenstellen
   var kws=prefs.map(function(n){
     var t=TOPICS.find(function(t){return t.name===n;});
     return t?t.kw:null;
@@ -630,7 +630,7 @@ window.asReset=function(){
 (function(){
   var section=document.getElementById('push-section');
   if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.VAPID_PUBLIC_KEY){
-    return;  // Push nicht unterstützt oder kein Schlüssel — Block bleibt verborgen.
+    return;
   }
   section.style.display='';
 
@@ -679,6 +679,7 @@ window.asReset=function(){
   <a href="dossier.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Themen</span></a>
   <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>E-Paper</span></a>
+  <a href="nyt/" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3c-2 3-2 15 0 18"/><path d="M12 3c2 3 2 15 0 18"/></svg><span>NYT</span></a>
 </nav>
 </div>
 <script>
