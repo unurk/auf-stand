@@ -678,7 +678,7 @@ _NYT_PAGE_TEMPLATE = (
     )
     .replace(
         "<a href=\"__ROOT__nyt/\" class=\"tab\">__ICON_NYT__<span>NYT</span></a>",
-        "<a href=\"../\" class=\"tab\">__ICON_PRESSE__<span>Presse</span></a>"
+        "<a href=\"__ROOT__../\" class=\"tab\">__ICON_PRESSE__<span>Presse</span></a>"
     )
     # JS timeline: German → English countdown strings
     .replace("if(mins<1) return 'gleich';", "if(mins<1) return 'now';")
