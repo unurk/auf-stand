@@ -11,9 +11,12 @@ permissions:
   pages: write
   id-token: write
 
+# Geteilt mit lagebild.yml und nyt.yml: nur EIN aktives github-pages-Deployment.
+# cancel-in-progress: false, damit ein Menschen-Push hier keinen laufenden
+# Editions-Deploy abbricht — alle drei Workflows serialisieren konsistent.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:

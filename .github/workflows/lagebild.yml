@@ -25,6 +25,16 @@ on:
         default: auto
         options: [auto, morgen, mittag, nachmittag, abend, woche]
 
+# GitHub Pages erlaubt nur EIN aktives Deployment pro Environment. lagebild.yml,
+# nyt.yml und pages.yml teilen sich daher dieselbe Concurrency-Gruppe: der zweite
+# Lauf wartet, statt zu kollidieren (sonst „deployment_queued"-Timeout bzw. HTTP 400
+# „in progress deployment"). cancel-in-progress: false bricht laufende Produktions-
+# Läufe nie ab; ein verdrängter wartender Lauf wird vom nächsten Deploy (das die
+# ganze site/ publiziert) ohnehin nachgeholt.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   lagebild:
     runs-on: ubuntu-latest

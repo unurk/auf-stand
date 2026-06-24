@@ -8,10 +8,13 @@ on:
     # bewusst NICHT auf :00 (GitHubs Top-of-Hour-Stau meiden). Fenster decken
     # Sommer- wie Winterzeit ab; die genaue Ausgabe wählt `auto` aus der Wiener
     # Uhrzeit. Der Block-Guard in main.py liefert je Tag und Block nur einmal aus.
-    - cron: "2,17,32,47 3-5 * * *"     # morgen     (Slot 04:00 Sommer / 05:00 Winter UTC)
-    - cron: "2,17,32,47 8-10 * * *"    # mittag     (Slot 09:00 / 10:00 UTC)
-    - cron: "2,17,32,47 13-15 * * *"   # nachmittag (Slot 14:00 / 15:00 UTC)
-    - cron: "2,17,32,47 17-19 * * *"   # abend      (Slot 18:00 / 19:00 UTC)
+    # Minuten gegen die Presse versetzt (lagebild.yml: 2,17,32,47), damit beide
+    # Workflows selten gleichzeitig starten und die Pages-Concurrency-Gruppe sauber
+    # nacheinander durchlaufen (weniger Warte-/Verdrängungs-Churn).
+    - cron: "9,24,39,54 3-5 * * *"     # morgen     (Slot 04:00 Sommer / 05:00 Winter UTC)
+    - cron: "9,24,39,54 8-10 * * *"    # mittag     (Slot 09:00 / 10:00 UTC)
+    - cron: "9,24,39,54 13-15 * * *"   # nachmittag (Slot 14:00 / 15:00 UTC)
+    - cron: "9,24,39,54 17-19 * * *"   # abend      (Slot 18:00 / 19:00 UTC)
   workflow_dispatch:       # Manueller Start (GitHub UI) und externer Trigger (cron-job.org)
     inputs:
       edition:
@@ -19,6 +22,12 @@ on:
         type: choice
         default: auto
         options: [auto, morgen, mittag, nachmittag, abend]
+
+# Teilt sich mit lagebild.yml und pages.yml dieselbe Pages-Deploy-Gruppe (nur EIN
+# aktives github-pages-Deployment möglich; sonst HTTP 400 „in progress deployment").
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   nyt:
