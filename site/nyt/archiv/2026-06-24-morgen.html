@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../push-config.js"></script>
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Copilot">
+  <meta name="application-name" content="Copilot">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Wednesday, June 24 · Morning Briefing · NYT Briefing</title>
+  <style>
+    /* Copilot · Die Presse — Richtung C „Briefing-Timeline" (Light, Presse-Stil)
+       Schriften: Newsreader (editoriale Serif für Schlagzeilen), Archivo (UI + Text).
+       Akzent: tiefes Redaktions-Blau #2d4f9e als sparsamer Akzent; klares Weiß,
+       Haarlinien statt verspielter Karten; Streak in Bernstein. */
+    :root {
+      --bg: #ffffff; --surface: #ffffff; --surface-tint: #f6f7f9;
+      --border: rgba(0,0,0,.10); --border-soft: rgba(0,0,0,.07);
+      --card-border: rgba(0,0,0,.06);
+      --text: #16233a; --text-alt: #1c2b3d; --text-body: #22304a;
+      --fg: #566173; --muted: #6a7382; --dim: #97a0ab;
+      --accent: #2d4f9e; --accent-soft: rgba(45,79,158,.10);
+      --accent-shadow: rgba(45,79,158,.45);
+      --streak: #c8791b; --streak-text: #a8650f;
+      --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+      --sans: 'Archivo', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: -webkit-fill-available; }
+    body {
+      background: #e7e5df; color: var(--text); font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column;
+      height: 100vh; height: -webkit-fill-available; overflow: hidden;
+    }
+    /* ── App-Shell (zentrierte Handy-Säule) ── */
+    .app {
+      position: relative;
+      max-width: 430px; width: 100%; margin: 0 auto; background: var(--bg);
+      display: flex; flex-direction: column;
+      height: 100vh; height: -webkit-fill-available; overflow: hidden;
+    }
+    /* ── Scroll-Bereich ── */
+    .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    /* ── Topbar (Masthead im Presse-Stil) ── */
+    .topbar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .brandrow {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 22px 12px;
+    }
+    .wordmark-text {
+      font-family: var(--serif); font-weight: 600; font-size: 23px;
+      letter-spacing: .2px; color: var(--text-alt);
+    }
+    .copilot-pill {
+      display: inline-flex; align-items: center; padding: 5px 12px;
+      border-radius: 20px; font: 700 10px var(--sans);
+      letter-spacing: .14em; text-transform: uppercase;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .progress-track { height: 2px; background: var(--surface-tint); }
+    .progress-bar {
+      height: 100%; border-radius: 0 2px 2px 0;
+      background: var(--accent); width: 0; transition: width .12s linear;
+    }
+    /* ── Masthead ausblenden (Topbar übernimmt) ── */
+    .masthead { display: none; }
+    /* ── Layout (Platz unten für die schwebende Tableiste) ── */
+    .wrap { padding: 4px 0 116px; }
+    /* ── Typografie ── */
+    h1 {
+      font-family: var(--serif); font-size: 2.5rem; line-height: 1.0;
+      margin: 0 0 12px; font-weight: 500; color: var(--text); letter-spacing: -.5px;
+    }
+    h2 {
+      font-family: var(--serif); font-size: 1.5rem; line-height: 1.14;
+      margin: 0 0 10px; font-weight: 500; color: var(--text); letter-spacing: -.3px;
+    }
+    p { margin: 0 0 13px; color: var(--fg); font-size: 15px; line-height: 1.6; }
+    strong {
+      font-family: var(--sans); font-size: 11px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); font-weight: 700;
+    }
+    em { font-style: italic; color: var(--muted); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+    /* ── Lagebild-Kopf (randlos, editorial) ── */
+    .lagebild-header {
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 24px 22px 0; margin: 0;
+    }
+    .kicker {
+      font: 700 11.5px var(--sans); letter-spacing: .16em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 14px;
+    }
+    .lagebild-header h1 { margin: 0; }
+    .next-edition { font: 400 13px var(--sans); color: var(--muted); margin: 12px 0 0; }
+    /* ── Byline (Rule darüber, wie im Presse-Feed) ── */
+    .byline {
+      font: 400 14px var(--sans); color: var(--muted);
+      padding-top: 16px; border-top: 1px solid var(--border); margin: 20px 0 0;
+    }
+    /* ── Streak (Bernstein-Akzent) ── */
+    .streak {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 700 12px var(--sans); color: var(--streak-text);
+      background: rgba(200,121,27,.12); border: 1px solid rgba(200,121,27,.25);
+      border-radius: 20px; padding: 5px 12px; margin: 12px 0 0;
+    }
+    /* ── Briefing-Timeline (Richtung C: der Kuratierungs-Takt als Held) ── */
+    .timeline {
+      background: var(--surface-tint); border-radius: 18px;
+      padding: 18px 20px 16px; margin: 22px 0 6px;
+    }
+    .tl-label {
+      font: 700 11px var(--sans); letter-spacing: .16em; text-transform: uppercase;
+      color: var(--dim); margin: 0 0 18px;
+    }
+    .tl-track {
+      position: relative; display: flex; justify-content: space-between;
+      align-items: center; margin: 0 8px;
+    }
+    .tl-track::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 50%;
+      height: 2px; background: var(--border); transform: translateY(-50%);
+    }
+    .tl-fill {
+      position: absolute; left: 0; top: 50%; height: 2px;
+      background: var(--accent); transform: translateY(-50%);
+      transition: width .4s ease;
+    }
+    .tl-node {
+      position: relative; z-index: 1; width: 26px; height: 26px;
+      border-radius: 50%; background: #fff; border: 2px solid var(--border);
+      color: var(--dim); font: 700 10.5px var(--sans);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tl-node.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .tl-node.now {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 0 0 6px var(--accent-soft); transform: scale(1.14);
+    }
+    .tl-caption { font: 400 13px var(--sans); color: var(--muted); margin: 18px 0 0; text-align: center; }
+    .tl-caption b { color: var(--accent); font-weight: 700; }
+    /* ── Audio-Player (Inset) ── */
+    .audio-player {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 14px 16px; margin: 6px 22px; box-shadow: none;
+    }
+    .audio-player .audio-label {
+      display: block; font: 700 11px var(--sans); letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .audio-player audio { width: 100%; height: 40px; }
+    /* ── „Heute wichtig" als nummerierte editoriale Liste (Richtung C) ── */
+    .highlights {
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 28px 22px 0; margin: 0; counter-reset: hl;
+    }
+    /* Label-Zeile („Heute wichtig:") als dezentes Sektions-Label + Rule darunter */
+    .highlights p:has(strong) {
+      margin: 0; padding: 0 0 4px; border-bottom: 1px solid var(--border);
+    }
+    .highlights p:has(strong) strong {
+      display: block; color: var(--dim); font-size: 11.5px; letter-spacing: .16em;
+    }
+    /* Eintragszeilen: blaue 01/02/03 + Serif-Schlagzeile, Haarlinien dazwischen */
+    .highlights p:not(:has(strong)) {
+      counter-increment: hl; position: relative;
+      margin: 0; padding: 16px 0 16px 34px;
+      border-bottom: 1px solid var(--border-soft);
+      font-family: var(--serif); font-size: 18px; line-height: 1.3; color: var(--text-body);
+    }
+    .highlights p:not(:has(strong))::before {
+      content: counter(hl, decimal-leading-zero);
+      position: absolute; left: 0; top: 18px;
+      font: 700 12px var(--sans); color: var(--accent); letter-spacing: .5px;
+    }
+    .highlights p:not(:has(strong)):last-child { border-bottom: none; }
+    /* ── Story-Sektionen (randlos, durch Haarlinien getrennt — Presse-Feed) ── */
+    .story-card {
+      background: transparent; border-radius: 0; box-shadow: none;
+      padding: 24px 22px 8px; margin: 0; border-top: 1px solid var(--border);
+    }
+    /* Fallback: h2 außerhalb story-card (dossier/archiv) */
+    h2 { margin: 28px 0 10px; }
+    /* ── Accordion (Story-Sektionen) ── */
+    .story-head {
+      display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; padding: 0 0 12px;
+    }
+    .story-head h2 { flex: 1; margin: 0; padding: 0; }
+    .story-head .chev {
+      flex: none; width: 27px; height: 27px; border-radius: 50%;
+      background: var(--surface-tint); color: var(--dim);
+      font-family: var(--serif); font-size: 17px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .story-body { max-height: 0; opacity: 0; overflow: hidden;
+      transition: max-height .3s ease, opacity .2s ease; }
+    .story-card.open .story-body { max-height: 2000px; opacity: 1;
+      transition: max-height .45s ease, opacity .35s ease; }
+    .story-body p { color: var(--fg); }
+    /* ── „Was ist neu / Warum es zählt" als WARUM-Mikrozeile (Richtung C) ── */
+    .story-body p > strong:first-child {
+      display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: .14em;
+    }
+    /* ── Ressort-Tag ── */
+    .ressort {
+      display: inline-block; background: var(--accent-soft); color: var(--accent);
+      border-radius: 999px; padding: 3px 10px; font: 600 10.5px var(--sans);
+      letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-right: 6px;
+    }
+    /* ── Quell-Link als Pill ── */
+    .source-link {
+      display: inline-block; background: var(--accent); color: #fff;
+      border-radius: 999px; padding: 6px 16px; font: 600 12px var(--sans);
+      letter-spacing: .03em; text-decoration: none; margin-top: 4px;
+      transition: filter .15s;
+    }
+    .source-link:hover { filter: brightness(.9); text-decoration: none; }
+    .byline-source { font: italic 12px var(--sans); color: var(--muted); white-space: nowrap; }
+    .reporters {
+      font: 400 13px var(--sans); color: var(--muted);
+      margin: 6px 22px 0; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    /* ── Done-Box („Du bist informiert ✓") ── */
+    .done {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 16px 18px; margin: 18px 22px 6px; box-shadow: none;
+      font: 600 13px var(--sans); color: #1f7a52;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .done-check {
+      width: 20px; height: 20px; border-radius: 50%; background: #1f7a52;
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    /* ── Deine-Themen Karte (kein Accordion) ── */
+    .topic-summary-head {
+      font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    .story-card:has(.topic-summary-head) .story-head { cursor: default; }
+    /* ── Archiv ── */
+    .archiv-grid {
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 8px 16px 0;
+    }
+    .archiv-card {
+      display: block; background: var(--surface); border-radius: 16px;
+      padding: 15px 18px; box-shadow: 0 1px 3px rgba(22,32,43,.05);
+      border: 1px solid var(--card-border); transition: border-color .15s;
+    }
+    .archiv-card:hover { border-color: var(--accent); text-decoration: none; }
+    .archiv-date { display: block; font: 600 14px var(--sans); color: var(--text); margin-bottom: 3px; }
+    .archiv-label { display: block; font: 400 12px var(--sans); color: var(--muted); }
+    /* ── Dossier / Themen ── */
+    .dossier-topic {
+      background: var(--surface); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 18px 20px;
+      margin: 8px 16px; box-shadow: 0 1px 3px rgba(22,32,43,.05);
+    }
+    .dossier-topic h2 {
+      margin: 0 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px;
+    }
+    .dossier-entries { list-style: none; padding: 0; margin: 0; }
+    .dossier-entries li {
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+      display: flex; gap: 12px; align-items: baseline; font-size: 14px; color: var(--fg);
+    }
+    .dossier-entries li:last-child { border-bottom: none; }
+    .dossier-date { font: 600 12px var(--sans); color: var(--accent); white-space: nowrap; min-width: 68px; }
+    .empty-state {
+      color: var(--muted); font-style: italic; padding: 32px 16px;
+      text-align: center; font: 400 15px var(--sans);
+    }
+    /* ── Tab-Leiste (schwebende Pille — wie in der Presse-App) ── */
+    .tabbar {
+      position: absolute; left: 14px; right: 14px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      height: 66px; border-radius: 30px; z-index: 30;
+      background: rgba(255,255,255,.82);
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 24px -8px rgba(0,0,0,.18);
+      display: flex; padding: 0 6px;
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; color: #8a929e;
+      font: 600 10px var(--sans); letter-spacing: .04em; text-transform: uppercase;
+      transition: color .15s;
+    }
+    .tab:hover { color: var(--text); text-decoration: none; }
+    .tab svg { width: 22px; height: 22px; }
+    .tab.active { color: var(--accent); font-weight: 700; }
+    /* ── Artikel-Feedback ── */
+    .article-fb { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
+    .fb-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--surface-tint); border: 1px solid var(--card-border); border-radius: 999px;
+      padding: 8px 16px; font: 600 12px var(--sans); cursor: pointer;
+      color: var(--muted); transition: all .15s; line-height: 1;
+    }
+    .fb-btn:hover { filter: brightness(.97); }
+    .fb-btn.active[data-vote="up"] {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 12px -4px var(--accent-shadow);
+    }
+    .fb-btn.active[data-vote="down"] { background: #28303a; color: #fff; }
+    /* ── Themen-Reiter ── */
+    .schlagwort-badge {
+      display: inline-block; font: 600 11px var(--sans); color: var(--accent);
+      background: var(--accent-soft); border-radius: 999px;
+      padding: 2px 8px; margin-left: 8px; vertical-align: middle; letter-spacing: .03em;
+    }
+    .dossier-empty { color: var(--muted); font-style: italic; font: 400 13px var(--sans); padding: 6px 0; }
+    .topic-stand { font: italic 13px var(--sans); color: var(--muted); margin: 4px 0 10px; }
+    .topic-articles { list-style: none; padding: 0; margin: 0; }
+    .topic-article { padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .topic-article:last-child { border-bottom: none; }
+    .topic-article a {
+      color: var(--fg); text-decoration: none; display: flex;
+      justify-content: space-between; align-items: baseline; gap: 10px;
+    }
+    .topic-article-title { flex: 1; font-size: 14px; line-height: 1.4; }
+    .topic-article-date { font: 400 12px var(--sans); color: var(--muted); white-space: nowrap; }
+    /* ── Assessment v2 (Toggle-Karten) ── */
+    .as-intro-text { font: 400 15px var(--sans); color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+    .as-btn-primary {
+      background: var(--accent); color: #fff; font-weight: 600; border-radius: 999px;
+      padding: 13px 28px; font-size: 15px; cursor: pointer; font-family: var(--sans);
+      border: none; display: inline-block; transition: filter .15s;
+    }
+    .as-btn-primary:hover { filter: brightness(.93); }
+    .as-toggle-card {
+      display: flex; gap: 14px; align-items: flex-start; padding: 14px;
+      border: 1.5px solid var(--border); border-radius: 14px; margin: 8px 0;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      user-select: none; background: var(--surface);
+    }
+    .as-toggle-card.selected {
+      border-color: rgba(45,79,158,.35); background: var(--accent-soft);
+    }
+    .as-card-check {
+      width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15px;
+    }
+    .as-toggle-card.selected .as-card-check {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
+    .as-card-name { font: 600 14.5px var(--sans); margin-bottom: 3px; line-height: 1.3; }
+    .as-card-q { font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.42; margin-top: 5px; }
+    .as-custom-section { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 12px; }
+    .as-custom-inputs { display: flex; gap: 8px; margin: 10px 0 12px; flex-wrap: wrap; }
+    .as-custom-input {
+      flex: 1; min-width: 130px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; color: var(--fg); font: 400 14px var(--sans); outline: none;
+    }
+    .as-custom-input:focus { border-color: var(--accent); }
+    .as-add-btn {
+      background: none; border: 1px solid var(--border); border-radius: 999px;
+      padding: 10px 18px; color: var(--fg); font: 400 14px var(--sans);
+      cursor: pointer; white-space: nowrap; transition: border-color .15s;
+    }
+    .as-add-btn:hover { border-color: var(--accent); }
+    .as-confirm-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);
+    }
+    .as-cmd-box {
+      background: var(--surface-tint); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; margin: 10px 0 16px; font-family: monospace; font-size: 13px;
+      color: var(--accent); white-space: pre-wrap; line-height: 1.7;
+    }
+    .tg-copy-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 12px; font: 400 12px var(--sans); color: var(--muted);
+      cursor: pointer; margin-left: 8px;
+    }
+    .reset-link {
+      font: 400 12px var(--sans); color: var(--muted); text-decoration: underline;
+      cursor: pointer; margin-top: 20px; display: inline-block; background: none;
+      border: none; padding: 0;
+    }
+    /* ── Cross-link chip ── */
+    .crosslink {
+      font: 400 12px var(--sans); color: var(--muted);
+      padding: 12px 22px 0; display: block;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <div class="brandrow">
+    <div class="wordmark-text">New York Times</div>
+    <div class="copilot-pill">Copilot</div>
+  </div>
+  <div class="progress-track"><div class="progress-bar" id="__pb"></div></div>
+</div>
+<div class="scroll-area" id="__sa">
+<div class="wrap">
+<header class="lagebild-header"><p class="kicker">Wednesday, June 24, 2026 · Morning Briefing</p><h1>Good morning. Let's go.</h1><p class="byline">By the New York Times briefing desk · ca. 3 min.</p></header><div class="highlights"><p><strong>Today&#x27;s headlines:</strong></p>
+  <p>1️⃣ Congress clears housing bill in rare bipartisan win</p>
+  <p>2️⃣ Federal judge bars ICE from making arrests in immigration courts</p>
+  <p>3️⃣ Tech stocks lead global market sell-off; Nasdaq down 2.2%</p>
+  <p>4️⃣ Trump&#x27;s Iran negotiation claims face contradictions from Tehran</p>
+  <p>5️⃣ N.S.A. loses access to Anthropic&#x27;s A.I. model amid dispute</p>
+  </div><hr>
+  <h2>Congress Clears Housing Bill in Rare Bipartisan Achievement</h2>
+  <p><strong>What&#x27;s new:</strong> The House voted decisively to pass a bipartisan housing bill that now heads to President Trump&#x27;s desk for signature. The measure survived multiple near-fatal obstacles during lengthy negotiations between Democrats and Republicans, making it a conspicuous success in an otherwise polarized Congress.</p>
+  <p><strong>Why it matters:</strong> Housing affordability remains a top concern for working professionals and families. This bill represents a functional legislative process at a moment when bipartisan agreement is rare, signaling that Congress can still produce results on bread-and-butter issues that affect your housing costs and market access. The measure&#x27;s passage demonstrates that compromise is still possible on domestic priorities.</p>
+  <p><strong>What&#x27;s next:</strong> Trump&#x27;s signature is expected; the bill will then move to implementation. <span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Ronda Kaysen</span> <a class="source-link" href="https://www.nytimes.com/2026/06/23/us/politics/congress-housing-bill.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-06-24|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+  <h2>Federal Judge Blocks ICE Arrests Inside Immigration Courts Nationwide</h2>
+  <p><strong>What&#x27;s new:</strong> A federal judge in California issued a ruling in a class-action lawsuit that bars Immigration and Customs Enforcement from making arrests inside immigration courts. The decision applies to all immigration courts across the country.</p>
+  <p><strong>Why it matters:</strong> This reshapes enforcement procedures for undocumented immigrants and affects how the immigration system operates. If you work in immigration law, manage immigrant employees, or have family in removal proceedings, this changes the legal landscape significantly by protecting people during their court appearances. <span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Jazmine Ulloa and Luis Ferré-Sadurní</span> <a class="source-link" href="https://www.nytimes.com/2026/06/23/us/ice-arrests-immigration-courts-california.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-06-24|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+  <h2>Tech Stocks Lead Global Market Sell-Off</h2>
+  <p><strong>What&#x27;s new:</strong> Markets recoiled globally, with the Nasdaq in the U.S. falling 2.2 percent. Chip makers led declines in Asia, where South Korea&#x27;s main index plunged 10.5 percent. The sell-off underscores volatility in tech and A.I.-related equities.</p>
+  <p><strong>Why it matters:</strong> If you hold tech stocks or have retirement savings in diversified portfolios, this signals renewed concern about valuations in the sector that has driven recent gains. (Business · By: Daisuke Wakabayashi, Jason Karaian and Aruni Soni) <a class="source-link" href="https://www.nytimes.com/2026/06/23/business/stock-market-down-tech-ai-asia-sp500-oil-gas.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-06-24|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+  <h2>Trump and Iran Offer Conflicting Accounts of Nuclear Talks</h2>
+  <p>Trump claimed Iran agreed to &quot;highest level&quot; inspections; Iranian officials immediately contradicted him, saying there were &quot;no detailed discussions on the nuclear issue.&quot; The pattern of clashing narratives raises questions about whether the negotiation framework will hold. <span class="ressort" style="--h:265">World</span> <span class="byline-source">By: The New York Times</span> <a class="source-link" href="https://www.nytimes.com/live/2026/06/23/world/iran-us-trump-lebanon">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-06-24|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+  <h2>N.S.A. Lost Access to Anthropic&#x27;s Advanced A.I. Model</h2>
+  <p>The Trump administration, increasingly reliant on advanced A.I. systems for cybersecurity, lost access to a powerful tool from Anthropic amid an ongoing dispute with the leading U.S. A.I. developer. The episode highlights tension between the administration&#x27;s security needs and its conflict with major tech firms. <span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Dustin Volz and Julian E. Barnes</span> <a class="source-link" href="https://www.nytimes.com/2026/06/23/us/politics/nsa-lost-access-anthropic-tool.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-06-24|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+  <p class="reporters">Today&#x27;s reporting by: Ronda Kaysen, Jazmine Ulloa and Luis Ferré-Sadurní, Daisuke Wakabayashi, Jason Karaian and Aruni Soni, The New York Times and Dustin Volz and Julian E. Barnes · The New York Times</p>
+  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — reading time ca. 180 seconds. Next briefing: today at 11:00.</div>
+  <hr>
+</div>
+</div>
+<nav class="tabbar">
+  <a href="../index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Briefing</span></a>
+  <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Topics</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archive</span></a>
+  <a href="https://www.nytimes.com/section/todayspaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>Today's Paper</span></a>
+</nav>
+</div>
+<script>
+(function(){
+  // Lesefortschritts-Balken
+  var sa=document.getElementById('__sa'), pb=document.getElementById('__pb');
+  if(sa&&pb){
+    sa.addEventListener('scroll',function(){
+      var max=sa.scrollHeight-sa.clientHeight;
+      pb.style.width=(max>0?Math.round(sa.scrollTop/max*100):0)+'%';
+    },{passive:true});
+  }
+  // Briefing-Timeline live an die echte Wiener Uhrzeit koppeln: aktiver Knoten
+  // + mitlaufender Countdown zur nächsten Ausgabe (06/11/16/20). Die im Build
+  // erzeugte Version ist der No-JS-Fallback; hier wird sie zur Laufzeit aktuell.
+  (function(){
+    var tl=document.querySelector('.timeline');
+    if(!tl) return;
+    var fill=tl.querySelector('.tl-fill');
+    var nodes=tl.querySelectorAll('.tl-node');
+    var cap=tl.querySelector('.tl-caption');
+    var SLOTS=[6,11,16,20];
+    function viennaNow(){
+      try{
+        var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Vienna',hour12:false,
+          hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(new Date());
+        var h=0,m=0,s=0;
+        p.forEach(function(x){ if(x.type==='hour')h=+x.value;
+          else if(x.type==='minute')m=+x.value; else if(x.type==='second')s=+x.value; });
+        return (h%24)*60+m+s/60;
+      }catch(e){ var d=new Date(); return d.getHours()*60+d.getMinutes()+d.getSeconds()/60; }
+    }
+    function fmtDur(mins){
+      mins=Math.max(0,Math.ceil(mins));
+      if(mins<1) return 'now';
+      var h=Math.floor(mins/60), m=mins%60;
+      if(h>0) return 'in '+h+' hr'+(h>1?'s':'')+(m>0?' '+m+' min':'');
+      return 'in '+m+' min';
+    }
+    function pad(n){ return (n<10?'0':'')+n; }
+    function update(){
+      var now=viennaNow(), cur=-1, i;
+      for(i=0;i<SLOTS.length;i++){ if(now>=SLOTS[i]*60) cur=i; }
+      var nextIdx, when, until, prog;
+      if(cur===-1){ nextIdx=0; when='today'; until=SLOTS[0]*60-now; prog=0; }
+      else if(cur===SLOTS.length-1){ nextIdx=0; when='tomorrow'; until=(24*60-now)+SLOTS[0]*60; prog=1; }
+      else { nextIdx=cur+1; when='today'; until=SLOTS[nextIdx]*60-now;
+        prog=(cur+(now-SLOTS[cur]*60)/(SLOTS[nextIdx]*60-SLOTS[cur]*60))/(SLOTS.length-1); }
+      for(i=0;i<nodes.length;i++){
+        nodes[i].className='tl-node'+(i<cur?' done':(i===cur?' now':''));
+      }
+      if(fill) fill.style.width=Math.round(Math.max(0,Math.min(1,prog))*100)+'%';
+      if(cap) cap.innerHTML='Next update <b>'+fmtDur(until)+'</b> · '
+        +when+' at '+pad(SLOTS[nextIdx])+':00';
+    }
+    update();
+    setInterval(update,30000);
+  })();
+  // Story-Sektionen in Karten verpacken (h2…hr → .story-card)
+  (function(){
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var nodes=Array.from(wrap.childNodes);
+    var card=null;
+    nodes.forEach(function(n){
+      var tag=n.nodeType===1?n.tagName:'';
+      if(tag==='H2'){
+        card=document.createElement('div');
+        card.className='story-card';
+        n.parentNode.insertBefore(card,n);
+        card.appendChild(n);
+      } else if(tag==='HR'){
+        card=null;
+        wrap.removeChild(n);
+      } else if(card){
+        card.appendChild(n);
+      }
+    });
+  })();
+  // Accordion: Story-Karten auf-/zuklappbar machen
+  (function(){
+    document.querySelectorAll('.story-card').forEach(function(card){
+      var h2=card.querySelector('h2');
+      if(!h2) return;
+      // "Deine Themen" und andere Sonder-h2 nicht als Accordion behandeln
+      if(h2.classList.contains('topic-summary-head')) return;
+      // Ressort-Tag aus dem Body holen und vor h2 platzieren
+      var ressort=card.querySelector('.ressort');
+      if(ressort){
+        var tagWrap=document.createElement('div');
+        tagWrap.appendChild(ressort);
+        h2.parentNode.insertBefore(tagWrap,h2);
+      }
+      // Body-Wrapper für alles nach h2
+      var body=document.createElement('div');
+      body.className='story-body';
+      var sib=h2.nextSibling;
+      while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Chevron-Button
+      var chev=document.createElement('span');
+      chev.className='chev'; chev.textContent='–';
+      // Head-Wrapper
+      var head=document.createElement('div');
+      head.className='story-head';
+      card.insertBefore(head,h2);
+      head.appendChild(h2);
+      head.appendChild(chev);
+      card.appendChild(body);
+      card.classList.add('open');
+      head.addEventListener('click',function(){
+        card.classList.toggle('open');
+        chev.textContent=card.classList.contains('open')?'–':'+';
+      });
+    });
+  })();
+  // Artikel-Feedback
+  function castVote(btn){
+    var bar=btn.closest('.article-fb');
+    var key='afb_'+bar.dataset.key;
+    var vote=btn.dataset.vote;
+    var prev=localStorage.getItem(key);
+    bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    else{localStorage.removeItem(key);}
+  }
+  document.querySelectorAll('.article-fb').forEach(function(bar){
+    var saved=localStorage.getItem('afb_'+bar.dataset.key);
+    if(saved){var b=bar.querySelector('[data-vote="'+saved+'"]');if(b)b.classList.add('active');}
+    bar.querySelectorAll('.fb-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){castVote(btn);});
+    });
+  });
+  // PWA: Service Worker registrieren
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('../sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
