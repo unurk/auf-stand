@@ -57,6 +57,17 @@ _ICON_EPAPER = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
                 '<path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/>'
                 '<path d="M16 8h4v9a2 2 0 0 1-2 2"/>'
                 '<path d="M7 8h6M7 11h6M7 14h4"/></svg>')
+_ICON_NYT = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+             'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+             '<circle cx="12" cy="12" r="9"/>'
+             '<path d="M3.6 9h16.8M3.6 15h16.8"/>'
+             '<path d="M12 3c-2 3-2 15 0 18"/><path d="M12 3c2 3 2 15 0 18"/>'
+             '</svg>')
+_ICON_PRESSE = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+                'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+                '<rect x="4" y="4" width="16" height="16" rx="2"/>'
+                '<path d="M8 9h8M8 12h5M8 15h3"/>'
+                '</svg>')
 
 _PAGE_TEMPLATE = """\
 <!DOCTYPE html>
@@ -487,6 +498,7 @@ __CONTENT__
   <a href="__ROOT__dossier.html" class="tab __NAV_DOSSIER__">__ICON_DOSSIER__<span>Themen</span></a>
   <a href="__ROOT__archiv/index.html" class="tab __NAV_ARCHIV__">__ICON_ARCHIV__<span>Archiv</span></a>
   <a href="https://www.diepresse.com/epaper" class="tab" target="_blank" rel="noopener">__ICON_EPAPER__<span>E-Paper</span></a>
+  <a href="__ROOT__nyt/" class="tab">__ICON_NYT__<span>NYT</span></a>
 </nav>
 </div>
 <script>
@@ -664,6 +676,10 @@ _NYT_PAGE_TEMPLATE = (
         "<a href=\"https://www.diepresse.com/epaper\" class=\"tab\" target=\"_blank\" rel=\"noopener\">__ICON_EPAPER__<span>E-Paper</span></a>",
         "<a href=\"__NYT_EPAPER_URL__\" class=\"tab\" target=\"_blank\" rel=\"noopener\">__ICON_EPAPER__<span>Today's Paper</span></a>"
     )
+    .replace(
+        "<a href=\"__ROOT__nyt/\" class=\"tab\">__ICON_NYT__<span>NYT</span></a>",
+        "<a href=\"../\" class=\"tab\">__ICON_PRESSE__<span>Presse</span></a>"
+    )
     # JS timeline: German → English countdown strings
     .replace("if(mins<1) return 'gleich';", "if(mins<1) return 'now';")
     .replace(
@@ -706,6 +722,7 @@ def _render_page(title: str, content: str, active: str, root: str = "") -> str:
         .replace("__ICON_DOSSIER__", _ICON_DOSSIER)
         .replace("__ICON_ARCHIV__", _ICON_ARCHIV)
         .replace("__ICON_EPAPER__", _ICON_EPAPER)
+        .replace("__ICON_NYT__", _ICON_NYT)
         .replace("__CONTENT__", content)
     )
 
@@ -729,6 +746,7 @@ def _render_nyt_page(
         .replace("__ICON_DOSSIER__", _ICON_DOSSIER)
         .replace("__ICON_ARCHIV__", _ICON_ARCHIV)
         .replace("__ICON_EPAPER__", _ICON_EPAPER)
+        .replace("__ICON_PRESSE__", _ICON_PRESSE)
         .replace("__NYT_EPAPER_URL__", epaper_url)
         .replace("__CONTENT__", content)
     )
@@ -1887,11 +1905,6 @@ def _build_presse_site() -> Path:
         if hint:
             latest_content = _insert_after_header(latest_content, hint)
 
-    # Cross-link: NYT-Edition verlinken wenn vorhanden
-    nyt_index = BASE_DIR / "site" / "nyt" / "index.html"
-    if nyt_index.exists():
-        latest_content += '\n<p class="crosslink"><a href="nyt/">Also: NYT Briefing (English) →</a></p>'
-
     title = _label(latest_d, latest_edition, "de")
     index_html = _render_page(title, latest_content, "lagebild")
     index.write_text(index_html, encoding="utf-8")
@@ -1961,9 +1974,6 @@ def _build_nyt_site(config: dict) -> Path:
         hint = _next_edition_hint(latest_edition, lang)
         if hint:
             latest_content = _insert_after_header(latest_content, hint)
-
-    # Cross-link: Presse-Edition verlinken
-    latest_content += '\n<p class="crosslink"><a href="../">← Die Presse (Deutsch)</a></p>'
 
     title = _label(latest_d, latest_edition, lang)
     index_html = _render_nyt_page(title, latest_content, "lagebild", epaper_url=epaper_url)
