@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 data/state.json
+data/state.nyt.json
 out/
 manual_input/*.txt
 manual_input/*.md

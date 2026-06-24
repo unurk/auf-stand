@@ -3,11 +3,7 @@ from __future__ import annotations
 
 from datetime import date
 
-WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-MONTHS = [
-    "Jän", "Feb", "Mär", "Apr", "Mai", "Jun",
-    "Jul", "Aug", "Sep", "Okt", "Nov", "Dez",
-]
+from . import i18n
 
 
 def get_upcoming(termine: list[dict], days_ahead: int = 6) -> list[dict]:
@@ -24,17 +20,21 @@ def get_upcoming(termine: list[dict], days_ahead: int = 6) -> list[dict]:
     return sorted(result, key=lambda x: x["date_obj"])
 
 
-def format_vorausschau(termine: list[dict]) -> str:
+def format_vorausschau(termine: list[dict], lang: str = "de") -> str:
     """Gibt einen Markdown-Block mit kommenden Terminen zurück, oder ''."""
     upcoming = get_upcoming(termine)
     if not upcoming:
         return ""
-    lines = ["## 📅 Diese Woche noch"]
+    weekdays = i18n.t(lang, "weekdays_short")
+    months = i18n.t(lang, "months_short")
+    lines = [i18n.t(lang, "vorausschau_heading")]
     for t in upcoming:
         d = t["date_obj"]
-        label = f"{WEEKDAYS[d.weekday()]} {d.day}. {MONTHS[d.month - 1]}."
+        label = i18n.t(lang, "vorausschau_date_fmt").format(
+            weekday=weekdays[d.weekday()], day=d.day, month=months[d.month - 1]
+        )
         name = t.get("name", "")
         tracker = t.get("tracker", "")
-        hint = (' — betrifft Tracker „' + tracker + '“') if tracker else ""
+        hint = i18n.t(lang, "vorausschau_tracker_fmt").format(tracker=tracker) if tracker else ""
         lines.append(f"- **{label}** · {name}{hint}")
     return "\n".join(lines)

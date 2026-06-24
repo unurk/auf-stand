@@ -42,6 +42,27 @@ RSS liefert nur Teaser. Für tiefere Synthese: Volltexte als .txt/.md in
 Für den echten Pilot: offiziellen Content-Feed über die Presse-IT anfragen,
 kein Login-Scraping bauen.
 
+## Englische NYT-Edition (`config.nyt.yaml`)
+
+Dieselbe Pipeline kann ein **englisches Briefing aus öffentlichen New-York-Times-
+RSS-Feeds** erzeugen (im Stil von „Today's Paper"). Alles läuft über eine zweite
+Config — das deutsche Presse-Produkt bleibt unberührt:
+
+```bash
+# Feeds prüfen:
+python -m copilot.main feeds  --config config.nyt.yaml
+# Prompt bauen ohne API-Kosten:
+python -m copilot.main morgen --config config.nyt.yaml --dry-run
+# Echtes Briefing (braucht ANTHROPIC_API_KEY):
+python -m copilot.main morgen --config config.nyt.yaml
+```
+
+Die NYT-Config wählt Sprache und Prompt (`language: en`, `prompt_file: lagebild.en.md`),
+führt einen **eigenen State** (`state_file: data/state.nyt.json`, getrennt von der
+Presse-Ausgabe) und verlinkt am Ende „Today's Paper". Quelle sind ausschließlich die
+öffentlichen RSS-Feeds (Headlines + Teaser) — **kein** Login-Scraping hinter der Paywall
+(siehe `CLAUDE.md`). Volltexte bei Bedarf wie gehabt über `manual_input/`.
+
 ## Zuverlässiges Timing (cron-job.org → GitHub Actions)
 
 Die vier Ausgaben (06/11/16/20 Uhr Wien) + die Wochen-Quittung laufen in GitHub

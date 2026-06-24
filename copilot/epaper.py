@@ -7,6 +7,8 @@ Die Presse leitet eingeloggte Abonnent:innen selbst zur aktuellen Ausgabe.
 """
 from __future__ import annotations
 
+from . import i18n
+
 _DEFAULT_URL = "https://www.diepresse.com/epaper"
 
 
@@ -16,6 +18,8 @@ def get_epaper_url(config: dict | None = None) -> str:
     return _DEFAULT_URL
 
 
-def epaper_section(url: str) -> str:
+def epaper_section(url: str, lang: str = "de") -> str:
     """Gibt den Markdown-Block für den E-Paper-Link zurück."""
-    return f"\n---\n\n📰 **Die Presse — E-Paper** · [Aktuelle Ausgabe öffnen →]({url})"
+    label = i18n.t(lang, "epaper_label")
+    link_text = i18n.t(lang, "epaper_link_text")
+    return f"\n---\n\n📰 **{label}** · [{link_text}]({url})"

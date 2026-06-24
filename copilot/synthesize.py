@@ -6,15 +6,11 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-PROMPT_PATH = BASE_DIR / "prompts" / "lagebild.md"
-MANUAL_DIR = BASE_DIR / "manual_input"
+from . import i18n
 
-WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-MONTHS = [
-    "Jänner", "Februar", "März", "April", "Mai", "Juni",
-    "Juli", "August", "September", "Oktober", "November", "Dezember",
-]
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROMPTS_DIR = BASE_DIR / "prompts"
+MANUAL_DIR = BASE_DIR / "manual_input"
 
 
 def topic_name(topic) -> str:
@@ -29,11 +25,14 @@ def topic_keyword(topic) -> str:
     return topic_name(topic).split()[0] if topic_name(topic) else ""
 
 
-def date_label(edition_label: str) -> str:
+def date_label(edition_label: str, lang: str = "de") -> str:
     now = datetime.now()
-    return (
-        f"{WEEKDAYS[now.weekday()]}, {now.day}. {MONTHS[now.month - 1]} "
-        f"{now.year} · {edition_label}"
+    return i18n.t(lang, "date_label_fmt").format(
+        weekday=i18n.t(lang, "weekdays")[now.weekday()],
+        day=now.day,
+        month=i18n.t(lang, "months")[now.month - 1],
+        year=now.year,
+        edition=edition_label,
     )
 
 
@@ -74,20 +73,17 @@ def build_prompt(
     next_edition: str = "",
     edition_emoji: str = "☀️",
     show_vorausschau: bool = False,
+    lang: str = "de",
+    prompt_file: str = "lagebild.md",
 ) -> str:
     from .vorausschau import format_vorausschau
 
-    template = PROMPT_PATH.read_text(encoding="utf-8")
-    tracker_hint = (
-        "## Deine Themen\n[Nur falls es zu verfolgten Themen materielle "
-        "Änderungen gibt — sonst Abschnitt weglassen]"
-        if topics
-        else ""
-    )
-    vorausschau = format_vorausschau(termine or []) if show_vorausschau else ""
+    template = (PROMPTS_DIR / prompt_file).read_text(encoding="utf-8")
+    tracker_hint = i18n.t(lang, "tracker_hint") if topics else ""
+    vorausschau = format_vorausschau(termine or [], lang) if show_vorausschau else ""
     template = (
         template.replace("{EDITION_EMOJI}", edition_emoji)
-        .replace("{DATUM_LABEL}", date_label(edition_label))
+        .replace("{DATUM_LABEL}", date_label(edition_label, lang))
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
         .replace("{VORAUSSCHAU_SECTION}", vorausschau)
         .replace("{LESEZEIT}", "90")
@@ -109,28 +105,32 @@ def build_prompt(
 
     if topics:
         dossier = dossier or {}
-        lines.append("## Verfolgte Themen\n")
+        lines.append(i18n.t(lang, "section_topics"))
         for topic in topics:
             name = topic_name(topic)
             lines.append(f"- {name}")
             verlauf = _format_verlauf(dossier.get(name, []))
             if verlauf:
-                lines.append(f"  Verlauf: {verlauf}")
+                lines.append(f"{i18n.t(lang, 'verlauf_prefix')}{verlauf}")
         lines.append("")
 
     fulltexts = load_manual_fulltexts()
     if fulltexts:
-        lines.append("## Volltexte (haben Vorrang)\n")
+        lines.append(i18n.t(lang, "section_fulltexts"))
         for title, text in fulltexts:
             lines.append(f"### {title}\n{text}\n")
 
-    lines.append(f"## Artikel aus den RSS-Feeds ({len(articles)} Stück)\n")
+    lines.append(i18n.t(lang, "section_articles_fmt").format(n=len(articles)))
     for article in articles:
         published = (
             article.published.strftime("%d.%m. %H:%M UTC") if article.published else "ohne Datum"
         )
         link_part = f"\n  Link: {article.link}" if article.link else ""
-        author_part = f" — Autor: {article.author}" if getattr(article, "author", None) else ""
+        author_part = (
+            f"{i18n.t(lang, 'author_prefix')}{article.author}"
+            if getattr(article, "author", None)
+            else ""
+        )
         if article.fulltext:
             lines.append(
                 f"- [{article.ressort}] {article.title} ({published}){author_part}{link_part}\n"
@@ -158,20 +158,36 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
         f"- [{a.ressort}] {a.title}: {(a.teaser or '')[:100]}"
         for a in articles[:30]
     )
-    prompt = (
-        "Du generierst Assessment-Fragen für eine Nachrichten-App.\n\n"
-        f"Verfügbare Themen:\n{topic_lines}\n\n"
-        f"Aktuelle Presse-Artikel (heute):\n{article_lines}\n\n"
-        "Aufgabe: Generiere für JEDES Thema exakt eine Assessment-Frage.\n"
-        "Die Frage soll:\n"
-        "- Konkret auf aktuelle Artikel Bezug nehmen, wenn möglich\n"
-        "- Persönlich formuliert sein (\"betrifft dich\", \"interessiert dich\")\n"
-        "- Kurz sein (1 Satz, max. 120 Zeichen)\n"
-        "- Mit Ja oder Nein beantwortbar sein\n\n"
-        "Antworte NUR mit einem JSON-Array:\n"
-        '[{"name": "<exakter Themenname>", "question": "<Frage>"}]\n'
-        "Keine anderen Ausgaben."
-    )
+    if (config.get("language") or "de") == "en":
+        prompt = (
+            "You generate assessment questions for a news app.\n\n"
+            f"Available topics:\n{topic_lines}\n\n"
+            f"Current articles (today):\n{article_lines}\n\n"
+            "Task: Generate exactly one assessment question for EACH topic.\n"
+            "Each question should:\n"
+            "- Refer concretely to current articles where possible\n"
+            "- Be phrased personally (\"affects you\", \"interests you\")\n"
+            "- Be short (1 sentence, max. 120 characters)\n"
+            "- Be answerable with yes or no\n\n"
+            "Reply ONLY with a JSON array:\n"
+            '[{"name": "<exact topic name>", "question": "<question>"}]\n'
+            "No other output."
+        )
+    else:
+        prompt = (
+            "Du generierst Assessment-Fragen für eine Nachrichten-App.\n\n"
+            f"Verfügbare Themen:\n{topic_lines}\n\n"
+            f"Aktuelle Presse-Artikel (heute):\n{article_lines}\n\n"
+            "Aufgabe: Generiere für JEDES Thema exakt eine Assessment-Frage.\n"
+            "Die Frage soll:\n"
+            "- Konkret auf aktuelle Artikel Bezug nehmen, wenn möglich\n"
+            "- Persönlich formuliert sein (\"betrifft dich\", \"interessiert dich\")\n"
+            "- Kurz sein (1 Satz, max. 120 Zeichen)\n"
+            "- Mit Ja oder Nein beantwortbar sein\n\n"
+            "Antworte NUR mit einem JSON-Array:\n"
+            '[{"name": "<exakter Themenname>", "question": "<Frage>"}]\n'
+            "Keine anderen Ausgaben."
+        )
     try:
         client = anthropic.Anthropic(api_key=api_key)
         resp = client.messages.create(
