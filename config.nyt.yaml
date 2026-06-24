@@ -10,6 +10,8 @@
 language: en
 prompt_file: lagebild.en.md
 state_file: data/state.nyt.json
+out_dir: out/nyt
+site_dir: site/nyt
 
 # Öffentliche NYT-RSS-Feeds. name = Ressort (erscheint als [Ressort] und im Dossier).
 # Beim ersten Lauf mit `python -m copilot.main feeds --config config.nyt.yaml` prüfen.

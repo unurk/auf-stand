@@ -9,6 +9,16 @@ from pathlib import Path
 from . import i18n
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "out"
+_BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def set_out_dir(path: str | None) -> None:
+    """Setzt das Ausgabeverzeichnis (z. B. 'out/nyt' für die NYT-Edition)."""
+    global OUT_DIR
+    if not path:
+        return
+    p = Path(path)
+    OUT_DIR = p if p.is_absolute() else _BASE_DIR / p
 
 HTML_TEMPLATE = """<!doctype html>
 <html lang="{lang}">

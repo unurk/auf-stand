@@ -262,6 +262,8 @@ def main() -> int:
         # Eigener State-Pfad je Edition (config.nyt.yaml -> data/state.nyt.json),
         # damit NYT- und Presse-Lauf getrennte „seen"-/Dossier-Stände führen.
         state.set_state_path(config.get("state_file"))
+        # Ausgabeverzeichnis je Edition (config.nyt.yaml -> out/nyt/).
+        render.set_out_dir(config.get("out_dir"))
         if args.command == "feeds":
             return cmd_feeds(config)
         if args.command == "catchup":
@@ -274,7 +276,7 @@ def main() -> int:
             return rueckkanal.cmd_rueckkanal(config)
         if args.command == "site":
             from . import webview
-            webview.build_site()
+            webview.build_site(config)
             return 0
         if args.command == "vapid-keys":
             pub, priv = webpush.generate_vapid_keys()

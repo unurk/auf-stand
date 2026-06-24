@@ -22,6 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages-deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +52,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
-          mkdir -p data out
+          mkdir -p data out out/nyt
           EDITION="${{ github.event.inputs.edition }}"
           case "$EDITION" in
             morgen|mittag|nachmittag|abend)
@@ -71,6 +76,40 @@ jobs:
         with:
           path: data/state.nyt.json
           key: nyt-state-${{ github.run_id }}
+
+      - name: NYT-Site bauen und committen
+        id: site
+        if: always() && github.ref == 'refs/heads/master'
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+        run: |
+          python -m copilot.main site --config config.nyt.yaml
+          if [ -n "$(git status --porcelain site/nyt)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add site/nyt
+            git commit -m "site/nyt: NYT-Ausgabe vom $(date -u +%F)"
+            for i in 1 2 3 4; do
+              git pull --rebase origin master
+              git push origin HEAD:master && break
+              sleep $((2 ** i))
+            done
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Keine Änderung an site/nyt/ — kein Commit, kein Deploy."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: GitHub Pages hochladen
+        uses: actions/upload-pages-artifact@v3
+        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
+        with:
+          path: site
+
+      - name: GitHub Pages deployen
+        id: pages-deployment
+        uses: actions/deploy-pages@v4
+        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
 
       - name: Fehler melden
         if: failure()
