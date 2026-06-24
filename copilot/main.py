@@ -9,14 +9,17 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, render, state, synthesize, telegram, tts, webpush
+from . import deliver, i18n, render, state, synthesize, telegram, tts, webpush
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def load_config() -> dict:
-    return yaml.safe_load((BASE_DIR / "config.yaml").read_text(encoding="utf-8"))
+def load_config(path: str = "config.yaml") -> dict:
+    config_path = Path(path)
+    if not config_path.is_absolute():
+        config_path = BASE_DIR / config_path
+    return yaml.safe_load(config_path.read_text(encoding="utf-8"))
 
 
 def cmd_feeds(config: dict) -> int:
@@ -46,6 +49,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         print(f"Unbekannte Ausgabe '{edition}'. Verfügbar: {', '.join(editions)}")
         return 1
     edition_config = editions[edition]
+    lang = config.get("language", "de")
+    prompt_file = config.get("prompt_file", "lagebild.md")
 
     current_state = state.load_state()
 
@@ -100,8 +105,10 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     # Nächste Ausgabe im Presse-Takt bestimmen (Reihenfolge = config-Reihenfolge).
     nxt = order[(rank + 1) % len(order)]
-    when = "morgen" if rank == len(order) - 1 else "heute"
-    next_edition = f"Nächstes Lagebild: {when} {editions[nxt].get('time', '')} Uhr."
+    when_key = "when_tomorrow" if rank == len(order) - 1 else "when_today"
+    next_edition = i18n.t(lang, "next_edition_fmt").format(
+        when=i18n.t(lang, when_key), time=editions[nxt].get("time", "")
+    )
 
     prompt = synthesize.build_prompt(
         selection,
@@ -114,6 +121,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         next_edition=next_edition,
         edition_emoji=edition_config.get("emoji", "☀️"),
         show_vorausschau=(edition == "morgen"),
+        lang=lang,
+        prompt_file=prompt_file,
     )
 
     if dry_run:
@@ -128,15 +137,18 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
     import re
     words = len(re.findall(r"\w+", lagebild))
-    secs = max(60, round(words / 3.2 / 15) * 15)  # ~3.2 Wörter/Sek (Deutsch), auf 15s gerundet
+    wps = float(i18n.t(lang, "words_per_sec"))
+    secs = max(60, round(words / wps / 15) * 15)  # Wörter/Sek je Sprache, auf 15s gerundet
     lagebild = re.sub(
-        r"Lesezeit ca\.\s*\d+\s*Sekunden", f"Lesezeit ca. {secs} Sekunden", lagebild
+        i18n.t(lang, "reading_time_re"),
+        i18n.t(lang, "reading_time_fmt").format(secs=secs),
+        lagebild,
     )
-    # Redakteur:innen-Fußzeile aus den je Punkt genannten „Bericht: …"-Namen.
-    lagebild = render.insert_reporters_footer(lagebild)
+    # Redakteur:innen-Fußzeile aus den je Punkt genannten Reporter-Namen.
+    lagebild = render.insert_reporters_footer(lagebild, lang)
     from . import epaper as epaper_module
-    lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config))
-    md_path, html_path = render.write_output(lagebild, edition)
+    lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config), lang)
+    md_path, html_path = render.write_output(lagebild, edition, lang)
     print(f"Lagebild erzeugt:\n  {md_path}\n  {html_path}")
 
     subject = f"{config.get('mail_subject_prefix', 'Copilot')} — {edition_config.get('label', edition)}"
@@ -168,7 +180,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
             if mp3:
                 telegram.send_audio(
                     mp3,
-                    "Dein Lagebild zum Hören",
+                    i18n.t(lang, "audio_caption"),
                     config.get("telegram_chat_ids", []),
                     title=edition_config.get("label", edition),
                 )
@@ -178,8 +190,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     # Web-Push an PWA-Abonnenten (nur wenn VAPID konfiguriert ist).
     if webpush.webpush_configured():
         title_match = re.search(r"^#\s+(.+)$", lagebild, re.MULTILINE)
-        push_title = title_match.group(1).strip() if title_match else "Dein Lagebild"
-        push_body = article_headings[0] if article_headings else "Dein Lagebild ist da."
+        push_title = title_match.group(1).strip() if title_match else i18n.t(lang, "push_title_fallback")
+        push_body = article_headings[0] if article_headings else i18n.t(lang, "push_body_fallback")
         site_url = config.get("site_url", "https://unurk.github.io/auf-stand/")
         webpush.send_push(push_title, push_body, site_url, current_state, config)
 
@@ -202,13 +214,19 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
 def cmd_catchup(config: dict, dry_run: bool) -> int:
     """Catch-up: alles aus den letzten 72 h, unabhängig vom Gesehen-Status."""
+    lang = config.get("language", "de")
+    prompt_file = config.get("prompt_file", "lagebild.md")
     result = fetch_all(config)
     articles = filter_recent(result.articles, 72)
     if not articles:
         print("Keine Artikel der letzten 72 Stunden gefunden.")
         return 1
     prompt = synthesize.build_prompt(
-        articles, config.get("topics", []), "Catch-up · die letzten Tage in 4 Minuten"
+        articles,
+        config.get("topics", []),
+        i18n.t(lang, "catchup_label"),
+        lang=lang,
+        prompt_file=prompt_file,
     )
     if dry_run:
         path = render.OUT_DIR / f"{datetime.now():%Y-%m-%d}-catchup-prompt.txt"
@@ -217,7 +235,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
         print(f"Dry-Run: Prompt gespeichert unter {path}")
         return 0
     lagebild = synthesize.synthesize(prompt, config)
-    md_path, html_path = render.write_output(lagebild, "catchup")
+    md_path, html_path = render.write_output(lagebild, "catchup", lang)
     print(f"Catch-up erzeugt:\n  {md_path}\n  {html_path}")
     return 0
 
@@ -227,6 +245,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument("--url", help="URL für test-fulltext")
+    parser.add_argument(
+        "--config", default="config.yaml",
+        help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
         "--keep-seen", action="store_true",
@@ -236,7 +258,12 @@ def main() -> int:
 
     config: dict = {}
     try:
-        config = load_config()
+        config = load_config(args.config)
+        # Eigener State-Pfad je Edition (config.nyt.yaml -> data/state.nyt.json),
+        # damit NYT- und Presse-Lauf getrennte „seen"-/Dossier-Stände führen.
+        state.set_state_path(config.get("state_file"))
+        # Ausgabeverzeichnis je Edition (config.nyt.yaml -> out/nyt/).
+        render.set_out_dir(config.get("out_dir"))
         if args.command == "feeds":
             return cmd_feeds(config)
         if args.command == "catchup":
@@ -249,7 +276,7 @@ def main() -> int:
             return rueckkanal.cmd_rueckkanal(config)
         if args.command == "site":
             from . import webview
-            webview.build_site()
+            webview.build_site(config)
             return 0
         if args.command == "vapid-keys":
             pub, priv = webpush.generate_vapid_keys()

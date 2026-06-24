@@ -5,8 +5,23 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-STATE_PATH = Path(__file__).resolve().parent.parent / "data" / "state.json"
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_PATH = BASE_DIR / "data" / "state.json"
 MAX_SEEN = 2000  # alte Eintraege werden abgeschnitten
+
+
+def set_state_path(path: str | None) -> None:
+    """Setzt den State-Pfad (z. B. data/state.nyt.json für eine parallele Edition).
+
+    None lässt den Default (data/state.json). Relative Pfade werden auf das
+    Projekt-Wurzelverzeichnis bezogen, damit NYT- und Presse-Lauf getrennte
+    „seen"-/Dossier-Stände führen und sich nicht überschreiben.
+    """
+    global STATE_PATH
+    if not path:
+        return
+    p = Path(path)
+    STATE_PATH = p if p.is_absolute() else BASE_DIR / p
 
 
 def load_state() -> dict:

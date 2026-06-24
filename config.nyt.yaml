@@ -1,0 +1,135 @@
+# Copilot — NYT-Edition (englisch, „Today's Paper"-Style)
+#
+# Parallel-Konfiguration zur deutschen Presse-Ausgabe. Aufruf:
+#   python -m copilot.main feeds  --config config.nyt.yaml
+#   python -m copilot.main morgen --config config.nyt.yaml --dry-run
+#
+# Quelle: öffentliche NYT-RSS-Feeds (Headlines + Teaser, ToS-konform).
+# KEIN Login-Scraping hinter der Paywall — bewusst nicht gebaut (siehe CLAUDE.md).
+
+language: en
+prompt_file: lagebild.en.md
+state_file: data/state.nyt.json
+out_dir: out/nyt
+site_dir: site/nyt
+
+# Öffentliche NYT-RSS-Feeds. name = Ressort (erscheint als [Ressort] und im Dossier).
+# Beim ersten Lauf mit `python -m copilot.main feeds --config config.nyt.yaml` prüfen.
+# Weitere Feeds: rss.nytimes.com/services/xml/rss/nyt/<Section>.xml (Economy, Science, Climate …)
+feeds:
+  - name: HomePage
+    url: https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+  - name: World
+    url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+  - name: US
+    url: https://rss.nytimes.com/services/xml/rss/nyt/US.xml
+  - name: Politics
+    url: https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml
+  - name: Business
+    url: https://rss.nytimes.com/services/xml/rss/nyt/Business.xml
+  - name: Technology
+    url: https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+
+max_articles_per_feed: 15
+
+# Topic trackers: explicitly followed developments (NO click personalization).
+# Appear in the briefing only when there is a material change.
+# schlagwort: short keyword to begin the topic delta line ("- **Fed:** …").
+topics:
+  - name: US politics, Congress and the White House
+    schlagwort: Politics
+    assessment_question: "Do you follow US federal politics and decisions out of Washington?"
+  - name: "Federal Reserve: interest rates and monetary policy"
+    schlagwort: Fed
+    assessment_question: "Does the Fed's rate path affect you — via a mortgage, savings or loans?"
+  - name: "Wall Street: S&P 500, Nasdaq, Dow — direction and drivers"
+    schlagwort: Markets
+    assessment_question: "Do you hold stocks, ETFs or a brokerage account, or follow the markets?"
+  - name: US economy, jobs and inflation
+    schlagwort: Economy
+    assessment_question: "Do you notice the economy in daily life — prices, your job, the job market?"
+  - name: US foreign policy and national security
+    schlagwort: Foreign
+    assessment_question: "Do you follow US foreign policy and its global consequences?"
+  - name: Middle East
+    schlagwort: MiddleEast
+    assessment_question: "Do you follow developments in the Middle East?"
+  - name: Russia's war in Ukraine
+    schlagwort: Ukraine
+    assessment_question: "Do you follow the war in Ukraine and its consequences?"
+  - name: Artificial intelligence and Big Tech
+    schlagwort: AI
+    assessment_question: "Does AI affect you — as a user, at work, or because you follow the field?"
+  - name: "Supreme Court and the law"
+    schlagwort: Court
+    assessment_question: "Do you follow Supreme Court rulings and major legal decisions?"
+  - name: Immigration and the border
+    schlagwort: Immigration
+    assessment_question: "Is immigration policy relevant to you professionally or socially?"
+  - name: Climate and the environment
+    schlagwort: Climate
+    assessment_question: "Do you care about climate policy and the environment — personally or at work?"
+
+# Claude model for synthesis
+model: claude-haiku-4-5
+max_tokens: 2500
+
+# Audio output (OpenAI TTS). Needs OPENAI_API_KEY in .env. enabled: false turns it off.
+tts:
+  enabled: false
+  model: gpt-4o-mini-tts
+  voice: alloy
+  instructions: "Read calmly and factually, at the pace of a serious news anchor."
+
+# Editions — same internal keys (morgen/mittag/nachmittag/abend) as the German product,
+# only the labels are English. Times/lookback unchanged.
+editions:
+  morgen:
+    label: "Morning Briefing"
+    time: "06:00"
+    emoji: "☀️"
+    lookback_hours: 10
+  mittag:
+    label: "Midday Update"
+    time: "11:00"
+    emoji: "🌤️"
+    lookback_hours: 5.5
+  nachmittag:
+    label: "Afternoon Update"
+    time: "16:00"
+    emoji: "🌆"
+    lookback_hours: 5.5
+  abend:
+    label: "Evening Briefing"
+    time: "20:00"
+    emoji: "🌙"
+    lookback_hours: 4.5
+
+# Look-ahead: upcoming dates shown in the Morning Briefing. tracker (optional) must
+# match a topic name exactly. FOMC dates — verify against federalreserve.gov.
+termine:
+  - datum: 2026-07-29
+    name: "FOMC meeting · rate decision"
+    tracker: "Federal Reserve: interest rates and monetary policy"
+  - datum: 2026-09-16
+    name: "FOMC meeting · rate decision"
+    tracker: "Federal Reserve: interest rates and monetary policy"
+  - datum: 2026-10-28
+    name: "FOMC meeting · rate decision"
+    tracker: "Federal Reserve: interest rates and monetary policy"
+  - datum: 2026-12-09
+    name: "FOMC meeting · rate decision"
+    tracker: "Federal Reserve: interest rates and monetary policy"
+
+# E-mail delivery (optional). SMTP comes from .env — only recipients here.
+recipients: []
+mail_subject_prefix: "NYT Briefing"
+
+# Telegram (optional). Bot token from .env — only chat IDs here. Leave empty for file-only.
+telegram_chat_ids: []
+
+feedback_enabled: true
+
+# Link at the end of each edition — NYT "Today's Paper" (logged-in subscribers land on
+# the current edition).
+epaper_url: https://www.nytimes.com/section/todayspaper

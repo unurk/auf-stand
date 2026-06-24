@@ -10,8 +10,8 @@ from pathlib import Path
 
 import yaml
 
-from .render import OUT_DIR
-from .vorausschau import MONTHS, WEEKDAYS
+from . import i18n as _i18n
+from . import render as _render
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SITE_DIR = BASE_DIR / "site"
@@ -22,6 +22,11 @@ _EDITION_RANK = {"catchup": 0, "morgen": 1, "mittag": 2, "nachmittag": 3, "abend
 _EDITION_LABEL = {
     "morgen": "Morgen-Ausgabe", "mittag": "Mittags-Ausgabe",
     "nachmittag": "Nachmittags-Ausgabe", "abend": "Abend-Ausgabe",
+    "catchup": "Catch-up",
+}
+_EDITION_LABEL_EN = {
+    "morgen": "Morning Briefing", "mittag": "Midday Update",
+    "nachmittag": "Afternoon Update", "abend": "Evening Briefing",
     "catchup": "Catch-up",
 }
 # Presse-Kuratierungszeiten je Ausgabe (für die dezente Rhythmus-Anzeige).
@@ -416,7 +421,7 @@ _PAGE_TEMPLATE = """\
     .as-card-check {
       width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #d4dae2;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15s;
+      font-size: 13px; color: transparent; margin-top: 1px; transition: all .15px;
     }
     .as-toggle-card.selected .as-card-check {
       background: var(--accent); border-color: var(--accent); color: #fff;
@@ -455,6 +460,11 @@ _PAGE_TEMPLATE = """\
       font: 400 12px var(--sans); color: var(--muted); text-decoration: underline;
       cursor: pointer; margin-top: 20px; display: inline-block; background: none;
       border: none; padding: 0;
+    }
+    /* ── Cross-link chip ── */
+    .crosslink {
+      font: 400 12px var(--sans); color: var(--muted);
+      padding: 12px 22px 0; display: block;
     }
   </style>
 </head>
@@ -621,9 +631,67 @@ __CONTENT__
 </html>
 """
 
+# NYT-Edition-Template: abgeleitet vom Presse-Template, nur Brand/Labels/JS-Strings
+# auf Englisch umgestellt. Strukturell und CSS identisch — Änderungen an _PAGE_TEMPLATE
+# wirken automatisch durch. __NYT_EPAPER_URL__ wird in _render_nyt_page() ersetzt.
+_NYT_PAGE_TEMPLATE = (
+    _PAGE_TEMPLATE
+    .replace(
+        "<html lang=\"de\">",
+        "<html lang=\"en\">"
+    )
+    .replace(
+        "<title>__TITLE__ · Die Presse · Copilot</title>",
+        "<title>__TITLE__ · NYT Briefing</title>"
+    )
+    .replace(
+        "<div class=\"wordmark-text\">Die Presse</div>",
+        "<div class=\"wordmark-text\">New York Times</div>"
+    )
+    .replace(
+        "<span>Lagebild</span>",
+        "<span>Briefing</span>"
+    )
+    .replace(
+        "<span>Themen</span>",
+        "<span>Topics</span>"
+    )
+    .replace(
+        "<span>Archiv</span>",
+        "<span>Archive</span>"
+    )
+    .replace(
+        "<a href=\"https://www.diepresse.com/epaper\" class=\"tab\" target=\"_blank\" rel=\"noopener\">__ICON_EPAPER__<span>E-Paper</span></a>",
+        "<a href=\"__NYT_EPAPER_URL__\" class=\"tab\" target=\"_blank\" rel=\"noopener\">__ICON_EPAPER__<span>Today's Paper</span></a>"
+    )
+    # JS timeline: German → English countdown strings
+    .replace("if(mins<1) return 'gleich';", "if(mins<1) return 'now';")
+    .replace(
+        "if(h>0) return 'in '+h+' Std'+(m>0?' '+m+' Min':'');",
+        "if(h>0) return 'in '+h+' hr'+(h>1?'s':'')+(m>0?' '+m+' min':'');"
+    )
+    .replace("return 'in '+m+' Min';", "return 'in '+m+' min';")
+    .replace(
+        "if(cur===-1){ nextIdx=0; when='heute'; until=SLOTS[0]*60-now; prog=0; }",
+        "if(cur===-1){ nextIdx=0; when='today'; until=SLOTS[0]*60-now; prog=0; }"
+    )
+    .replace(
+        "else if(cur===SLOTS.length-1){ nextIdx=0; when='morgen'; until=(24*60-now)+SLOTS[0]*60; prog=1; }",
+        "else if(cur===SLOTS.length-1){ nextIdx=0; when='tomorrow'; until=(24*60-now)+SLOTS[0]*60; prog=1; }"
+    )
+    .replace(
+        "else { nextIdx=cur+1; when='heute'; until=SLOTS[nextIdx]*60-now;",
+        "else { nextIdx=cur+1; when='today'; until=SLOTS[nextIdx]*60-now;"
+    )
+    .replace(
+        "if(cap) cap.innerHTML='Nächste Aktualisierung <b>'+fmtDur(until)+'</b> · '\n        +when+' '+pad(SLOTS[nextIdx])+':00 Uhr';",
+        "if(cap) cap.innerHTML='Next update <b>'+fmtDur(until)+'</b> · '\n        +when+' at '+pad(SLOTS[nextIdx])+':00';"
+    )
+)
+
 
 def _render_page(title: str, content: str, active: str, root: str = "") -> str:
-    """Füllt das Page-Template mit Inhalt und aktivem Tab."""
+    """Füllt das Presse-Page-Template mit Inhalt und aktivem Tab."""
     nav = {"lagebild": "", "dossier": "", "archiv": ""}
     if active in nav:
         nav[active] = "active"
@@ -642,6 +710,30 @@ def _render_page(title: str, content: str, active: str, root: str = "") -> str:
     )
 
 
+def _render_nyt_page(
+    title: str, content: str, active: str, root: str = "",
+    epaper_url: str = "https://www.nytimes.com/section/todayspaper",
+) -> str:
+    """Füllt das NYT-Page-Template mit Inhalt und aktivem Tab."""
+    nav = {"lagebild": "", "dossier": "", "archiv": ""}
+    if active in nav:
+        nav[active] = "active"
+    return (
+        _NYT_PAGE_TEMPLATE
+        .replace("__TITLE__", title)
+        .replace("__ROOT__", root)
+        .replace("__NAV_LAGEBILD__", nav["lagebild"])
+        .replace("__NAV_DOSSIER__", nav["dossier"])
+        .replace("__NAV_ARCHIV__", nav["archiv"])
+        .replace("__ICON_HOME__", _ICON_HOME)
+        .replace("__ICON_DOSSIER__", _ICON_DOSSIER)
+        .replace("__ICON_ARCHIV__", _ICON_ARCHIV)
+        .replace("__ICON_EPAPER__", _ICON_EPAPER)
+        .replace("__NYT_EPAPER_URL__", epaper_url)
+        .replace("__CONTENT__", content)
+    )
+
+
 # Ressort → oklch-Hue-Winkel (farbcodierte Tags wie im Die-Presse-Design-System).
 _RESSORT_HUE = {
     "politik": 245, "wirtschaft": 175, "unternehmen": 175, "börse": 175,
@@ -649,11 +741,13 @@ _RESSORT_HUE = {
     "recht": 35, "justiz": 35, "energie": 75, "umwelt": 130,
     "wissenschaft": 150, "tech": 150, "technik": 150, "digital": 150,
     "wien": 25, "lokales": 25, "chronik": 25, "sport": 200, "kultur": 300,
+    # NYT sections
+    "homepage": 245, "world": 265, "us": 25, "politics": 245,
+    "business": 175, "technology": 150, "science": 150, "climate": 130,
 }
 
-
-# Redaktionelle Byline (zentral, damit alte Seiten beim Build normalisiert werden).
-_BYLINE = 'Von der „Presse“-Redaktion'
+_BYLINE = 'Von der „Presse"-Redaktion'
+_NYT_BYLINE = "By the New York Times briefing desk"
 
 
 def _ressort_tag_str(name: str) -> str:
@@ -663,13 +757,24 @@ def _ressort_tag_str(name: str) -> str:
 
 
 def _meta_tag(m: re.Match) -> str:
-    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile."""
+    """„(Ressort · Bericht: Name)" → Ressort-Pill + Quellenzeile (Deutsch)."""
     ressort, _, bericht = m.group(1).partition("·")
     out = _ressort_tag_str(ressort)
     if "Bericht:" in bericht:
         name = bericht.split("Bericht:", 1)[1].strip()
         if name:
             out += f' <span class="byline-source">Bericht: {name}</span>'
+    return out + " "
+
+
+def _meta_tag_en(m: re.Match) -> str:
+    """„(Ressort · By: Name)" → Ressort-Pill + Quellenzeile (Englisch)."""
+    ressort, _, by_part = m.group(1).partition("·")
+    out = _ressort_tag_str(ressort)
+    if "By:" in by_part:
+        name = by_part.split("By:", 1)[1].strip()
+        if name:
+            out += f' <span class="byline-source">By: {name}</span>'
     return out + " "
 
 
@@ -719,12 +824,60 @@ _GREETING_POOL: dict[str, list[str]] = {
     ],
 }
 
+_GREETING_POOL_EN: dict[str, list[str]] = {
+    "morgen": [
+        "Good morning.",
+        "Here's what happened.",
+        "A new day.",
+        "Good morning. Let's go.",
+        "Ready?",
+        "Good morning. Here it is.",
+        "Start informed.",
+    ],
+    "mittag": [
+        "Good afternoon.",
+        "A quick pause.",
+        "Midday check-in.",
+        "Here's the latest.",
+        "Halfway through the day.",
+        "Good afternoon. Briefly.",
+        "The midday picture.",
+    ],
+    "nachmittag": [
+        "Good afternoon.",
+        "Almost there.",
+        "A moment to catch up.",
+        "Here's what's new.",
+        "The afternoon, compact.",
+        "One more look.",
+        "Good afternoon. Here we are.",
+    ],
+    "abend": [
+        "Good evening.",
+        "The day, in brief.",
+        "What the day leaves behind.",
+        "Good evening. Quick.",
+        "The evening is yours.",
+        "End of day briefing.",
+        "What mattered today.",
+    ],
+    "catchup": [
+        "Welcome back.",
+        "Good to have you here.",
+        "What you missed.",
+        "Welcome. Caught up quickly.",
+        "The last few days, compact.",
+    ],
+}
 
-def _pick_greeting(edition: str, datum_iso: str) -> str:
-    # Demo-Personalisierung: feste Begrüßung für die Vorführ-Ausgabe (15. Juni, morgen).
-    if datum_iso == "2026-06-15" and edition == "morgen":
-        return "Guten Morgen, Andreas Rast."
-    pool = _GREETING_POOL.get(edition, ["Dein Lagebild."])
+
+def _pick_greeting(edition: str, datum_iso: str, lang: str = "de") -> str:
+    if lang == "en":
+        pool = _GREETING_POOL_EN.get(edition, ["Your Briefing."])
+    else:
+        if datum_iso == "2026-06-15" and edition == "morgen":
+            return "Guten Morgen, Andreas Rast."
+        pool = _GREETING_POOL.get(edition, ["Dein Lagebild."])
     try:
         idx = date.fromisoformat(datum_iso).toordinal() % len(pool)
     except (ValueError, TypeError):
@@ -732,12 +885,20 @@ def _pick_greeting(edition: str, datum_iso: str) -> str:
     return pool[idx]
 
 
-def _next_edition_hint(edition: str) -> str:
-    """Dezente Rhythmus-Zeile für die Startseite (nächstes Lagebild + Presse-Takt)."""
+def _next_edition_hint(edition: str, lang: str = "de") -> str:
+    """Dezente Rhythmus-Zeile für die Startseite (nächstes Lagebild + Takt)."""
     if edition not in _EDITION_ORDER:
         return ""
     i = _EDITION_ORDER.index(edition)
     nxt = _EDITION_ORDER[(i + 1) % len(_EDITION_ORDER)]
+    if lang == "en":
+        when = "tomorrow" if i == len(_EDITION_ORDER) - 1 else "today"
+        return (
+            '<p class="next-edition">'
+            f"Next briefing: {when} at {_EDITION_TIME[nxt]} · "
+            "Four editions daily: 6, 11, 16 &amp; 20:00"
+            "</p>"
+        )
     when = "morgen" if i == len(_EDITION_ORDER) - 1 else "heute"
     return (
         '<p class="next-edition">'
@@ -747,7 +908,7 @@ def _next_edition_hint(edition: str) -> str:
     )
 
 
-def _timeline_panel(edition: str) -> str:
+def _timeline_panel(edition: str, lang: str = "de") -> str:
     """Richtung C: macht den Kuratierungs-Takt zum Helden.
 
     Horizontale 4-Knoten-Spur 06·11·16·20; vergangene Knoten gefüllt, der aktuelle
@@ -764,38 +925,66 @@ def _timeline_panel(edition: str) -> str:
         nodes.append(f'<span class="{cls}">{label}</span>')
     fill = round(cur / (len(_EDITION_ORDER) - 1) * 100)
     nxt = _EDITION_ORDER[(cur + 1) % len(_EDITION_ORDER)]
-    when = "morgen" if cur == len(_EDITION_ORDER) - 1 else "heute"
+    if lang == "en":
+        when = "tomorrow" if cur == len(_EDITION_ORDER) - 1 else "today"
+        tl_label = "Curated at"
+        caption = f"Next update: <b>{when} at {_EDITION_TIME[nxt]}</b>"
+    else:
+        when = "morgen" if cur == len(_EDITION_ORDER) - 1 else "heute"
+        tl_label = "Kuratiert um"
+        caption = f"Nächste Aktualisierung: <b>{when} {_EDITION_TIME[nxt]} Uhr</b>"
     return (
         '<div class="timeline">'
-        '<div class="tl-label">Kuratiert um</div>'
+        f'<div class="tl-label">{tl_label}</div>'
         '<div class="tl-track">'
         f'<span class="tl-fill" style="width:{fill}%"></span>'
         f'{"".join(nodes)}'
         "</div>"
-        f'<p class="tl-caption">Nächste Aktualisierung: <b>{when} {_EDITION_TIME[nxt]} Uhr</b></p>'
+        f'<p class="tl-caption">{caption}</p>'
         "</div>"
     )
 
 
-def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | None) -> str:
+def _lagebild_header(
+    datum_iso: str, edition: str, points: int, lesezeit: int | None, lang: str = "de"
+) -> str:
     """Baut den Seitenkopf: Kicker (Datum · Ausgabe), Begrüßung, Meta-Byline."""
+    weekdays = _i18n.t(lang, "weekdays")
+    months = _i18n.t(lang, "months")
     try:
         d = date.fromisoformat(datum_iso)
-        kicker = f"{WEEKDAYS[d.weekday()]}, {d.day}. {MONTHS[d.month - 1]} · {_EDITION_LABEL.get(edition, edition)}"
+        if lang == "en":
+            kicker = f"{weekdays[d.weekday()]}, {months[d.month - 1]} {d.day}, {d.year} · {_EDITION_LABEL_EN.get(edition, edition)}"
+        else:
+            kicker = f"{weekdays[d.weekday()]}, {d.day}. {months[d.month - 1]} · {_EDITION_LABEL.get(edition, edition)}"
     except (ValueError, TypeError):
-        kicker = _EDITION_LABEL.get(edition, edition)
-    greeting = _pick_greeting(edition, datum_iso)
-    meta = [_BYLINE]
-    if points == 1:
-        meta.append("1 Thema")
-    elif points > 1:
-        meta.append(f"{points} Themen")
-    if lesezeit and lesezeit < 90:
-        meta.append(f"ca. {lesezeit} Sek.")
-    elif lesezeit:
-        mins = round(lesezeit / 60 * 2) / 2
-        label = f"{mins:.1f}".rstrip("0").rstrip(".").replace(".", ",")
-        meta.append(f"ca. {label} Min.")
+        kicker = (_EDITION_LABEL_EN if lang == "en" else _EDITION_LABEL).get(edition, edition)
+    greeting = _pick_greeting(edition, datum_iso, lang)
+    byline = _NYT_BYLINE if lang == "en" else _BYLINE
+    if lang == "en":
+        meta = [byline]
+        if points == 1:
+            meta.append("1 story")
+        elif points > 1:
+            meta.append(f"{points} stories")
+        if lesezeit and lesezeit < 90:
+            meta.append(f"ca. {lesezeit} sec.")
+        elif lesezeit:
+            mins = round(lesezeit / 60 * 2) / 2
+            label = f"{mins:.1f}".rstrip("0").rstrip(".")
+            meta.append(f"ca. {label} min.")
+    else:
+        meta = [byline]
+        if points == 1:
+            meta.append("1 Thema")
+        elif points > 1:
+            meta.append(f"{points} Themen")
+        if lesezeit and lesezeit < 90:
+            meta.append(f"ca. {lesezeit} Sek.")
+        elif lesezeit:
+            mins = round(lesezeit / 60 * 2) / 2
+            label = f"{mins:.1f}".rstrip("0").rstrip(".").replace(".", ",")
+            meta.append(f"ca. {label} Min.")
     return (
         '<header class="lagebild-header">'
         f'<p class="kicker">{kicker}</p>'
@@ -805,10 +994,11 @@ def _lagebild_header(datum_iso: str, edition: str, points: int, lesezeit: int | 
     )
 
 
-def _add_article_feedback(content: str, datum: str, edition: str) -> str:
+def _add_article_feedback(content: str, datum: str, edition: str, lang: str = "de") -> str:
     """Fügt 👍/👎-Buttons nach jedem nummerierten Artikel ein."""
     content = re.sub(r'\n?<div class="article-fb".*?</div>', "", content)
     idx = 0
+    less_label = "Less" if lang == "en" else "Weniger"
 
     def _insert(m: re.Match) -> str:
         nonlocal idx
@@ -817,56 +1007,60 @@ def _add_article_feedback(content: str, datum: str, edition: str) -> str:
         bar = (
             f'\n<div class="article-fb" data-key="{key}">'
             f'<button class="fb-btn" data-vote="up">Relevant</button>'
-            f'<button class="fb-btn" data-vote="down">Weniger</button>'
+            f'<button class="fb-btn" data-vote="down">{less_label}</button>'
             f"</div>"
         )
         return m.group(0).rstrip() + bar
 
-    # Jeder Artikel — nach Emoji-Stripping keine Ziffernpräfixe mehr:
-    # alle h2 außer "Deine Themen" bekommen einen Feedback-Balken.
-    return re.sub(r"<h2>(?!Deine Themen).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
+    return re.sub(r"<h2>(?!Deine Themen|Your Topics).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
 
 
-def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
-    """Verleiht dem Roh-Inhalt Die-Presse-Charakter (Pills, Kicker, Highlight-Box)."""
-    # Etwaigen Audio-Player aus früherem Build entfernen (wird in build_site neu,
-    # mit korrektem Pfad, eingesetzt) — hält das erneute Rendern idempotent.
+def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str = "de") -> str:
+    """Verleiht dem Roh-Inhalt Die-Presse-/NYT-Charakter (Pills, Kicker, Highlight-Box)."""
     content = re.sub(
         r'<div class="audio-player">.*?</div>\s*', "", content, flags=re.DOTALL
     )
-    # Marken-Zeile entfernen (steht jetzt im Masthead) — als <p> oder <div>.
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
-    # Meta-Klammer „(Ressort · Bericht: Name)" direkt vor dem „→ Artikel"-Link:
-    # Ressort als farbiges Pill, Autor als Quellenzeile (vor dem Link-Umbau).
+    # Meta-Klammer — Bericht:/By: als Ressort-Pill + Quellenzeile
     if 'class="ressort"' not in content:
-        content = re.sub(
-            r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
-        )
+        if lang == "en":
+            content = re.sub(
+                r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Article</a>)', _meta_tag_en, content
+            )
+        else:
+            content = re.sub(
+                r'\(([^)]{2,60})\)\s*(?=<a[^>]*>→ Artikel</a>)', _meta_tag, content
+            )
     # Nummerierte Emojis + optionale Topic-Emojis am Anfang von h2-Titeln entfernen
-    # z.B. "1️⃣ 🌍 EU verlängert…" → "EU verlängert…"
     content = re.sub(
         r'(<h2>)\s*\d[^\w\s]*\s*(?:[^\x00-\x7F]\S*\s*)?',
         r'\1',
         content,
     )
-    # Nummern-Emojis (z.B. 1️⃣) aus "Heute wichtig"-Einträgen entfernen
-    # Nur Emoji-Ziffernfolgen (mit Variation Selector U+FE0F oder Combining Enclosing Keycap)
+    # Nummern-Emojis aus "Heute wichtig"/"Today's headlines"-Einträgen entfernen
     content = re.sub(
         r'(<div class="highlights">)(.*?)(</div>)',
         lambda m: m.group(1)
-            + re.sub(r'\d\uFE0F?\u20E3?\s*', '', m.group(2))
+            + re.sub(r'\d️?⃣?\s*', '', m.group(2))
             + m.group(3),
         content,
         flags=re.DOTALL,
     )
-    # Quell-Links als Pill auszeichnen.
-    content = re.sub(
-        r'<a href="([^"]+)">→ Artikel</a>',
-        r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
-        content,
-    )
+    # Quell-Links als Pill auszeichnen (sprachspezifischer Link-Text)
+    if lang == "en":
+        content = re.sub(
+            r'<a href="([^"]+)">→ Article</a>',
+            r'<a class="source-link" href="\1">Read in the NYT →</a>',
+            content,
+        )
+    else:
+        content = re.sub(
+            r'<a href="([^"]+)">→ Artikel</a>',
+            r'<a class="source-link" href="\1">Weiterlesen bei der Presse →</a>',
+            content,
+        )
     # E-Paper-Paragraph (📰) entfernen — steht bereits in der Tab-Leiste.
     content = re.sub(r'\s*<p>[^<]*📰.*?</p>', '', content, flags=re.DOTALL)
     # Done-Box: Emoji und ungültige <em>-Tags bereinigen.
@@ -880,19 +1074,27 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
         r'<div class="done"><span class="done-check">✓</span> \1</div>',
         content, flags=re.DOTALL,
     )
-    # "Deine Themen" h2 bekommt eigene Klasse → kein Accordion.
-    content = content.replace(
-        '<h2>Deine Themen</h2>',
-        '<h2 class="topic-summary-head">Deine Themen</h2>',
-    )
-    # Seitenkopf neu bauen: H1 (+ etwaige alte Byline) durch Kicker/Begrüßung/Meta ersetzen.
+    # Topic-Sektionsköpfe: kein Accordion
+    if lang == "en":
+        content = content.replace(
+            '<h2>Your Topics</h2>',
+            '<h2 class="topic-summary-head">Your Topics</h2>',
+        )
+    else:
+        content = content.replace(
+            '<h2>Deine Themen</h2>',
+            '<h2 class="topic-summary-head">Deine Themen</h2>',
+        )
+    # Seitenkopf neu bauen
     if datum:
         points = len(re.findall(r"<h2>\s*[1-9]", content))
-        m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
+        if lang == "en":
+            m = re.search(r"reading time ca\.\s*(\d+)\s*seconds", content)
+        else:
+            m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
         lesezeit = int(m.group(1)) if m else None
-        header = _lagebild_header(datum, edition, points, lesezeit)
+        header = _lagebild_header(datum, edition, points, lesezeit, lang)
         if '<header class="lagebild-header">' in content:
-            # Idempotent: bestehenden Header komplett ersetzen (kein Verschachteln).
             content = re.sub(
                 r'<header class="lagebild-header">.*?</header>',
                 header, content, count=1, flags=re.DOTALL,
@@ -903,36 +1105,46 @@ def _enhance_content(content: str, datum: str = "", edition: str = "") -> str:
                 header, content, count=1, flags=re.DOTALL,
             )
     else:
-        # Fallback (kein Datum): nur Byline normalisieren bzw. einsetzen.
+        byline = _NYT_BYLINE if lang == "en" else _BYLINE
         content = re.sub(
             r'<p class="byline">.*?</p>',
-            f'<p class="byline">{_BYLINE}</p>', content, count=1, flags=re.DOTALL,
+            f'<p class="byline">{byline}</p>', content, count=1, flags=re.DOTALL,
         )
         if 'class="byline"' not in content:
             content = re.sub(
-                r"(</h1>)", rf'\1\n<p class="byline">{_BYLINE}</p>', content, count=1
+                r"(</h1>)", rf'\1\n<p class="byline">{byline}</p>', content, count=1
             )
-    # Redakteur:innen-Fußzeile als eigene Klasse auszeichnen.
-    content = re.sub(
-        r'<p><em>(Heute mit Berichterstattung von:.*?)</em></p>',
-        r'<p class="reporters">\1</p>', content, count=1, flags=re.DOTALL,
-    )
-    # „Heute wichtig" + die nummerierten Zeilen zu einer Highlight-Box bündeln.
-    # Nur einmal — beim erneuten Rendern ist die Box schon vorhanden.
-    if 'class="highlights"' not in content:
+    # Redakteur:innen-Fußzeile als eigene Klasse auszeichnen
+    if lang == "en":
         content = re.sub(
-            r'(<p><strong>Heute wichtig:</strong></p>.*?)(?=<hr>)',
-            r'<div class="highlights">\1</div>',
-            content,
-            count=1,
-            flags=re.DOTALL,
+            r'<p><em>(Today&#x27;s reporting by:.*?|Today\'s reporting by:.*?)</em></p>',
+            r'<p class="reporters">\1</p>', content, count=1, flags=re.DOTALL,
         )
+    else:
+        content = re.sub(
+            r'<p><em>(Heute mit Berichterstattung von:.*?)</em></p>',
+            r'<p class="reporters">\1</p>', content, count=1, flags=re.DOTALL,
+        )
+    # „Heute wichtig" / „Today's headlines" + die nummerierten Zeilen zu einer Highlight-Box bündeln.
+    if 'class="highlights"' not in content:
+        if lang == "en":
+            content = re.sub(
+                r'(<p><strong>Today&#x27;s headlines:</strong></p>.*?)(?=<hr>)',
+                r'<div class="highlights">\1</div>',
+                content, count=1, flags=re.DOTALL,
+            )
+        else:
+            content = re.sub(
+                r'(<p><strong>Heute wichtig:</strong></p>.*?)(?=<hr>)',
+                r'<div class="highlights">\1</div>',
+                content, count=1, flags=re.DOTALL,
+            )
     if datum:
-        content = _add_article_feedback(content, datum, edition)
+        content = _add_article_feedback(content, datum, edition, lang)
     return content.strip()
 
 
-def _extract_body(html: str, datum: str = "", edition: str = "") -> str:
+def _extract_body(html: str, datum: str = "", edition: str = "", lang: str = "de") -> str:
     """Extrahiert Inhalt der .wrap-Div — korrekt bei verschachtelten Divs."""
     marker = '<div class="wrap">'
     start = html.find(marker)
@@ -952,7 +1164,7 @@ def _extract_body(html: str, datum: str = "", edition: str = "") -> str:
         else:
             depth -= 1
             if depth == 0:
-                return _enhance_content(html[content_start:c].strip(), datum, edition)
+                return _enhance_content(html[content_start:c].strip(), datum, edition, lang)
             i = c + 6
     return "<p>Kein Inhalt verfügbar.</p>"
 
@@ -969,8 +1181,13 @@ def _parse(path: Path) -> tuple[date, int, str] | None:
     return d, _EDITION_RANK[edition], edition
 
 
-def _label(d: date, edition: str) -> str:
-    return f"{WEEKDAYS[d.weekday()]} {d.day}. {MONTHS[d.month - 1]} · {_EDITION_LABEL[edition]}"
+def _label(d: date, edition: str, lang: str = "de") -> str:
+    weekdays = _i18n.t(lang, "weekdays")
+    months = _i18n.t(lang, "months")
+    if lang == "en":
+        ed_label = _EDITION_LABEL_EN.get(edition, edition)
+        return f"{weekdays[d.weekday()]}, {months[d.month - 1]} {d.day} · {ed_label}"
+    return f"{weekdays[d.weekday()]} {d.day}. {months[d.month - 1]} · {_EDITION_LABEL[edition]}"
 
 
 def _iso_to_display(iso: str) -> str:
@@ -1028,12 +1245,10 @@ def build_dossier(
     from .synthesize import topic_keyword, topic_name as get_topic_name
     SITE_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Topic-Karten (nach Assessment)
     topic_cards = "\n".join(_topic_card_html(t, dossier, topic_articles) for t in topics)
     if not topic_cards:
         topic_cards = '<p class="empty-state">Keine Themen konfiguriert.</p>'
 
-    # Fragen-Mapping: bevorzuge dynamische (artikel-basierte) Fragen, Fallback auf statische
     dyn_q = {q["name"]: q["question"] for q in (assessment_questions or [])}
     topics_data = [
         {
@@ -1048,7 +1263,6 @@ def build_dossier(
     ]
     topics_js = json.dumps(topics_data, ensure_ascii=False)
 
-    # Toggle-Karten für das Assessment (eine pro Topic)
     toggle_cards_html = "\n".join(
         f'<div class="as-toggle-card" data-name="{_html.escape(td["name"])}" onclick="asToggle(this)">'
         f'<div class="as-card-check">✓</div>'
@@ -1131,7 +1345,6 @@ function updateCount(){{
   document.getElementById('as-count').textContent=selected.size+customTopics.length+' ausgewählt';
 }}
 
-// Init: Lade gespeicherte Präferenzen
 try{{
   var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
   customTopics=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');
@@ -1140,12 +1353,10 @@ try{{
 }}catch(e){{show('as-intro');}}
 
 window.asOpen=function(){{
-  // Lade bisherige Auswahl in Set
   try{{
     var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'[]');
     selected=new Set(saved||[]);
   }}catch(e){{selected=new Set();}}
-  // Karten-Zustand setzen
   document.querySelectorAll('.as-toggle-card').forEach(function(el){{
     if(selected.has(el.dataset.name))el.classList.add('selected');
     else el.classList.remove('selected');
@@ -1169,7 +1380,6 @@ window.asAddCustom=function(){{
   customTopics.push({{name:name,kw:kw}});
   localStorage.setItem(CUSTOM_KEY,JSON.stringify(customTopics));
   selected.add(name);
-  // Neue Toggle-Karte einfügen
   var cards=document.getElementById('as-cards');
   var section=cards.querySelector('.as-custom-section');
   var div=document.createElement('div');
@@ -1186,7 +1396,6 @@ window.asAddCustom=function(){{
 window.asConfirm=function(){{
   var prefs=Array.from(selected);
   localStorage.setItem(PREF_KEY,JSON.stringify(prefs));
-  // Telegram-Befehle zusammenstellen
   var kws=prefs.map(function(n){{
     var t=TOPICS.find(function(t){{return t.name===n;}});
     return t?t.kw:null;
@@ -1223,8 +1432,128 @@ window.asReset=function(){{
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
 
 
-# Push-Aktivierung — eigenständiger Block am Ende des Themen-Screens. Versteckt sich
-# selbst, wenn der Browser kein Push kann oder kein VAPID_PUBLIC_KEY gesetzt ist.
+def _build_nyt_dossier(site_dir: Path, state: dict, topics: list, config: dict) -> None:
+    """Erzeugt site/nyt/dossier.html (englische Topics-Seite)."""
+    from .synthesize import topic_keyword, topic_name as get_topic_name
+    site_dir.mkdir(parents=True, exist_ok=True)
+    epaper_url = config.get("epaper_url", "https://www.nytimes.com/section/todayspaper")
+
+    dossier = state.get("dossier", {})
+    topic_articles = state.get("topic_articles", {})
+
+    def topic_card_en(topic) -> str:
+        name = get_topic_name(topic)
+        kw = topic_keyword(topic)
+        badge = f'<span class="schlagwort-badge">#{kw}</span>' if kw else ""
+        arts = topic_articles.get(name, [])
+        if arts:
+            items = "\n".join(
+                f'<li class="topic-article">'
+                f'<a href="{a["link"]}" target="_blank" rel="noopener">'
+                f'<span class="topic-article-title">{a["title"]}</span>'
+                f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
+                f"</a></li>"
+                for a in arts if a.get("link") and a.get("title")
+            )
+            body_html = f'<ul class="topic-articles">{items}</ul>'
+        else:
+            body_html = '<p class="dossier-empty">No recent articles on this topic.</p>'
+        return (
+            f'<div class="dossier-topic" data-topic-name="{_html.escape(name)}">'
+            f"<h2>{_html.escape(name)}{badge}</h2>"
+            f"{body_html}"
+            f"</div>"
+        )
+
+    topic_cards = "\n".join(topic_card_en(t) for t in topics)
+    if not topic_cards:
+        topic_cards = '<p class="empty-state">No topics configured.</p>'
+
+    topics_data = [
+        {
+            "name": get_topic_name(t),
+            "kw": topic_keyword(t),
+            "q": t.get("assessment_question", "") if isinstance(t, dict) else "",
+        }
+        for t in topics
+        if isinstance(t, dict) and t.get("assessment_question")
+    ]
+    topics_js = json.dumps(topics_data, ensure_ascii=False)
+
+    toggle_cards_html = "\n".join(
+        f'<div class="as-toggle-card" data-name="{_html.escape(td["name"])}" onclick="asToggle(this)">'
+        f'<div class="as-card-check">✓</div>'
+        f'<div><div class="as-card-name">{_html.escape(td["name"])}</div>'
+        f'<div class="as-card-q">{_html.escape(td["q"])}</div></div>'
+        f"</div>"
+        for td in topics_data
+    )
+
+    content = f"""<h1>My Topics</h1>
+<div id="as-intro">
+  <p class="as-intro-text">Select the topics you want to follow. The questions help you gauge what's relevant to you.</p>
+  <button class="as-btn-primary" onclick="asOpen()">Select topics →</button>
+</div>
+<div id="as-cards" style="display:none">
+  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">Tap a topic to select or deselect it.</p>
+  {toggle_cards_html}
+  <div class="as-confirm-row">
+    <span id="as-count" style="font-size:13px;color:var(--muted);font-family:var(--sans)">0 selected</span>
+    <button class="as-btn-primary" onclick="asConfirm()">Save</button>
+  </div>
+</div>
+<div id="topic-list" style="display:none">
+{topic_cards}
+  <button class="reset-link" onclick="asReset()">Edit topic selection</button>
+</div>
+<script>
+(function(){{
+var TOPICS={topics_js};
+var PREF_KEY='nyt_prefs';
+var selected=new Set();
+function show(id){{['as-intro','as-cards','topic-list'].forEach(function(i){{
+  document.getElementById(i).style.display=i===id?'':'none';
+}});}}
+function filterTopics(prefs){{
+  document.getElementById('topic-list').querySelectorAll('.dossier-topic').forEach(function(el){{
+    el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
+  }});
+}}
+function updateCount(){{
+  document.getElementById('as-count').textContent=selected.size+' selected';
+}}
+try{{
+  var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
+  if(saved&&saved.length){{show('topic-list');filterTopics(saved);}}
+  else{{show('as-intro');}}
+}}catch(e){{show('as-intro');}}
+window.asOpen=function(){{
+  try{{selected=new Set(JSON.parse(localStorage.getItem(PREF_KEY)||'[]'));}}
+  catch(e){{selected=new Set();}}
+  document.querySelectorAll('.as-toggle-card').forEach(function(el){{
+    el.classList.toggle('selected',selected.has(el.dataset.name));
+  }});
+  updateCount();show('as-cards');
+}};
+window.asToggle=function(el){{
+  var name=el.dataset.name;
+  if(selected.has(name)){{selected.delete(name);el.classList.remove('selected');}}
+  else{{selected.add(name);el.classList.add('selected');}}
+  updateCount();
+}};
+window.asConfirm=function(){{
+  localStorage.setItem(PREF_KEY,JSON.stringify(Array.from(selected)));
+  show('topic-list');filterTopics(Array.from(selected));
+}};
+window.asReset=function(){{window.asOpen();}};
+}})();
+</script>"""
+
+    html = _render_nyt_page("My Topics", content, "dossier", epaper_url=epaper_url)
+    (site_dir / "dossier.html").write_text(html, encoding="utf-8")
+
+
+# Push-Aktivierung — eigenständiger Block am Ende des Themen-Screens.
 _PUSH_SECTION = """
 <div id="push-section" style="display:none;border-top:1px solid var(--border);padding-top:24px;margin-top:36px">
   <p style="font-size:15px;font-weight:600;font-family:var(--sans);margin:0 0 4px">🔔 Push-Benachrichtigungen</p>
@@ -1247,7 +1576,7 @@ _PUSH_SECTION = """
 (function(){
   var section=document.getElementById('push-section');
   if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.VAPID_PUBLIC_KEY){
-    return;  // Push nicht unterstützt oder kein Schlüssel — Block bleibt verborgen.
+    return;
   }
   section.style.display='';
 
@@ -1291,19 +1620,26 @@ _PUSH_SECTION = """
 """
 
 
-def build_archiv_index(editions: list) -> None:
-    """Erzeugt site/archiv/index.html als Karten-Raster."""
-    ARCHIV_DIR.mkdir(parents=True, exist_ok=True)
+def build_archiv_index(editions: list, lang: str = "de", site_dir: Path | None = None,
+                       epaper_url: str = "https://www.diepresse.com/epaper") -> None:
+    """Erzeugt archiv/index.html als Karten-Raster."""
+    _site = site_dir or SITE_DIR
+    _archiv = _site / "archiv"
+    _archiv.mkdir(parents=True, exist_ok=True)
     cards = "\n".join(
         f'<a class="archiv-card" href="{path.name}">'
-        f'<span class="archiv-date">{_label(d, edition)}</span>'
-        f'<span class="archiv-label">{_EDITION_LABEL[edition]}</span>'
+        f'<span class="archiv-date">{_label(d, edition, lang)}</span>'
+        f'<span class="archiv-label">{(_EDITION_LABEL_EN if lang == "en" else _EDITION_LABEL)[edition]}</span>'
         f"</a>"
         for (d, _rank, edition), path in editions[:60]
     )
-    content = f'<h1>Archiv</h1>\n<div class="archiv-grid">\n{cards}\n</div>'
-    html = _render_page("Archiv", content, "archiv", root="../")
-    (ARCHIV_DIR / "index.html").write_text(html, encoding="utf-8")
+    title = "Archive" if lang == "en" else "Archiv"
+    content = f'<h1>{title}</h1>\n<div class="archiv-grid">\n{cards}\n</div>'
+    if lang == "en":
+        html = _render_nyt_page(title, content, "archiv", root="../", epaper_url=epaper_url)
+    else:
+        html = _render_page(title, content, "archiv", root="../")
+    (_archiv / "index.html").write_text(html, encoding="utf-8")
 
 
 _MANIFEST = {
@@ -1326,9 +1662,26 @@ _MANIFEST = {
     ],
 }
 
-# Service Worker: Seiten network-first (frisches Lagebild zuerst, Cache als
-# Offline-Fallback), statische/Fremd-Assets cache-first. Cache-Version im Namen,
-# damit ein Deploy alte Caches verdrängt.
+_NYT_MANIFEST = {
+    "name": "NYT Briefing · Copilot",
+    "short_name": "NYT Briefing",
+    "description": "Your daily NYT briefing — informed in 90 seconds.",
+    "lang": "en",
+    "dir": "ltr",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "categories": ["news"],
+    "icons": [
+        {"src": "../icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+        {"src": "../icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+        {"src": "../icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    ],
+}
+
 _SERVICE_WORKER = """\
 const CACHE = 'copilot-v2';
 const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',
@@ -1353,7 +1706,6 @@ self.addEventListener('fetch', function(e){
   if(req.method !== 'GET') return;
   var url = new URL(req.url);
   if(url.origin !== self.location.origin){
-    // Fremd-Assets (Google Fonts): cache-first, lange haltbar.
     e.respondWith(caches.open(CACHE).then(function(c){
       return c.match(req).then(function(hit){
         return hit || fetch(req).then(function(res){
@@ -1364,7 +1716,6 @@ self.addEventListener('fetch', function(e){
     }));
     return;
   }
-  // Eigene Seiten: network-first, Cache als Offline-Fallback.
   e.respondWith(fetch(req).then(function(res){
     if(res && res.ok){
       var copy = res.clone();
@@ -1378,7 +1729,6 @@ self.addEventListener('fetch', function(e){
   }));
 });
 
-// Web-Push: Notification anzeigen und bei Klick die PWA öffnen.
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}
@@ -1398,24 +1748,37 @@ self.addEventListener('notificationclick', function(e){
 });
 """
 
+_NYT_SERVICE_WORKER = _SERVICE_WORKER.replace(
+    "const CACHE = 'copilot-v2';",
+    "const CACHE = 'nyt-briefing-v1';"
+).replace(
+    "const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html',\n"
+    "  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './die-presse-logo.png'];",
+    "const SHELL = ['./', './index.html', './dossier.html', './archiv/index.html'];"
+).replace(
+    "tag: 'lagebild'",
+    "tag: 'nyt-briefing'"
+)
 
-def _write_pwa_assets() -> None:
-    """Schreibt Web-App-Manifest, Service Worker und Push-Config (Public-Key)."""
+
+def _write_pwa_assets(site_dir: Path | None = None, manifest: dict | None = None,
+                      sw: str | None = None) -> None:
+    """Schreibt Web-App-Manifest, Service Worker und Push-Config."""
     import os
-    SITE_DIR.mkdir(parents=True, exist_ok=True)
-    (SITE_DIR / "manifest.webmanifest").write_text(
-        json.dumps(_MANIFEST, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    _site = site_dir or SITE_DIR
+    _site.mkdir(parents=True, exist_ok=True)
+    _manifest = manifest or _MANIFEST
+    (_site / "manifest.webmanifest").write_text(
+        json.dumps(_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    (SITE_DIR / "sw.js").write_text(_SERVICE_WORKER, encoding="utf-8")
-    # VAPID-Public-Key (öffentlich) für den Client. Leer ⇒ Push-UI bleibt verborgen.
+    (_site / "sw.js").write_text(sw or _SERVICE_WORKER, encoding="utf-8")
     vapid_public = os.environ.get("VAPID_PUBLIC_KEY", "")
-    (SITE_DIR / "push-config.js").write_text(
+    (_site / "push-config.js").write_text(
         f'window.VAPID_PUBLIC_KEY = "{vapid_public}";\n', encoding="utf-8"
     )
 
 
 def _audio_player(src: str) -> str:
-    """HTML-Block für den Lagebild-Audioplayer, oder '' wenn keine mp3 da ist."""
     return (
         '<div class="audio-player">'
         '<span class="audio-label">▶ Lagebild zum Hören</span>'
@@ -1425,8 +1788,6 @@ def _audio_player(src: str) -> str:
 
 
 def _insert_after_header(content: str, snippet: str) -> str:
-    """Fügt `snippet` direkt INNERHALB des Seitenkopfes ein (vor </header>).
-    So bleibt Streak/Hinweis-Zeile Teil der Header-Karte statt darunter zu floaten."""
     if "</header>" in content:
         return content.replace("</header>", snippet + "\n</header>", 1)
     if "</h1>" in content:
@@ -1434,12 +1795,11 @@ def _insert_after_header(content: str, snippet: str) -> str:
     return snippet + content
 
 
-def _prune_old_audio(days: int = 14) -> None:
+def _prune_old_audio(archiv_dir: Path, days: int = 14) -> None:
     """Löscht mp3-Dateien im Archiv, die älter als `days` Tage sind."""
     from datetime import timedelta
-
     cutoff = date.today() - timedelta(days=days)
-    for mp3 in ARCHIV_DIR.glob("*.mp3"):
+    for mp3 in archiv_dir.glob("*.mp3"):
         m = re.match(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})\.mp3$", mp3.name)
         if not m:
             continue
@@ -1451,8 +1811,8 @@ def _prune_old_audio(days: int = 14) -> None:
             mp3.unlink()
 
 
-def build_site() -> Path:
-    """Kopiert neue Ausgaben ins Archiv und baut alle Site-Seiten neu."""
+def _build_presse_site() -> Path:
+    """Baut die deutsche Presse-Edition (site/)."""
     state: dict = {}
     try:
         state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
@@ -1469,22 +1829,21 @@ def build_site() -> Path:
         assessment_questions=state.get("assessment_questions"),
     )
 
-    ARCHIV_DIR.mkdir(parents=True, exist_ok=True)
-    fresh_copies: set[str] = set()
-    if OUT_DIR.exists():
-        for path in OUT_DIR.glob("*.html"):
+    out_dir = _render.OUT_DIR
+    archiv_dir = ARCHIV_DIR
+    archiv_dir.mkdir(parents=True, exist_ok=True)
+    if out_dir.exists():
+        for path in out_dir.glob("*.html"):
             if _parse(path):
-                shutil.copy2(path, ARCHIV_DIR / path.name)
-                fresh_copies.add(path.name)
-        # Audio-Ausgaben mitkopieren (Lagebild zum Hören).
-        for mp3 in OUT_DIR.glob("*.mp3"):
+                shutil.copy2(path, archiv_dir / path.name)
+        for mp3 in out_dir.glob("*.mp3"):
             if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})\.mp3$", mp3.name):
-                shutil.copy2(mp3, ARCHIV_DIR / mp3.name)
-    _prune_old_audio()
+                shutil.copy2(mp3, archiv_dir / mp3.name)
+    _prune_old_audio(archiv_dir)
 
     editions = [
         (parsed, path)
-        for path in ARCHIV_DIR.glob("*.html")
+        for path in archiv_dir.glob("*.html")
         if (parsed := _parse(path))
     ]
     index = SITE_DIR / "index.html"
@@ -1494,49 +1853,133 @@ def build_site() -> Path:
 
     editions.sort(key=lambda e: e[0], reverse=True)
 
-    # Alle Archiv-Einzelseiten neu durchrendern, damit sie das aktuelle (helle)
-    # Template tragen. Idempotent: _enhance_content fügt Highlights/Ressort/Byline
-    # nur einmal ein, _add_article_feedback ersetzt bestehende Leisten.
     for (d, _rank, edition), path in editions:
         raw = path.read_text(encoding="utf-8")
-        content = _extract_body(raw, d.isoformat(), edition)
+        content = _extract_body(raw, d.isoformat(), edition, "de")
         mp3_name = f"{d.isoformat()}-{edition}.mp3"
-        if (ARCHIV_DIR / mp3_name).exists():
+        if (archiv_dir / mp3_name).exists():
             content = _insert_after_header(content, _audio_player(mp3_name))
-        branded = _render_page(_label(d, edition), content, "archiv", root="../")
+        branded = _render_page(_label(d, edition, "de"), content, "archiv", root="../")
         path.write_text(branded, encoding="utf-8")
 
     build_archiv_index(editions)
 
-    # Hauptseite: neueste Ausgabe — mit Streak-Ritus ganz oben.
     latest_html = editions[0][1].read_text(encoding="utf-8")
     latest_d, _, latest_edition = editions[0][0]
-    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition)
-    # Reihenfolge nach dem Header: Streak-Chip, dann Audio-Player.
-    from . import state as state_mod
+    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition, "de")
     latest_mp3 = f"{latest_d.isoformat()}-{latest_edition}.mp3"
-    if (ARCHIV_DIR / latest_mp3).exists():
+    if (archiv_dir / latest_mp3).exists():
         latest_content = _insert_after_header(
             latest_content, _audio_player(f"archiv/{latest_mp3}")
         )
+    from . import state as state_mod
     streak = state_mod.current_streak(state)
     if streak >= 2:
         latest_content = _insert_after_header(
             latest_content,
             f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n',
         )
-    # Briefing-Timeline direkt unter dem Header (nur Startseite, Richtung C):
-    # macht den Presse-Kuratierungstakt sichtbar. Fällt für Catch-up weg.
-    timeline = _timeline_panel(latest_edition)
+    timeline = _timeline_panel(latest_edition, "de")
     if timeline:
         latest_content = _insert_after_header(latest_content, timeline)
     else:
-        hint = _next_edition_hint(latest_edition)
+        hint = _next_edition_hint(latest_edition, "de")
         if hint:
             latest_content = _insert_after_header(latest_content, hint)
-    title = _label(latest_d, latest_edition)
+
+    # Cross-link: NYT-Edition verlinken wenn vorhanden
+    nyt_index = BASE_DIR / "site" / "nyt" / "index.html"
+    if nyt_index.exists():
+        latest_content += '\n<p class="crosslink"><a href="nyt/">Also: NYT Briefing (English) →</a></p>'
+
+    title = _label(latest_d, latest_edition, "de")
     index_html = _render_page(title, latest_content, "lagebild")
     index.write_text(index_html, encoding="utf-8")
 
     print(f"Web-App gebaut: {index} ({len(editions)} Ausgabe(n) im Archiv)")
     return index
+
+
+def _build_nyt_site(config: dict) -> Path:
+    """Baut die englische NYT-Edition (site/nyt/)."""
+    site_dir = BASE_DIR / config.get("site_dir", "site/nyt")
+    archiv_dir = site_dir / "archiv"
+    state_path = BASE_DIR / config.get("state_file", "data/state.nyt.json")
+    out_dir = BASE_DIR / config.get("out_dir", "out/nyt")
+    epaper_url = config.get("epaper_url", "https://www.nytimes.com/section/todayspaper")
+    lang = "en"
+
+    state: dict = {}
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    _write_pwa_assets(site_dir, _NYT_MANIFEST, _NYT_SERVICE_WORKER)
+    all_topics = config.get("topics", []) + state.get("custom_topics", [])
+    _build_nyt_dossier(site_dir, state, all_topics, config)
+
+    archiv_dir.mkdir(parents=True, exist_ok=True)
+    if out_dir.exists():
+        for path in out_dir.glob("*.html"):
+            if _parse(path):
+                shutil.copy2(path, archiv_dir / path.name)
+        for mp3 in out_dir.glob("*.mp3"):
+            if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})\.mp3$", mp3.name):
+                shutil.copy2(mp3, archiv_dir / mp3.name)
+    _prune_old_audio(archiv_dir)
+
+    editions = [
+        (parsed, path)
+        for path in archiv_dir.glob("*.html")
+        if (parsed := _parse(path))
+    ]
+    index = site_dir / "index.html"
+    if not editions:
+        print("No NYT editions in archive — index.html unchanged.")
+        return index
+
+    editions.sort(key=lambda e: e[0], reverse=True)
+
+    for (d, _rank, edition), path in editions:
+        raw = path.read_text(encoding="utf-8")
+        content = _extract_body(raw, d.isoformat(), edition, lang)
+        branded = _render_nyt_page(
+            _label(d, edition, lang), content, "archiv", root="../", epaper_url=epaper_url
+        )
+        path.write_text(branded, encoding="utf-8")
+
+    build_archiv_index(editions, lang=lang, site_dir=site_dir, epaper_url=epaper_url)
+
+    latest_html = editions[0][1].read_text(encoding="utf-8")
+    latest_d, _, latest_edition = editions[0][0]
+    latest_content = _extract_body(latest_html, latest_d.isoformat(), latest_edition, lang)
+    timeline = _timeline_panel(latest_edition, lang)
+    if timeline:
+        latest_content = _insert_after_header(latest_content, timeline)
+    else:
+        hint = _next_edition_hint(latest_edition, lang)
+        if hint:
+            latest_content = _insert_after_header(latest_content, hint)
+
+    # Cross-link: Presse-Edition verlinken
+    latest_content += '\n<p class="crosslink"><a href="../">← Die Presse (Deutsch)</a></p>'
+
+    title = _label(latest_d, latest_edition, lang)
+    index_html = _render_nyt_page(title, latest_content, "lagebild", epaper_url=epaper_url)
+    index.write_text(index_html, encoding="utf-8")
+
+    print(f"NYT site built: {index} ({len(editions)} edition(s) in archive)")
+    return index
+
+
+def build_site(config: dict | None = None) -> Path:
+    """Kopiert neue Ausgaben ins Archiv und baut alle Site-Seiten neu.
+
+    config=None oder language='de' → Presse-Edition (site/).
+    language='en' → NYT-Edition (site/nyt/).
+    """
+    lang = (config or {}).get("language", "de")
+    if lang == "en" and config:
+        return _build_nyt_site(config)
+    return _build_presse_site()
