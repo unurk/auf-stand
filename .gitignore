@@ -2,8 +2,5 @@
 .venv/
 __pycache__/
 *.pyc
-data/state.json
-data/state.nyt.json
+data/tokens.json
 out/
-manual_input/*.txt
-manual_input/*.md

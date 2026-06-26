@@ -1,9 +1,3 @@
 anthropic>=0.40.0
-feedparser>=6.0.11
-httpx>=0.27.0
-PyYAML>=6.0
-python-dotenv>=1.0.1
 requests>=2.31.0
-beautifulsoup4>=4.12.0
-matplotlib>=3.8
-pywebpush>=2.0
+python-dotenv>=1.0.1
