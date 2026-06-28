@@ -42,6 +42,30 @@ RSS liefert nur Teaser. Für tiefere Synthese: Volltexte als .txt/.md in
 Für den echten Pilot: offiziellen Content-Feed über die Presse-IT anfragen,
 kein Login-Scraping bauen.
 
+## Themen-Wiki (optional, intern)
+
+Nach Andrej Karpathys „LLM Wiki"-Muster pflegt Claude je verfolgtem Thema eine
+Markdown-Wissensbasis unter `data/wiki/<thema>.md` — **first-hand aus den Quell-Artikeln**
+statt second-hand aus der fertigen Ausgabe. Der kurze „## Stand"-Kopf fließt in den
+Synthese-Prompt und schärft so das **Delta** („Was ist neu seit deinem letzten Stand").
+
+Rein interner Mechanismus für bessere Qualität — **keine** browsebare Leser-Seite
+(das widerspräche Time-to-Informed). Einzige menschliche Fläche: die `.md`-Datei selbst
+(für die Redaktion) und der bestehende „Stand:"-Einzeiler im Webview.
+
+Standard: **aus**. Aktivieren in `config.yaml`:
+
+```yaml
+wiki_enabled: true          # Themen-Wiki ein
+wiki_dir: data/wiki         # je Edition eigener Pfad (NYT: data/wiki.nyt)
+wiki_lint_enabled: true     # wöchentlicher Wartungs-Pass im `woche`-Befehl
+wiki_stale_days: 14         # Lint markiert Themen ohne Verlauf-Eintrag seit N Tagen
+```
+
+Beim ersten Lauf werden fehlende Seiten verlustfrei aus dem bestehenden Dossier
+geseedet (kein API-Call). `--dry-run` löst nie einen Wiki-API-Call aus. Der wöchentliche
+`woche`-Lauf schreibt einen Lint-Bericht nach `data/wiki/_lint.log`.
+
 ## Englische NYT-Edition (`config.nyt.yaml`)
 
 Dieselbe Pipeline kann ein **englisches Briefing aus öffentlichen New-York-Times-

@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, i18n, render, state, synthesize, telegram, tts, webpush
+from . import deliver, i18n, render, state, synthesize, telegram, tts, webpush, wiki
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -103,6 +103,15 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
     fb_hint = state.article_feedback_hint(current_state, cutoff)
 
+    # Themen-Wiki (QUERY): den kurzen „Stand"-Kopf je Thema in den Prompt geben.
+    # Migration aus dem bestehenden Dossier ist reines Text-Mapping (kein API-Call),
+    # also auch im Dry-Run sicher — der Dry-Run-Prompt zeigt so die echten Köpfe.
+    wiki_stands = None
+    if config.get("wiki_enabled"):
+        wiki.set_wiki_dir(config.get("wiki_dir"))
+        wiki.migrate_dossier_to_wiki(current_state.get("dossier", {}), all_topics)
+        wiki_stands = wiki.current_stands(all_topics)
+
     # Nächste Ausgabe im Presse-Takt bestimmen (Reihenfolge = config-Reihenfolge).
     nxt = order[(rank + 1) % len(order)]
     when_key = "when_tomorrow" if rank == len(order) - 1 else "when_today"
@@ -123,6 +132,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         show_vorausschau=(edition == "morgen"),
         lang=lang,
         prompt_file=prompt_file,
+        wiki_stands=wiki_stands,
     )
 
     if dry_run:
@@ -144,6 +154,24 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         i18n.t(lang, "reading_time_fmt").format(secs=secs),
         lagebild,
     )
+
+    # LLM-as-Judge: bewertet das fertige Lagebild gegen die Produktregeln
+    # (wesentlich/Delta/kurz/faktentreu). Reines Kalibrier-Signal — blockiert den
+    # Versand nie und greift nicht ins Lagebild ein. Auf dem redaktionellen Text
+    # vor Footer/E-Paper, damit Anhänge die Faktentreue-Note nicht verfälschen.
+    quality = None
+    if config.get("quality_gate_enabled", True):
+        try:
+            quality = synthesize.assess_quality(lagebild, selection, config)
+            if quality:
+                flag = "✓" if quality.get("gate_ok") else "⚠️ unter Schwelle"
+                print(
+                    f"Qualität (LLM-Judge): Ø {quality['gesamt']}/5 {flag} — "
+                    f"{quality.get('verdikt', '')}"
+                )
+        except Exception as exc:
+            print(f"Qualitäts-Check übersprungen: {exc}")
+
     # Redakteur:innen-Fußzeile aus den je Punkt genannten Reporter-Namen.
     lagebild = render.insert_reporters_footer(lagebild, lang)
     from . import epaper as epaper_module
@@ -200,11 +228,21 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         state.save_topic_articles(current_state, all_topics, result.articles)
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
-            current_state, edition, points, len(lagebild.split()), len(new_articles)
+            current_state, edition, points, len(lagebild.split()), len(new_articles),
+            quality=quality,
         )
-        state.update_dossier(
-            current_state, lagebild, all_topics, f"{datetime.now():%Y-%m-%d}"
-        )
+        datum = f"{datetime.now():%Y-%m-%d}"
+        if config.get("wiki_enabled"):
+            # INGEST: Wiki-Seiten first-hand aus den neuen Quell-Artikeln pflegen.
+            # Derselbe Call liefert den „Stand"-Einzeiler, der den Webview-Dossier-
+            # Eintrag speist — daher hier KEIN zusätzliches update_dossier.
+            new_stands = wiki.ingest(
+                current_state, all_topics, new_articles, datum, config, dry_run=False
+            )
+            for name, stand in new_stands.items():
+                state.append_dossier_entry(current_state, name, datum, stand)
+        else:
+            state.update_dossier(current_state, lagebild, all_topics, datum)
         questions = synthesize.generate_assessment_questions(result.articles, all_topics, config)
         if questions:
             current_state["assessment_questions"] = questions
@@ -264,6 +302,9 @@ def main() -> int:
         state.set_state_path(config.get("state_file"))
         # Ausgabeverzeichnis je Edition (config.nyt.yaml -> out/nyt/).
         render.set_out_dir(config.get("out_dir"))
+        # Themen-Wiki-Verzeichnis je Edition (config.nyt.yaml -> data/wiki.nyt/).
+        if config.get("wiki_enabled"):
+            wiki.set_wiki_dir(config.get("wiki_dir"))
         if args.command == "feeds":
             return cmd_feeds(config)
         if args.command == "catchup":

@@ -107,6 +107,25 @@ def _strip_markdown(text: str) -> str:
     return text.strip()
 
 
+def append_dossier_entry(state: dict, name: str, datum: str, summary: str) -> None:
+    """Hängt einen Dossier-Eintrag an und kappt auf 5 Einträge / 30 Tage.
+
+    Geteilte Cap-Logik für update_dossier (second-hand aus der Ausgabe) und das
+    Themen-Wiki (first-hand aus den Quell-Artikeln), damit der Webview-„Stand:"
+    aus einer einzigen Quelle gespeist wird.
+    """
+    if not summary:
+        return
+    dossier = state.setdefault("dossier", {})
+    entries = dossier.setdefault(name, [])
+    entries.append({"date": datum, "summary": summary})
+    cutoff = datetime.now(timezone.utc).date().toordinal() - 30
+    dossier[name] = [
+        e for e in entries
+        if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+    ][-5:]
+
+
 def update_dossier(state: dict, lagebild_md: str, topics: list, datum: str) -> None:
     """Hält die heutige Themen-Entwicklung je Tracker als Verlauf fest.
 
@@ -261,18 +280,28 @@ def current_streak(state: dict) -> int:
     return streak
 
 
-def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
+def record_stats(
+    state: dict,
+    edition: str,
+    points: int,
+    words: int,
+    new_articles: int,
+    quality: dict | None = None,
+) -> None:
     """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
     now = datetime.now(timezone.utc)
     stats = state.setdefault("stats", [])
-    stats.append({
+    entry = {
         "date": now.date().isoformat(),
         "ts": now.isoformat(),
         "edition": edition,
         "points": points,
         "words": words,
         "new_articles": new_articles,
-    })
+    }
+    if quality:
+        entry["quality"] = quality
+    stats.append(entry)
     # Nur die letzten 30 Tage behalten
     cutoff = now.date().toordinal() - 30
     state["stats"] = [

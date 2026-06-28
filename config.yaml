@@ -70,6 +70,22 @@ topics:
 model: claude-haiku-4-5
 max_tokens: 2500
 
+# Qualitäts-Gate (LLM-as-Judge): bewertet jedes fertige Lagebild gegen die
+# Produktregeln (wesentlich/Delta/kurz/faktentreu) mit einem zweiten, günstigen
+# Claude-Call. Reines Kalibrier-Signal — blockiert den Versand nie. Die Note
+# landet in data/state.json (stats[].quality) und im Lauf-Log.
+quality_gate_enabled: true
+quality_gate_threshold: 3.5          # Ø < Schwelle ⇒ ⚠️ im Log
+judge_model: claude-haiku-4-5-20251001
+
+# Themen-Wiki (Karpathy „LLM Wiki"): Claude pflegt je Thema eine Wissensbasis aus den
+# QUELL-Artikeln (first-hand) und liefert einen kurzen „Stand" in den Synthese-Prompt.
+# Rein intern für besseres Delta — keine browsebare Leser-Seite. Standard: aus.
+wiki_enabled: false
+wiki_dir: data/wiki                   # je Edition eigener Pfad (NYT: data/wiki.nyt)
+wiki_lint_enabled: true              # wöchentlicher Wartungs-/Lint-Lauf im `woche`-Befehl
+wiki_stale_days: 14                  # Lint markiert Themen ohne Verlauf-Eintrag seit N Tagen
+
 # Audio-Ausgabe: das Lagebild zum Hören (OpenAI TTS). Braucht OPENAI_API_KEY in .env.
 # enabled: false schaltet Audio hart ab, auch wenn ein Key gesetzt ist.
 tts:

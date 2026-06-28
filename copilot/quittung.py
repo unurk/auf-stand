@@ -132,4 +132,16 @@ def cmd_woche(config: dict) -> int:
     )
     telegram.send_photo(image, caption, config.get("telegram_chat_ids", []))
     print(f"Quittung erzeugt: {image}")
+
+    # Themen-Wiki (LINT): wöchentlicher Wartungs-Pass. Nach dem Versand und in
+    # try/except — ein Lint-Fehler darf die Quittung nie nachträglich brechen.
+    if config.get("wiki_enabled") and config.get("wiki_lint_enabled", True):
+        try:
+            from . import wiki
+            wiki.set_wiki_dir(config.get("wiki_dir"))
+            topics = config.get("topics", []) + current_state.get("custom_topics", [])
+            summary = wiki.lint_wiki(topics, config, int(config.get("wiki_stale_days", 14)))
+            print(f"Wiki-Lint: {summary}")
+        except Exception as exc:
+            print(f"Wiki-Lint übersprungen: {exc}")
     return 0

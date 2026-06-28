@@ -4,6 +4,8 @@ __pycache__/
 *.pyc
 data/state.json
 data/state.nyt.json
+data/wiki/
+data/wiki.nyt/
 out/
 manual_input/*.txt
 manual_input/*.md

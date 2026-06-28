@@ -75,6 +75,7 @@ def build_prompt(
     show_vorausschau: bool = False,
     lang: str = "de",
     prompt_file: str = "lagebild.md",
+    wiki_stands: dict[str, str] | None = None,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -109,9 +110,17 @@ def build_prompt(
         for topic in topics:
             name = topic_name(topic)
             lines.append(f"- {name}")
-            verlauf = _format_verlauf(dossier.get(name, []))
-            if verlauf:
-                lines.append(f"{i18n.t(lang, 'verlauf_prefix')}{verlauf}")
+            # Themen-Wiki hat Vorrang: der kurze „## Stand"-Kopf (first-hand aus den
+            # Quell-Artikeln) ersetzt den second-hand Dossier-Verlauf, wenn vorhanden.
+            stand = (wiki_stands or {}).get(name)
+            if stand:
+                for sline in stand.splitlines():
+                    if sline.strip():
+                        lines.append(f"{i18n.t(lang, 'wiki_stand_prefix')}{sline.strip()}")
+            else:
+                verlauf = _format_verlauf(dossier.get(name, []))
+                if verlauf:
+                    lines.append(f"{i18n.t(lang, 'verlauf_prefix')}{verlauf}")
         lines.append("")
 
     fulltexts = load_manual_fulltexts()
@@ -201,6 +210,114 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
     except Exception as exc:
         print(f"generate_assessment_questions Fehler: {exc}")
         return []
+
+
+def assess_quality(lagebild: str, articles: list, config: dict) -> dict | None:
+    """Bewertet ein fertiges Lagebild per LLM-as-Judge auf die Produktregeln.
+
+    Idee angelehnt an das „Sample-Alignment"-Signal aus Proxy-KD (Chen et al.,
+    2024): nicht das Modell wird destilliert, aber wir messen, wie gut das
+    erzeugte Lagebild zum Qualitäts-Gate „passt". Ein zweiter, günstiger Claude-
+    Call (Haiku) vergibt 1–5 je Dimension. Reines Beobachtungs-/Kalibrier-Signal:
+    Es blockiert den Versand NIE und greift nicht ins Lagebild ein.
+
+    Dimensionen (genau die CLAUDE.md-Produktregeln):
+      - wesentlichkeit: nur Wesentliches, keine erzwungenen Füll-Punkte
+      - delta:          klar „Was ist neu seit deinem letzten Stand"
+      - kuerze:         Time-to-Informed kurz, kein Scroll-Anreiz
+      - faktentreue:    durch das gelieferte Material gedeckt, nichts erfunden
+
+    Rückgabe: dict mit Scores, Gesamtschnitt, gate_ok (Schwelle) und kurzem
+    Verdikt — oder None, wenn kein API-Key gesetzt ist (z. B. Dry-Run).
+    """
+    import json as _json
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key or not lagebild.strip():
+        return None
+    import anthropic
+
+    material = "\n".join(
+        f"- [{a.ressort}] {a.title}: {(a.teaser or '')[:160]}"
+        for a in articles[:40]
+    )
+    lang = config.get("language") or "de"
+    if lang == "en":
+        prompt = (
+            "You are a strict editorial quality judge for a news briefing product.\n"
+            "The product optimizes for TIME-TO-INFORMED, never time-on-site. Rules:\n"
+            "rather 1 honest point than 3 forced ones; clearly state what is NEW; "
+            "stay short; never invent anything beyond the source material.\n\n"
+            f"Source material the briefing was built from:\n{material}\n\n"
+            f"The produced briefing:\n---\n{lagebild}\n---\n\n"
+            "Rate each dimension from 1 (poor) to 5 (excellent):\n"
+            "- essential: only what matters, no padded/forced filler points\n"
+            "- delta: clearly conveys what is new since the last edition\n"
+            "- brevity: short, no scroll-bait, respects time-to-informed\n"
+            "- faithfulness: fully grounded in the material, nothing fabricated\n\n"
+            "Reply ONLY with JSON, no other text:\n"
+            '{"essential": <1-5>, "delta": <1-5>, "brevity": <1-5>, '
+            '"faithfulness": <1-5>, "verdict": "<one short sentence>"}'
+        )
+        keymap = {
+            "essential": "wesentlichkeit",
+            "delta": "delta",
+            "brevity": "kuerze",
+            "faithfulness": "faktentreue",
+        }
+    else:
+        prompt = (
+            "Du bist eine strenge redaktionelle Qualitäts-Jury für ein Nachrichten-"
+            "Lagebild. Das Produkt optimiert auf TIME-TO-INFORMED, nie auf Time-on-"
+            "Site. Regeln: lieber 1 ehrlicher Punkt als 3 erzwungene; klar sagen, "
+            "was NEU ist; kurz bleiben; nichts über das Quellmaterial hinaus "
+            "erfinden.\n\n"
+            f"Quellmaterial, aus dem das Lagebild gebaut wurde:\n{material}\n\n"
+            f"Das erzeugte Lagebild:\n---\n{lagebild}\n---\n\n"
+            "Bewerte jede Dimension von 1 (schlecht) bis 5 (ausgezeichnet):\n"
+            "- wesentlichkeit: nur Wesentliches, keine erzwungenen Füll-Punkte\n"
+            "- delta: macht klar, was seit der letzten Ausgabe neu ist\n"
+            "- kuerze: kurz, kein Scroll-Anreiz, respektiert Time-to-Informed\n"
+            "- faktentreue: vollständig durch das Material gedeckt, nichts erfunden\n\n"
+            "Antworte NUR mit JSON, kein anderer Text:\n"
+            '{"wesentlichkeit": <1-5>, "delta": <1-5>, "kuerze": <1-5>, '
+            '"faktentreue": <1-5>, "verdikt": "<ein kurzer Satz>"}'
+        )
+        keymap = {k: k for k in ("wesentlichkeit", "delta", "kuerze", "faktentreue")}
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model=config.get("judge_model", "claude-haiku-4-5-20251001"),
+            max_tokens=400,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if not m:
+            return None
+        raw = _json.loads(m.group())
+    except Exception as exc:
+        print(f"assess_quality Fehler: {exc}")
+        return None
+
+    dims: dict[str, int] = {}
+    for src, dst in keymap.items():
+        try:
+            dims[dst] = max(1, min(5, int(round(float(raw.get(src, 0))))))
+        except (TypeError, ValueError):
+            continue
+    if not dims:
+        return None
+    gesamt = round(sum(dims.values()) / len(dims), 2)
+    threshold = float(config.get("quality_gate_threshold", 3.5))
+    result = dict(dims)
+    result["gesamt"] = gesamt
+    result["gate_ok"] = gesamt >= threshold
+    verdikt = raw.get("verdikt") or raw.get("verdict") or ""
+    if verdikt:
+        result["verdikt"] = str(verdikt).strip()[:300]
+    return result
 
 
 def synthesize(prompt: str, config: dict) -> str:
