@@ -44,6 +44,7 @@ STRINGS: dict[str, dict] = {
         "section_fulltexts": "## Volltexte (haben Vorrang)\n",
         "section_articles_fmt": "## Artikel aus den RSS-Feeds ({n} Stück)\n",
         "verlauf_prefix": "  Verlauf: ",
+        "wiki_stand_prefix": "  Stand: ",
         "author_prefix": " — Autor: ",
         # Reporter-Fußzeile (render.insert_reporters_footer)
         "reporters_marker": r"Bericht:\s*([^)·\n]+)",
@@ -98,6 +99,7 @@ STRINGS: dict[str, dict] = {
         "section_fulltexts": "## Full texts (take priority)\n",
         "section_articles_fmt": "## Articles from the RSS feeds ({n})\n",
         "verlauf_prefix": "  History: ",
+        "wiki_stand_prefix": "  Status: ",
         "author_prefix": " — Author: ",
         "reporters_marker": r"By:\s*([^)·\n]+)",
         "reporters_footer_fmt": "*Today's reporting by: {names} · The New York Times*",

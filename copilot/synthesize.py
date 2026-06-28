@@ -75,6 +75,7 @@ def build_prompt(
     show_vorausschau: bool = False,
     lang: str = "de",
     prompt_file: str = "lagebild.md",
+    wiki_stands: dict[str, str] | None = None,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -109,9 +110,17 @@ def build_prompt(
         for topic in topics:
             name = topic_name(topic)
             lines.append(f"- {name}")
-            verlauf = _format_verlauf(dossier.get(name, []))
-            if verlauf:
-                lines.append(f"{i18n.t(lang, 'verlauf_prefix')}{verlauf}")
+            # Themen-Wiki hat Vorrang: der kurze „## Stand"-Kopf (first-hand aus den
+            # Quell-Artikeln) ersetzt den second-hand Dossier-Verlauf, wenn vorhanden.
+            stand = (wiki_stands or {}).get(name)
+            if stand:
+                for sline in stand.splitlines():
+                    if sline.strip():
+                        lines.append(f"{i18n.t(lang, 'wiki_stand_prefix')}{sline.strip()}")
+            else:
+                verlauf = _format_verlauf(dossier.get(name, []))
+                if verlauf:
+                    lines.append(f"{i18n.t(lang, 'verlauf_prefix')}{verlauf}")
         lines.append("")
 
     fulltexts = load_manual_fulltexts()

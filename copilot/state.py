@@ -107,6 +107,25 @@ def _strip_markdown(text: str) -> str:
     return text.strip()
 
 
+def append_dossier_entry(state: dict, name: str, datum: str, summary: str) -> None:
+    """Hängt einen Dossier-Eintrag an und kappt auf 5 Einträge / 30 Tage.
+
+    Geteilte Cap-Logik für update_dossier (second-hand aus der Ausgabe) und das
+    Themen-Wiki (first-hand aus den Quell-Artikeln), damit der Webview-„Stand:"
+    aus einer einzigen Quelle gespeist wird.
+    """
+    if not summary:
+        return
+    dossier = state.setdefault("dossier", {})
+    entries = dossier.setdefault(name, [])
+    entries.append({"date": datum, "summary": summary})
+    cutoff = datetime.now(timezone.utc).date().toordinal() - 30
+    dossier[name] = [
+        e for e in entries
+        if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+    ][-5:]
+
+
 def update_dossier(state: dict, lagebild_md: str, topics: list, datum: str) -> None:
     """Hält die heutige Themen-Entwicklung je Tracker als Verlauf fest.
 
