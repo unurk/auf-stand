@@ -144,6 +144,24 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         i18n.t(lang, "reading_time_fmt").format(secs=secs),
         lagebild,
     )
+
+    # LLM-as-Judge: bewertet das fertige Lagebild gegen die Produktregeln
+    # (wesentlich/Delta/kurz/faktentreu). Reines Kalibrier-Signal — blockiert den
+    # Versand nie und greift nicht ins Lagebild ein. Auf dem redaktionellen Text
+    # vor Footer/E-Paper, damit Anhänge die Faktentreue-Note nicht verfälschen.
+    quality = None
+    if config.get("quality_gate_enabled", True):
+        try:
+            quality = synthesize.assess_quality(lagebild, selection, config)
+            if quality:
+                flag = "✓" if quality.get("gate_ok") else "⚠️ unter Schwelle"
+                print(
+                    f"Qualität (LLM-Judge): Ø {quality['gesamt']}/5 {flag} — "
+                    f"{quality.get('verdikt', '')}"
+                )
+        except Exception as exc:
+            print(f"Qualitäts-Check übersprungen: {exc}")
+
     # Redakteur:innen-Fußzeile aus den je Punkt genannten Reporter-Namen.
     lagebild = render.insert_reporters_footer(lagebild, lang)
     from . import epaper as epaper_module
@@ -200,7 +218,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         state.save_topic_articles(current_state, all_topics, result.articles)
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
-            current_state, edition, points, len(lagebild.split()), len(new_articles)
+            current_state, edition, points, len(lagebild.split()), len(new_articles),
+            quality=quality,
         )
         state.update_dossier(
             current_state, lagebild, all_topics, f"{datetime.now():%Y-%m-%d}"
