@@ -79,7 +79,8 @@ def _markdown_to_html(markdown: str, lang: str = "de") -> str:
         elif line.startswith("## "):
             out.append(f"<h2>{escaped[3:]}</h2>")
         elif informed in line:
-            out.append(f'<div class="done">{escaped.strip("<em></em>")}</div>')
+            plain = re.sub(r"</?em>", "", escaped).strip()
+            out.append(f'<div class="done">{plain}</div>')
         else:
             out.append(f"<p>{escaped}</p>")
     return "\n  ".join(out)

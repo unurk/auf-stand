@@ -204,6 +204,13 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
 
 
 def synthesize(prompt: str, config: dict) -> str:
+    """Erzeugt die Synthese — Provider laut `config['provider']` (anthropic|glm)."""
+    if config.get("provider", "anthropic") == "glm":
+        return _synthesize_glm(prompt, config)
+    return _synthesize_anthropic(prompt, config)
+
+
+def _synthesize_anthropic(prompt: str, config: dict) -> str:
     import anthropic
 
     api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -219,3 +226,36 @@ def synthesize(prompt: str, config: dict) -> str:
         messages=[{"role": "user", "content": prompt}],
     )
     return "".join(block.text for block in response.content if block.type == "text").strip()
+
+
+def _synthesize_glm(prompt: str, config: dict) -> str:
+    """Synthese via GLM (Z.ai) über OpenRouter — OpenAI-kompatible Chat-Completions-API.
+
+    Nutzt httpx statt eines eigenen SDK, um die Abhängigkeiten minimal zu halten
+    (CLAUDE.md-Konvention, gleiches Muster wie tts.py).
+    """
+    import httpx
+
+    api_key = os.environ.get("ZAI_API_KEY")
+    if not api_key:
+        raise SystemExit(
+            "ZAI_API_KEY fehlt. .env anlegen (siehe .env.example) "
+            "oder mit --dry-run ohne API testen."
+        )
+    glm_config = config.get("glm", {})
+    base_url = glm_config.get("base_url", "https://openrouter.ai/api/v1").rstrip("/")
+    model = glm_config.get("model", "z-ai/glm-5.2")
+    response = httpx.post(
+        f"{base_url}/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "model": model,
+            "max_tokens": int(config.get("max_tokens", 1500)),
+            "messages": [{"role": "user", "content": prompt}],
+        },
+        timeout=120,
+    )
+    if response.status_code != 200:
+        raise SystemExit(f"GLM-Fehler ({response.status_code}): {response.text[:300]}")
+    data = response.json()
+    return data["choices"][0]["message"]["content"].strip()

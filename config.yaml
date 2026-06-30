@@ -89,13 +89,6 @@ tts:
   voice: alloy
   instructions: "Sprich ruhig und sachlich, im Tempo einer seriösen Nachrichtensprecherin."
 
-# Volltexte nur für diese Ressorts holen (spart API-Kosten).
-# Andere Ressorts gehen weiter als Teaser in die Synthese ein.
-fulltext_ressorts:
-  - Politik
-  - Wirtschaft
-  - Unternehmen
-
 # Ausgaben — angedockt an die vier Presse-Kuratierungszeiten (Rebrush 2026):
 # 06:00 · 11:00 · 16:00 · 20:00. Reihenfolge = Tagestakt; lookback deckt jeweils den
 # Block seit dem vorigen Zeitpunkt (+ Puffer). morgen großzügig über Nacht.

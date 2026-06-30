@@ -243,8 +243,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
-    parser.add_argument("--url", help="URL für test-fulltext")
+    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -284,13 +283,6 @@ def main() -> int:
             print(f"VAPID_PUBLIC_KEY={pub}")
             print(f"VAPID_PRIVATE_KEY={priv}")
             print("VAPID_SUBJECT=mailto:unur@gmx.at")
-            return 0
-        if args.command == "test-fulltext":
-            if not args.url:
-                print("Fehler: --url <URL> angeben.")
-                return 1
-            from . import fulltext
-            fulltext.test_url(args.url)
             return 0
         return run_edition(args.command, config, args.dry_run, args.keep_seen)
     except Exception as exc:
