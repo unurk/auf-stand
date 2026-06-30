@@ -66,9 +66,20 @@ topics:
     schlagwort: Gesundheit
     assessment_question: "Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?"
 
-# Claude-Modell für die Synthese
+# Synthese-Provider: anthropic (Standard, Claude) oder glm (Z.ai GLM-5.2).
+# Claude bleibt Default, damit sich an der Produktqualität nichts ändert,
+# solange nicht bewusst umgeschaltet wird. GLM ist die günstigere Alternative
+# zum A/B-Testen — braucht ZAI_API_KEY in .env.
+provider: glm
+
+# Claude-Modell für die Synthese (gilt bei provider: anthropic)
 model: claude-haiku-4-5
 max_tokens: 2500
+
+# GLM-5.2 via OpenRouter (gilt nur bei provider: glm). OpenAI-kompatible API.
+glm:
+  model: z-ai/glm-5.2
+  base_url: https://openrouter.ai/api/v1
 
 # Audio-Ausgabe: das Lagebild zum Hören (OpenAI TTS). Braucht OPENAI_API_KEY in .env.
 # enabled: false schaltet Audio hart ab, auch wenn ein Key gesetzt ist.
