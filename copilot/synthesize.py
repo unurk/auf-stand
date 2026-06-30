@@ -203,7 +203,27 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
         return []
 
 
+# Standard-Endpoint der Z.ai-Plattform (OpenAI-kompatibel). Über config.glm.base_url
+# überschreibbar — z. B. auf OpenRouter (https://openrouter.ai/api/v1) umstellbar.
+GLM_DEFAULT_BASE_URL = "https://api.z.ai/api/paas/v4"
+GLM_DEFAULT_MODEL = "glm-5.2"
+
+
 def synthesize(prompt: str, config: dict) -> str:
+    """Erzeugt das Lagebild. Provider-abhängig: Claude (Standard) oder GLM (Z.ai).
+
+    Der Provider wird über ``config["provider"]`` gewählt: ``anthropic`` (Standard)
+    oder ``glm`` (bzw. ``zai``). GLM ist eine optionale, günstigere Alternative —
+    Claude bleibt der Default, damit sich an der Produktqualität nichts ändert,
+    solange nicht bewusst umgeschaltet wird.
+    """
+    provider = str(config.get("provider", "anthropic")).lower()
+    if provider in ("glm", "zai", "z.ai"):
+        return _synthesize_glm(prompt, config)
+    return _synthesize_claude(prompt, config)
+
+
+def _synthesize_claude(prompt: str, config: dict) -> str:
     import anthropic
 
     api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -219,3 +239,42 @@ def synthesize(prompt: str, config: dict) -> str:
         messages=[{"role": "user", "content": prompt}],
     )
     return "".join(block.text for block in response.content if block.type == "text").strip()
+
+
+def _synthesize_glm(prompt: str, config: dict) -> str:
+    """Synthese über GLM-5.2 via OpenAI-kompatible Chat-Completions-API (Z.ai).
+
+    Nutzt bewusst nur ``requests`` (bereits Dependency) statt eines weiteren SDK,
+    um die Abhängigkeiten minimal zu halten (siehe CLAUDE.md).
+    """
+    import requests
+
+    glm_cfg = config.get("glm") or {}
+    api_key = os.environ.get("ZAI_API_KEY") or os.environ.get("GLM_API_KEY")
+    if not api_key:
+        raise SystemExit(
+            "ZAI_API_KEY fehlt (provider: glm). .env anlegen (siehe .env.example), "
+            "auf provider: anthropic zurückstellen oder mit --dry-run ohne API testen."
+        )
+    base_url = str(glm_cfg.get("base_url", GLM_DEFAULT_BASE_URL)).rstrip("/")
+    model = glm_cfg.get("model", GLM_DEFAULT_MODEL)
+    resp = requests.post(
+        f"{base_url}/chat/completions",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": model,
+            "max_tokens": int(config.get("max_tokens", 1500)),
+            "messages": [{"role": "user", "content": prompt}],
+        },
+        timeout=120,
+    )
+    if resp.status_code != 200:
+        raise SystemExit(f"GLM-API-Fehler ({resp.status_code}): {resp.text[:500]}")
+    data = resp.json()
+    try:
+        return data["choices"][0]["message"]["content"].strip()
+    except (KeyError, IndexError, TypeError) as exc:
+        raise SystemExit(f"GLM-Antwort unerwartet: {exc} — {str(data)[:500]}")

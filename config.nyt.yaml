@@ -70,9 +70,19 @@ topics:
     schlagwort: Climate
     assessment_question: "Do you care about climate policy and the environment — personally or at work?"
 
-# Claude model for synthesis
+# Synthesis provider: anthropic (default, Claude) or glm (Z.ai GLM-5.2).
+# Claude stays the default; GLM is the cheaper alternative for A/B testing.
+# Needs ZAI_API_KEY in .env when provider: glm.
+provider: anthropic
+
+# Claude model for synthesis (used when provider: anthropic)
 model: claude-haiku-4-5
 max_tokens: 2500
+
+# GLM-5.2 via Z.ai (used only when provider: glm). OpenAI-compatible API.
+glm:
+  model: glm-5.2
+  base_url: https://api.z.ai/api/paas/v4
 
 # Audio output (OpenAI TTS). Needs OPENAI_API_KEY in .env. enabled: false turns it off.
 tts:

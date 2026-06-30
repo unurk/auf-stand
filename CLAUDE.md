@@ -20,7 +20,8 @@ widerspricht dem Produkt und wird nicht gebaut.
 copilot/
   fetch.py       RSS-Feeds der Presse holen & normalisieren (nur öffentliche Teaser)
   state.py       Gesehene Artikel in data/state.json -> Delta zwischen Ausgaben
-  synthesize.py  Claude API: erzeugt das Lagebild aus Artikeln + Themen-Trackern
+  synthesize.py  Synthese-API: erzeugt das Lagebild aus Artikeln + Themen-Trackern
+                 (Provider via config.provider: anthropic/Claude Standard, glm/GLM-5.2 optional)
   render.py      Markdown- und HTML-Ausgabe nach out/
   deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
   main.py        CLI: morgen | mittag | nachmittag | abend | catchup [--dry-run]
@@ -40,6 +41,9 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
 - Python 3.10+, keine Frameworks. Abhängigkeiten minimal halten (requirements.txt).
 - Alle Nutzertexte und Prompts auf Deutsch (österreichisches Publikum).
 - Secrets nur über .env (siehe .env.example), niemals in Code oder config.yaml.
+- Synthese-Provider umschaltbar über `config.provider`: `anthropic` (Standard, Claude)
+  oder `glm` (Z.ai GLM-5.2, braucht `ZAI_API_KEY`). Claude bleibt Default; GLM ist die
+  günstigere Alternative zum A/B-Testen der deutschen Synthese-Qualität.
 - `--dry-run` muss immer funktionieren: baut den Prompt und schreibt ihn nach out/,
   ohne API-Call. So ist die Pipeline ohne Kosten testbar.
 - Das Qualitäts-Gate im Prompt nicht aufweichen: Lieber 1 Punkt oder die ehrliche
