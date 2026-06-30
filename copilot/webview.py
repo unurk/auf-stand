@@ -1235,8 +1235,8 @@ def _topic_card_html(topic, dossier: dict, topic_articles: dict) -> str:
     if arts:
         items = "\n".join(
             f'<li class="topic-article">'
-            f'<a href="{a["link"]}" target="_blank" rel="noopener">'
-            f'<span class="topic-article-title">{a["title"]}</span>'
+            f'<a href="{_html.escape(a["link"])}" target="_blank" rel="noopener">'
+            f'<span class="topic-article-title">{_html.escape(a["title"])}</span>'
             f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
             f"</a></li>"
             for a in arts
@@ -1467,8 +1467,8 @@ def _build_nyt_dossier(site_dir: Path, state: dict, topics: list, config: dict) 
         if arts:
             items = "\n".join(
                 f'<li class="topic-article">'
-                f'<a href="{a["link"]}" target="_blank" rel="noopener">'
-                f'<span class="topic-article-title">{a["title"]}</span>'
+                f'<a href="{_html.escape(a["link"])}" target="_blank" rel="noopener">'
+                f'<span class="topic-article-title">{_html.escape(a["title"])}</span>'
                 f'<span class="topic-article-date">{_iso_to_display(a["date"])[:5]}</span>'
                 f"</a></li>"
                 for a in arts if a.get("link") and a.get("title")
