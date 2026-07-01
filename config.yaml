@@ -66,11 +66,11 @@ topics:
     schlagwort: Gesundheit
     assessment_question: "Betrifft dich das Gesundheitssystem — als Patient, Angehöriger oder im Gesundheitsbereich tätig?"
 
-# Synthese-Modell: GLM-5.2 via OpenRouter (einziger Provider, OpenAI-kompatible API).
-# Braucht OPENROUTER_API_KEY in .env.
+# Synthese-Modell: GLM-5.2 direkt über Z.ai (einziger Provider, OpenAI-kompatible API).
+# Braucht ZAI_API_KEY in .env.
 glm:
-  model: z-ai/glm-5.2
-  base_url: https://openrouter.ai/api/v1
+  model: glm-5.2
+  base_url: https://api.z.ai/api/paas/v4/
   max_tokens: 2500
 
 # Audio-Ausgabe: das Lagebild zum Hören (OpenAI TTS). Braucht OPENAI_API_KEY in .env.

@@ -20,7 +20,7 @@ widerspricht dem Produkt und wird nicht gebaut.
 copilot/
   fetch.py       RSS-Feeds der Presse holen & normalisieren (nur öffentliche Teaser)
   state.py       Gesehene Artikel in data/state.json -> Delta zwischen Ausgaben
-  synthesize.py  GLM-5.2 via OpenRouter: erzeugt das Lagebild aus Artikeln + Themen-Trackern
+  synthesize.py  GLM-5.2 via Z.ai: erzeugt das Lagebild aus Artikeln + Themen-Trackern
   render.py      Markdown- und HTML-Ausgabe nach out/
   deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
   main.py        CLI: morgen | mittag | nachmittag | abend | catchup [--dry-run]
@@ -33,7 +33,7 @@ out/             Erzeugte Lagebilder (md + html)
 ```
 
 Ablauf einer Ausgabe: fetch -> state filtert auf „neu seit letzter Ausgabe" ->
-synthesize (GLM-5.2 via OpenRouter) -> render -> deliver -> state aktualisieren.
+synthesize (GLM-5.2 via Z.ai) -> render -> deliver -> state aktualisieren.
 
 ## Konventionen
 

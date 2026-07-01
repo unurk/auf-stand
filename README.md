@@ -10,7 +10,7 @@ Lesezeit) statt eines Artikel-Feeds. Hintergrund siehe `CLAUDE.md` und das Konze
 cd auf-stand
 python3 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env    # OPENROUTER_API_KEY eintragen (openrouter.ai/keys)
+cp .env.example .env    # ZAI_API_KEY eintragen (z.ai/manage-apikey/apikey-list)
 ```
 
 ## Erste Schritte
@@ -22,7 +22,7 @@ python -m copilot.main feeds
 # 2. Pipeline ohne API-Kosten testen — baut den Prompt und legt ihn in out/ ab:
 python -m copilot.main morgen --dry-run
 
-# 3. Erstes echtes Lagebild erzeugen (braucht OPENROUTER_API_KEY in .env):
+# 3. Erstes echtes Lagebild erzeugen (braucht ZAI_API_KEY in .env):
 python -m copilot.main morgen
 # -> out/JJJJ-MM-TT-morgen.md und .html (im Browser öffnen)
 
@@ -53,7 +53,7 @@ Config — das deutsche Presse-Produkt bleibt unberührt:
 python -m copilot.main feeds  --config config.nyt.yaml
 # Prompt bauen ohne API-Kosten:
 python -m copilot.main morgen --config config.nyt.yaml --dry-run
-# Echtes Briefing (braucht OPENROUTER_API_KEY):
+# Echtes Briefing (braucht ZAI_API_KEY):
 python -m copilot.main morgen --config config.nyt.yaml
 ```
 

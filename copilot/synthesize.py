@@ -1,4 +1,4 @@
-"""Erzeugt das Lagebild: Prompt zusammenbauen, GLM-5.2 via OpenRouter aufrufen."""
+"""Erzeugt das Lagebild: Prompt zusammenbauen, GLM-5.2 via Z.ai aufrufen."""
 from __future__ import annotations
 
 import os
@@ -147,7 +147,7 @@ def build_prompt(
 def generate_assessment_questions(articles: list, topics: list, config: dict) -> list[dict]:
     """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage via GLM-5.2."""
     import json as _json
-    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    api_key = os.environ.get("ZAI_API_KEY", "")
     if not api_key or not articles or not topics:
         return []
     from openai import OpenAI
@@ -190,9 +190,9 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
         )
     glm_config = config.get("glm", {})
     try:
-        client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://openrouter.ai/api/v1"))
+        client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://api.z.ai/api/paas/v4/"))
         resp = client.chat.completions.create(
-            model=glm_config.get("model", "z-ai/glm-5.2"),
+            model=glm_config.get("model", "glm-5.2"),
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -207,16 +207,16 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
 def synthesize(prompt: str, config: dict) -> str:
     from openai import OpenAI
 
-    api_key = os.environ.get("OPENROUTER_API_KEY")
+    api_key = os.environ.get("ZAI_API_KEY")
     if not api_key:
         raise SystemExit(
-            "OPENROUTER_API_KEY fehlt. .env anlegen (siehe .env.example) "
+            "ZAI_API_KEY fehlt. .env anlegen (siehe .env.example) "
             "oder mit --dry-run ohne API testen."
         )
     glm_config = config.get("glm", {})
-    client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://openrouter.ai/api/v1"))
+    client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://api.z.ai/api/paas/v4/"))
     response = client.chat.completions.create(
-        model=glm_config.get("model", "z-ai/glm-5.2"),
+        model=glm_config.get("model", "glm-5.2"),
         max_tokens=int(glm_config.get("max_tokens", 1500)),
         messages=[{"role": "user", "content": prompt}],
     )
