@@ -1,4 +1,4 @@
-"""Erzeugt das Lagebild: Prompt zusammenbauen, Claude API aufrufen."""
+"""Erzeugt das Lagebild: Prompt zusammenbauen, GLM-5.2 via OpenRouter aufrufen."""
 from __future__ import annotations
 
 import os
@@ -145,12 +145,12 @@ def build_prompt(
 
 
 def generate_assessment_questions(articles: list, topics: list, config: dict) -> list[dict]:
-    """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage via Claude."""
+    """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage via GLM-5.2."""
     import json as _json
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key or not articles or not topics:
         return []
-    import anthropic
+    from openai import OpenAI
     topic_lines = "\n".join(
         f"- {topic_name(t)} (Schlagwort: {topic_keyword(t)})" for t in topics
     )
@@ -188,14 +188,15 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
             '[{"name": "<exakter Themenname>", "question": "<Frage>"}]\n'
             "Keine anderen Ausgaben."
         )
+    glm_config = config.get("glm", {})
     try:
-        client = anthropic.Anthropic(api_key=api_key)
-        resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
+        client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://openrouter.ai/api/v1"))
+        resp = client.chat.completions.create(
+            model=glm_config.get("model", "z-ai/glm-5.2"),
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
-        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        text = (resp.choices[0].message.content or "").strip()
         m = re.search(r"\[.*\]", text, re.DOTALL)
         return _json.loads(m.group()) if m else []
     except Exception as exc:
@@ -204,18 +205,19 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
 
 
 def synthesize(prompt: str, config: dict) -> str:
-    import anthropic
+    from openai import OpenAI
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         raise SystemExit(
-            "ANTHROPIC_API_KEY fehlt. .env anlegen (siehe .env.example) "
+            "OPENROUTER_API_KEY fehlt. .env anlegen (siehe .env.example) "
             "oder mit --dry-run ohne API testen."
         )
-    client = anthropic.Anthropic(api_key=api_key)
-    response = client.messages.create(
-        model=config.get("model", "claude-sonnet-4-6"),
-        max_tokens=int(config.get("max_tokens", 1500)),
+    glm_config = config.get("glm", {})
+    client = OpenAI(api_key=api_key, base_url=glm_config.get("base_url", "https://openrouter.ai/api/v1"))
+    response = client.chat.completions.create(
+        model=glm_config.get("model", "z-ai/glm-5.2"),
+        max_tokens=int(glm_config.get("max_tokens", 1500)),
         messages=[{"role": "user", "content": prompt}],
     )
-    return "".join(block.text for block in response.content if block.type == "text").strip()
+    return (response.choices[0].message.content or "").strip()
