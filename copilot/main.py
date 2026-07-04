@@ -2,14 +2,15 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, i18n, render, state, synthesize, telegram, tts, webpush
+from . import deliver, epaper, i18n, render, state, synthesize, telegram, tts, webpush
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,7 +99,6 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
     print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
 
-    from datetime import timedelta
     all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
     cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
     fb_hint = state.article_feedback_hint(current_state, cutoff)
@@ -135,7 +135,6 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     lagebild = synthesize.synthesize(prompt, config)
     # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
-    import re
     words = len(re.findall(r"\w+", lagebild))
     wps = float(i18n.t(lang, "words_per_sec"))
     secs = max(60, round(words / wps / 15) * 15)  # Wörter/Sek je Sprache, auf 15s gerundet
@@ -146,8 +145,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     )
     # Redakteur:innen-Fußzeile aus den je Punkt genannten Reporter-Namen.
     lagebild = render.insert_reporters_footer(lagebild, lang)
-    from . import epaper as epaper_module
-    lagebild += epaper_module.epaper_section(epaper_module.get_epaper_url(config), lang)
+    lagebild += epaper.epaper_section(epaper.get_epaper_url(config), lang)
     md_path, html_path = render.write_output(lagebild, edition, lang)
     print(f"Lagebild erzeugt:\n  {md_path}\n  {html_path}")
 
@@ -160,7 +158,6 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         if config.get("feedback_enabled", True)
         else None
     )
-    import re
     article_headings = [
         re.sub(r"^[1-9]\S*\s+", "", line[3:]).strip()
         for line in lagebild.splitlines()
@@ -243,8 +240,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "test-fulltext", "woche", "rueckkanal", "site", "vapid-keys"])
-    parser.add_argument("--url", help="URL für test-fulltext")
+    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -284,13 +280,6 @@ def main() -> int:
             print(f"VAPID_PUBLIC_KEY={pub}")
             print(f"VAPID_PRIVATE_KEY={priv}")
             print("VAPID_SUBJECT=mailto:unur@gmx.at")
-            return 0
-        if args.command == "test-fulltext":
-            if not args.url:
-                print("Fehler: --url <URL> angeben.")
-                return 1
-            from . import fulltext
-            fulltext.test_url(args.url)
             return 0
         return run_edition(args.command, config, args.dry_run, args.keep_seen)
     except Exception as exc:

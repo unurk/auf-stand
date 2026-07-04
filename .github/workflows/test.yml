@@ -1,0 +1,21 @@
+name: Tests
+
+on:
+  push:
+    paths: [copilot/**, tests/**, prompts/**, config*.yaml, requirements*.txt, .github/workflows/test.yml]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements-dev.txt
+      # Bewusst nur Unit-Tests (hermetisch, ohne Netz) — die Feeds selbst prüft
+      # der Lagebild-Lauf ohnehin 4×/Tag und meldet Fehler auf Telegram.
+      - run: pytest -q

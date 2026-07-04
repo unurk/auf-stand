@@ -18,22 +18,33 @@ widerspricht dem Produkt und wird nicht gebaut.
 
 ```
 copilot/
-  fetch.py       RSS-Feeds der Presse holen & normalisieren (nur öffentliche Teaser)
-  state.py       Gesehene Artikel in data/state.json -> Delta zwischen Ausgaben
-  synthesize.py  Claude API: erzeugt das Lagebild aus Artikeln + Themen-Trackern
+  fetch.py       RSS-Feeds holen & normalisieren (nur öffentliche Teaser; httpx + Timeout)
+  state.py       Laufzeit-Zustand: gesehene Artikel, Feedback, Dossier, Push-Abos, Stats
+  synthesize.py  Prompt bauen + Synthese über Provider (anthropic | glm via OpenRouter)
   render.py      Markdown- und HTML-Ausgabe nach out/
   deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
-  main.py        CLI: morgen | mittag | nachmittag | abend | catchup [--dry-run]
+  telegram.py    Telegram-Versand (MarkdownV2, Feedback-Buttons, Audio, Alerts)
+  tts.py         Audio-Version des Lagebilds (OpenAI TTS, best-effort)
+  webpush.py     Web-Push an PWA-Abonnenten (VAPID)
+  webview.py     Statische PWA (site/): Lagebild, Dossier, Archiv — Presse + NYT
+  rueckkanal.py  Telegram-Rückkanal: Fragen, /themen, /thema-neu, /push, Feedback-Taps
+  quittung.py    Wochen-Quittung als Bild-Karte (Samstag)
+  epaper.py      E-Paper-Verweis am Ende jeder Ausgabe
+  vorausschau.py Termin-Vorausschau in der Morgen-Ausgabe
+  i18n.py        Deutsche/englische Textbausteine (Presse- vs. NYT-Edition)
+  main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site [--dry-run]
 prompts/
-  lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts)
+  lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
 manual_input/    Hier können Volltexte (Premium) als .txt/.md abgelegt werden
-config.yaml      Feeds, Themen-Tracker, Empfänger, Modell
-data/state.json  Laufzeit-Zustand (gesehene Artikel)
-out/             Erzeugte Lagebilder (md + html)
+config.yaml      Feeds, Themen-Tracker, Empfänger, Provider/Modell (config.nyt.yaml: NYT)
+data/state.json  Laufzeit-Zustand (gesehene Artikel; state.nyt.json für die NYT-Edition)
+out/             Erzeugte Lagebilder (md + html + mp3)
+tests/           pytest-Suite (hermetisch, ohne Netz) — läuft in CI bei jedem Push
 ```
 
 Ablauf einer Ausgabe: fetch -> state filtert auf „neu seit letzter Ausgabe" ->
-synthesize (Claude) -> render -> deliver -> state aktualisieren.
+synthesize (Claude oder GLM, je nach `provider` in config.yaml) -> render ->
+deliver/telegram/tts/webpush -> state aktualisieren.
 
 ## Konventionen
 
@@ -55,14 +66,18 @@ synthesize (Claude) -> render -> deliver -> state aktualisieren.
   soll ein offizieller interner Content-Feed/API über die IT angefragt werden.
   Das ist auch der bessere Weg für saubere, vollständige Daten.
 
-## Roadmap (in dieser Reihenfolge sinnvoll)
+## Stand & Roadmap
 
-1. Feeds verifizieren, erste echte Lagebilder erzeugen, Prompt-Qualität iterieren
-2. Themen-Tracker schärfen: Delta-Formulierung („Was ist neu seit deinem letzten Stand")
-3. E-Mail-Versand an kleine Testgruppe (Concierge-MVP, siehe Konzeptpapier)
-4. 17-Uhr-Ausgabe als Audio: TTS-Anbindung (z. B. ElevenLabs/OpenAI TTS), mp3 nach out/
-5. Telegram-Bot als Push-Kanal (einfacher als WhatsApp Business API)
-6. Mini-Web-Ansicht mit „Du bist informiert ✓"-Status (statisches HTML reicht zunächst)
+Gebaut und in Betrieb: 4 Ausgaben/Tag via GitHub Actions, Telegram (inkl.
+👍/👎-Feedback, Rückkanal, Audio), E-Mail, PWA mit Web-Push, Themen-Dossiers,
+Wochen-Quittung, NYT-Parallel-Edition, pytest-Suite in CI.
+
+Als Nächstes sinnvoll:
+
+1. Prompt-Qualität weiter iterieren (Feedback-Daten aus data/state.json nutzen)
+2. E-Mail-Versand an kleine Testgruppe (Concierge-MVP, siehe Konzeptpapier)
+3. Offiziellen Content-Feed/API über die Presse-IT anfragen (Volltexte statt Teaser)
+4. webview.py entflechten (1900+ Zeilen: Templates auslagern, Presse/NYT trennen)
 
 ## Was bewusst NICHT gebaut wird
 

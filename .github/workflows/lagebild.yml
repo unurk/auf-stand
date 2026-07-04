@@ -21,6 +21,13 @@ on:
         default: auto
         options: [auto, morgen, mittag, nachmittag, abend, woche]
 
+# Nie zwei Läufe parallel: die 30-Minuten-Wiederhol-Crons und der externe Trigger
+# können sich sonst überlappen — beide restoren dann denselben alten State, der
+# Block-Guard in main.py greift nicht und es kommt zur Doppelzustellung.
+concurrency:
+  group: lagebild
+  cancel-in-progress: false
+
 jobs:
   lagebild:
     runs-on: ubuntu-latest
@@ -148,11 +155,28 @@ jobs:
             data/rueckkanal_offset.json
           key: state-${{ github.run_id }}
 
+      # Disaster-Recovery: Der Cache kann evictet werden (Größenlimit) — dann wären
+      # seen-IDs, Feedback, Dossier und v. a. die Push-Subscriptions weg. Das
+      # Artifact ist privat (anders als das öffentliche Repo, in das state.json
+      # wegen der Push-Endpoints nicht gehört) und manuell wiederherstellbar.
+      - name: State-Backup als Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: state-backup
+          path: |
+            data/state.json
+            data/rueckkanal_offset.json
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: Fehler auf Telegram melden
         if: failure()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          # Repo-Variable pflegbar unter Settings → Variables; Fallback = bisherige ID.
+          ALERT_CHAT_ID: ${{ vars.TELEGRAM_ALERT_CHAT_ID || '8962080832' }}
         run: |
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d chat_id=8962080832 \
+            -d chat_id="$ALERT_CHAT_ID" \
             -d text="❌ Copilot: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"

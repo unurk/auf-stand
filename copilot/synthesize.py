@@ -145,12 +145,10 @@ def build_prompt(
 
 
 def generate_assessment_questions(articles: list, topics: list, config: dict) -> list[dict]:
-    """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage via Claude."""
+    """Generiert je Thema eine konkrete, artikel-basierte Assessment-Frage."""
     import json as _json
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key or not articles or not topics:
+    if not _provider_configured(config) or not articles or not topics:
         return []
-    import anthropic
     topic_lines = "\n".join(
         f"- {topic_name(t)} (Schlagwort: {topic_keyword(t)})" for t in topics
     )
@@ -189,13 +187,7 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
             "Keine anderen Ausgaben."
         )
     try:
-        client = anthropic.Anthropic(api_key=api_key)
-        resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        text = _complete(prompt, config, max_tokens=1000, anthropic_model="claude-haiku-4-5-20251001")
         m = re.search(r"\[.*\]", text, re.DOTALL)
         return _json.loads(m.group()) if m else []
     except Exception as exc:
@@ -204,6 +196,51 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
 
 
 def synthesize(prompt: str, config: dict) -> str:
+    """Erzeugt das Lagebild über den konfigurierten Provider (anthropic | glm)."""
+    return _complete(prompt, config, max_tokens=int(config.get("max_tokens", 1500)))
+
+
+# ---------------------------------------------------------------------------
+# Provider-Abstraktion: anthropic (Claude, Default) oder glm (OpenRouter,
+# OpenAI-kompatibel via httpx — kein zusätzliches SDK, CLAUDE.md-Konvention).
+# ---------------------------------------------------------------------------
+
+class _TransientError(Exception):
+    """API-Fehler, bei dem sich ein Wiederholungsversuch lohnt (Rate-Limit/Überlast)."""
+
+
+_RETRY_STATUS = {408, 429, 500, 502, 503, 529}
+
+
+def _provider_configured(config: dict) -> bool:
+    if config.get("provider", "anthropic") == "glm":
+        return bool(os.environ.get("ZAI_API_KEY"))
+    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+
+
+def _complete(prompt: str, config: dict, max_tokens: int, anthropic_model: str | None = None) -> str:
+    """Ein Prompt → Text. Transiente Fehler werden bis zu 2× mit Backoff wiederholt."""
+    import time
+
+    if config.get("provider", "anthropic") == "glm":
+        call = lambda: _complete_glm(prompt, config, max_tokens)  # noqa: E731
+    else:
+        model = anthropic_model or config.get("model", "claude-sonnet-4-6")
+        call = lambda: _complete_anthropic(prompt, model, max_tokens)  # noqa: E731
+
+    for attempt in range(3):
+        try:
+            return call()
+        except _TransientError as exc:
+            if attempt == 2:
+                raise RuntimeError(f"Synthese nach 3 Versuchen fehlgeschlagen: {exc}") from exc
+            wait = 2 ** (attempt + 1)
+            print(f"Synthese-Fehler (transient): {exc} — neuer Versuch in {wait}s.")
+            time.sleep(wait)
+    raise AssertionError("unreachable")
+
+
+def _complete_anthropic(prompt: str, model: str, max_tokens: int) -> str:
     import anthropic
 
     api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -213,9 +250,51 @@ def synthesize(prompt: str, config: dict) -> str:
             "oder mit --dry-run ohne API testen."
         )
     client = anthropic.Anthropic(api_key=api_key)
-    response = client.messages.create(
-        model=config.get("model", "claude-sonnet-4-6"),
-        max_tokens=int(config.get("max_tokens", 1500)),
-        messages=[{"role": "user", "content": prompt}],
-    )
+    try:
+        response = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except anthropic.APIConnectionError as exc:
+        raise _TransientError(str(exc)) from exc
+    except anthropic.APIStatusError as exc:
+        if exc.status_code in _RETRY_STATUS:
+            raise _TransientError(f"HTTP {exc.status_code}") from exc
+        raise
     return "".join(block.text for block in response.content if block.type == "text").strip()
+
+
+def _complete_glm(prompt: str, config: dict, max_tokens: int) -> str:
+    import httpx
+
+    api_key = os.environ.get("ZAI_API_KEY")
+    if not api_key:
+        raise SystemExit(
+            "ZAI_API_KEY fehlt (provider: glm in config.yaml). .env anlegen "
+            "(siehe .env.example) oder mit --dry-run ohne API testen."
+        )
+    glm_cfg = config.get("glm", {})
+    base_url = glm_cfg.get("base_url", "https://openrouter.ai/api/v1").rstrip("/")
+    try:
+        resp = httpx.post(
+            f"{base_url}/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "model": glm_cfg.get("model", "z-ai/glm-5.2"),
+                "max_tokens": max_tokens,
+                "messages": [{"role": "user", "content": prompt}],
+            },
+            timeout=180,
+        )
+    except httpx.HTTPError as exc:
+        raise _TransientError(str(exc)) from exc
+    if resp.status_code in _RETRY_STATUS:
+        raise _TransientError(f"HTTP {resp.status_code}: {resp.text[:200]}")
+    if resp.status_code != 200:
+        raise RuntimeError(f"GLM-Fehler (HTTP {resp.status_code}): {resp.text[:300]}")
+    data = resp.json()
+    content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+    if not content or not content.strip():
+        raise RuntimeError(f"GLM-Antwort ohne Inhalt: {str(data)[:300]}")
+    return content.strip()
