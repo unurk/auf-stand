@@ -126,6 +126,7 @@ jobs:
         id: pages-deployment
         uses: actions/deploy-pages@v4
         if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
+        continue-on-error: true
 
       - name: Fehler melden
         if: failure()
