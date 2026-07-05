@@ -12,8 +12,20 @@ feeds:
     url: https://www.diepresse.com/rss/Wirtschaft
   - name: Unternehmen
     url: https://www.diepresse.com/rss/Unternehmen
+  - name: Außenpolitik
+    url: https://www.diepresse.com/rss/Aussenpolitik
+  - name: EU
+    url: https://www.diepresse.com/rss/EU
+  - name: Recht
+    url: https://www.diepresse.com/rss/Recht
+  - name: Tech
+    url: https://www.diepresse.com/rss/Tech
+  - name: Science
+    url: https://www.diepresse.com/rss/Science
 
-max_articles_per_feed: 15
+# 9 Feeds × 10 statt 4 × 15 — hält den Synthese-Prompt trotz breiterer
+# Ressort-Abdeckung etwa gleich groß (Dedup über Feeds macht fetch.py).
+max_articles_per_feed: 10
 
 # Themen-Tracker: explizit verfolgte Entwicklungen (KEINE Klick-Personalisierung).
 # Erscheinen im Lagebild nur, wenn es eine materielle Änderung gibt.

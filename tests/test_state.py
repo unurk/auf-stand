@@ -79,6 +79,52 @@ def test_article_feedback_hint_braucht_mindestmenge():
     assert state.article_feedback_hint(s, "2026-01-01") == ""
 
 
+def test_save_edition_points_und_feedback_mit_heading():
+    s: dict = {}
+    today = datetime.now(timezone.utc).date().isoformat()
+    state.save_edition_points(s, today, "morgen", ["🏠 Mietpreisbremse kommt", "📊 EZB senkt Zins"])
+    state.record_article_feedback(s, today, "morgen", 1, "up", "1")
+    assert s["article_feedback"][0]["heading"] == "📊 EZB senkt Zins"
+    # Index außerhalb der Punkteliste → leeres Heading, kein Fehler
+    state.record_article_feedback(s, today, "morgen", 7, "down", "1")
+    assert s["article_feedback"][1]["heading"] == ""
+
+
+def test_save_edition_points_verwirft_alte_eintraege():
+    s = {"edition_points": {"2020-01-01|morgen": ["Uralt"]}}
+    today = datetime.now(timezone.utc).date().isoformat()
+    state.save_edition_points(s, today, "abend", ["Neu"])
+    assert f"{today}|abend" in s["edition_points"]
+    assert "2020-01-01|morgen" not in s["edition_points"]
+
+
+def test_article_feedback_hint_nennt_konkrete_titel():
+    s: dict = {}
+    today = datetime.now(timezone.utc).date().isoformat()
+    state.save_edition_points(s, today, "morgen", [f"Punkt {i}" for i in range(8)])
+    for i in range(7):
+        state.record_article_feedback(s, today, "morgen", i, "down", "1")
+    state.record_article_feedback(s, today, "morgen", 7, "up", "1")
+    hint = state.article_feedback_hint(s, "2026-01-01")
+    # Cap bei 5 Titeln je Richtung, dedupliziert, jüngste zuerst
+    assert hint.count("„Punkt") == 6  # 5 downs + 1 up
+    assert "„Punkt 6“" in hint and "„Punkt 1“" not in hint
+    assert "„Punkt 7“" in hint  # der Upvote
+    assert "Materialitäts-Schwelle" in hint
+
+
+def test_article_feedback_hint_ohne_headings_bleibt_grob():
+    """Alte Einträge ohne heading-Feld (Bestandsdaten) dürfen nichts brechen."""
+    s = {"article_feedback": [
+        {"date": datetime.now(timezone.utc).date().isoformat(), "edition": "morgen",
+         "article_idx": i, "rating": "down", "chat_id": "1", "ts": ""}
+        for i in range(4)
+    ]}
+    hint = state.article_feedback_hint(s, "2026-01-01")
+    assert "nicht relevant markiert" in hint
+    assert "„" not in hint  # keine Titel-Nennung ohne Headings
+
+
 def test_current_streak():
     today = datetime.now(timezone.utc).date()
     s = {"stats": [

@@ -156,16 +156,34 @@ def update_dossier(state: dict, lagebild_md: str, topics: list, datum: str) -> N
                 break  # eine Zeile zählt nur zum ersten passenden Thema
 
 
+def save_edition_points(state: dict, datum: str, edition: str, headings: list[str]) -> None:
+    """Merkt sich die Punkt-Titel einer Ausgabe, damit 👍/👎-Taps (die nur einen
+    Index tragen) später inhaltlich auflösbar sind."""
+    if not headings:
+        return
+    points = state.setdefault("edition_points", {})
+    points[f"{datum}|{edition}"] = headings
+    # Nur die letzten 30 Tage behalten (Schlüsselformat: "YYYY-MM-DD|edition").
+    cutoff = datetime.now(timezone.utc).date().toordinal() - 30
+    state["edition_points"] = {
+        k: v for k, v in points.items()
+        if datetime.fromisoformat(k.split("|")[0]).toordinal() >= cutoff
+    }
+
+
 def record_article_feedback(
     state: dict, datum: str, edition: str, article_idx: int, rating: str, chat_id: str
 ) -> None:
     """Hält Artikel-Relevanz-Bewertung fest (rating: 'up' oder 'down')."""
     now = datetime.now(timezone.utc)
+    headings = state.get("edition_points", {}).get(f"{datum}|{edition}", [])
+    heading = headings[article_idx] if 0 <= article_idx < len(headings) else ""
     entries = state.setdefault("article_feedback", [])
     entries.append({
         "date": datum,
         "edition": edition,
         "article_idx": article_idx,
+        "heading": heading,
         "rating": rating,
         "chat_id": chat_id,
         "ts": now.isoformat(),
@@ -177,8 +195,25 @@ def record_article_feedback(
     ]
 
 
+def _feedback_headings(entries: list[dict], rating: str, limit: int = 5) -> list[str]:
+    """Jüngste eindeutige Punkt-Titel mit der gegebenen Bewertung."""
+    result: list[str] = []
+    for e in reversed(entries):  # neueste zuerst
+        h = e.get("heading", "").strip()
+        if e["rating"] == rating and h and h not in result:
+            result.append(h)
+            if len(result) >= limit:
+                break
+    return result
+
+
 def article_feedback_hint(state: dict, cutoff_date: str) -> str:
-    """Kalibrierungshinweis aus Artikel-Bewertungen für den Synthese-Prompt."""
+    """Kalibrierungshinweis aus Artikel-Bewertungen für den Synthese-Prompt.
+
+    Bewusst KEINE Klick-Personalisierung: Der Hinweis kalibriert nur die
+    Materialitäts-Schwelle des Auswahlprinzips („strenger prüfen"), er filtert
+    keine Themen weg.
+    """
     entries = [
         e for e in state.get("article_feedback", [])
         if e.get("date", "") >= cutoff_date
@@ -187,17 +222,34 @@ def article_feedback_hint(state: dict, cutoff_date: str) -> str:
         return ""
     up = sum(1 for e in entries if e["rating"] == "up")
     down = len(entries) - up
+    lines: list[str] = []
     if down / len(entries) > 0.5:
-        return (
+        lines.append(
             f"⚠️ Artikel-Feedback: {down}/{len(entries)} Artikel wurden als "
-            "nicht relevant markiert — schärfere Themenauswahl, weniger Randthemen.\n"
+            "nicht relevant markiert — schärfere Themenauswahl, weniger Randthemen."
         )
-    if up / len(entries) > 0.7:
-        return (
+    elif up / len(entries) > 0.7:
+        lines.append(
             f"✅ Artikel-Feedback: {up}/{len(entries)} Artikel als relevant bewertet — "
-            "Kurs halten.\n"
+            "Kurs halten."
         )
-    return ""
+    downs = _feedback_headings(entries, "down")
+    if downs:
+        titel = " · ".join(f"„{h}“" for h in downs)
+        lines.append(
+            f"Als nicht relevant markiert wurden zuletzt: {titel} — "
+            "vergleichbare Themen strenger an der Materialitäts-Schwelle prüfen."
+        )
+    ups = _feedback_headings(entries, "up")
+    if ups:
+        titel = " · ".join(f"„{h}“" for h in ups)
+        lines.append(
+            f"Als relevant markiert wurden zuletzt: {titel} — "
+            "vergleichbare Entwicklungen bei gleicher Materialität priorisieren."
+        )
+    if not lines:
+        return ""
+    return "\n".join(lines) + "\n"
 
 
 def save_user_topic_prefs(state: dict, topic_names: list[str]) -> None:

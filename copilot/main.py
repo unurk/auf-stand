@@ -163,6 +163,12 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         for line in lagebild.splitlines()
         if line.startswith("## ") and re.match(r"## [1-9]", line)
     ]
+    # Punkt-Titel festhalten, damit 👍/👎-Taps später inhaltlich auflösbar sind
+    # (der Rückkanal-Lauf lädt den State neu, darum hier sofort persistieren).
+    state.save_edition_points(
+        current_state, f"{datetime.now():%Y-%m-%d}", edition, article_headings
+    )
+    state.save_state(current_state)
     telegram.send_telegram(
         lagebild,
         config.get("telegram_chat_ids", []),
