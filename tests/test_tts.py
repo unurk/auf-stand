@@ -34,6 +34,12 @@ def test_to_speech_text():
     assert "Mietpreisbremse kommt." in text  # Überschrift als Satz
 
 
+def test_schlusszeile_mit_streak_kollabiert_weiter():
+    md = "✅ *Du bist informiert — 12. Tag in Folge — Lesezeit ca. 90 Sekunden.*"
+    text = tts._to_speech_text(md)
+    assert text.strip() == "Du bist informiert."
+
+
 def test_chunks_haelt_limit_ein():
     para = "Satz. " * 100  # ~600 Zeichen
     text = "\n\n".join([para] * 10)

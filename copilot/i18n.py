@@ -51,6 +51,10 @@ STRINGS: dict[str, dict] = {
         "reporters_join": "und",
         # „Du bist informiert"-Anker (render._markdown_to_html, footer-Einfügung)
         "informed_marker": "Du bist informiert",
+        # Streak-Suffix in der Abschlusszeile (render.insert_streak)
+        "streak_suffix_fmt": " — {n}. Tag in Folge",
+        # Abend-Cliffhanger (vorausschau.format_morgen_teaser)
+        "morgen_teaser_fmt": "🔭 *Morgen wichtig:* {items}",
         # HTML-Rendering (render)
         "brand": "Die Presse · Copilot",
         "byline": "Von der „Presse“-Redaktion",
@@ -103,6 +107,8 @@ STRINGS: dict[str, dict] = {
         "reporters_footer_fmt": "*Today's reporting by: {names} · The New York Times*",
         "reporters_join": "and",
         "informed_marker": "You're informed",
+        "streak_suffix_fmt": " — day {n} in a row",
+        "morgen_teaser_fmt": "🔭 *Tomorrow:* {items}",
         "brand": "The New York Times · Copilot",
         "byline": "By the New York Times briefing desk",
         "html_lang": "en",

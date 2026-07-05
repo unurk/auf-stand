@@ -107,13 +107,33 @@ def insert_reporters_footer(markdown: str, lang: str = "de") -> str:
     else:
         joined = ", ".join(names[:-1]) + f" {join_word} {names[-1]}"
     footer = i18n.t(lang, "reporters_footer_fmt").format(names=joined)
+    return insert_before_footer(markdown, footer, lang)
+
+
+def insert_before_footer(markdown: str, block: str, lang: str = "de") -> str:
+    """Fügt einen Block direkt vor der „informiert"-Abschlusszeile ein, sonst ans Ende."""
+    informed = i18n.t(lang, "informed_marker")
     lines = markdown.splitlines()
     for i, line in enumerate(lines):
         if informed in line:
-            lines.insert(i, footer)
+            lines.insert(i, block)
             lines.insert(i + 1, "")
             return "\n".join(lines)
-    return markdown.rstrip() + "\n\n" + footer
+    return markdown.rstrip() + "\n\n" + block
+
+
+def insert_streak(markdown: str, streak: int, lang: str = "de") -> str:
+    """Hängt die Streak an die Abschlusszeile: „Du bist informiert — 12. Tag in Folge".
+
+    Der tägliche Habit-Moment (WHOOP-Logik). Ab Tag 2 — ein einzelner Tag ist
+    kein Streak. Der Marker bleibt als Substring erhalten, damit die Anker-Logik
+    in _markdown_to_html und webview weiter greift.
+    """
+    if streak < 2:
+        return markdown
+    informed = i18n.t(lang, "informed_marker")
+    suffix = i18n.t(lang, "streak_suffix_fmt").format(n=streak)
+    return markdown.replace(informed, informed + suffix, 1)
 
 
 def write_output(markdown: str, edition: str, lang: str = "de") -> tuple[Path, Path]:
