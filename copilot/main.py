@@ -246,7 +246,8 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
 def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
-    parser.add_argument("command", choices=["morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "vapid-keys"])
+    parser.add_argument("command", nargs="?", default="auto",
+                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "vapid-keys"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -266,6 +267,17 @@ def main() -> int:
         state.set_state_path(config.get("state_file"))
         # Ausgabeverzeichnis je Edition (config.nyt.yaml -> out/nyt/).
         render.set_out_dir(config.get("out_dir"))
+        if args.command == "auto":
+            hour = datetime.now().hour
+            if hour <= 8:
+                args.command = "morgen"
+            elif hour <= 13:
+                args.command = "mittag"
+            elif hour <= 17:
+                args.command = "nachmittag"
+            else:
+                args.command = "abend"
+            print(f"Auto-Modus: {args.command} (Uhrzeit {hour:02d}:xx)")
         if args.command == "feeds":
             return cmd_feeds(config)
         if args.command == "catchup":
