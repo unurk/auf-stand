@@ -88,7 +88,7 @@ editions:
     label: "Morning Briefing"
     time: "06:00"
     emoji: "☀️"
-    lookback_hours: 10
+    lookback_hours: 30
   mittag:
     label: "Midday Update"
     time: "11:00"
