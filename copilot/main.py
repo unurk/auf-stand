@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, epaper, i18n, render, state, synthesize, telegram, tts, webpush
+from . import deliver, epaper, i18n, render, state, synthesize, telegram, tts, vorausschau, webpush
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,6 +145,18 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     )
     # Redakteur:innen-Fußzeile aus den je Punkt genannten Reporter-Namen.
     lagebild = render.insert_reporters_footer(lagebild, lang)
+    # Abend-Cliffhanger: was morgen ansteht — ein Grund, die Morgen-Ausgabe zu öffnen.
+    if edition == "abend":
+        teaser = vorausschau.format_morgen_teaser(config.get("termine", []), lang)
+        if teaser:
+            lagebild = render.insert_before_footer(lagebild, teaser, lang)
+    # Streak in die Abschlusszeile: current_streak zählt heute erst nach record_stats
+    # (läuft NACH dem Versand) — die heutige Zustellung darum selbst dazurechnen.
+    heute = f"{datetime.now():%Y-%m-%d}"
+    streak = state.current_streak(current_state)
+    if not any(s.get("date") == heute for s in current_state.get("stats", [])):
+        streak += 1
+    lagebild = render.insert_streak(lagebild, streak, lang)
     lagebild += epaper.epaper_section(epaper.get_epaper_url(config), lang)
     md_path, html_path = render.write_output(lagebild, edition, lang)
     print(f"Lagebild erzeugt:\n  {md_path}\n  {html_path}")

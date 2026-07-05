@@ -20,6 +20,21 @@ def get_upcoming(termine: list[dict], days_ahead: int = 6) -> list[dict]:
     return sorted(result, key=lambda x: x["date_obj"])
 
 
+def format_morgen_teaser(termine: list[dict], lang: str = "de") -> str:
+    """Eine Zeile für die Abend-Ausgabe: was MORGEN ansteht — oder ''.
+
+    Der redaktionell saubere Cliffhanger: ein konkreter Grund, die
+    Morgen-Ausgabe zu öffnen.
+    """
+    morgen = [t for t in get_upcoming(termine, days_ahead=1) if t["delta_days"] == 1]
+    if not morgen:
+        return ""
+    items = " · ".join(t.get("name", "") for t in morgen if t.get("name"))
+    if not items:
+        return ""
+    return i18n.t(lang, "morgen_teaser_fmt").format(items=items)
+
+
 def format_vorausschau(termine: list[dict], lang: str = "de") -> str:
     """Gibt einen Markdown-Block mit kommenden Terminen zurück, oder ''."""
     upcoming = get_upcoming(termine)
