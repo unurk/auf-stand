@@ -17,6 +17,12 @@ on:
         default: auto
         options: [auto, morgen, mittag, nachmittag, abend]
 
+# Nie zwei Läufe parallel (siehe lagebild.yml): schützt den Block-Guard vor
+# überlappenden Läufen mit demselben restaurierten State.
+concurrency:
+  group: nyt
+  cancel-in-progress: false
+
 jobs:
   nyt:
     runs-on: ubuntu-latest
@@ -77,6 +83,16 @@ jobs:
           path: data/state.nyt.json
           key: nyt-state-${{ github.run_id }}
 
+      # Disaster-Recovery bei Cache-Eviction (siehe lagebild.yml).
+      - name: NYT-State-Backup als Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nyt-state-backup
+          path: data/state.nyt.json
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: NYT-Site bauen und committen
         id: site
         if: always() && github.ref == 'refs/heads/master'
@@ -110,12 +126,15 @@ jobs:
         id: pages-deployment
         uses: actions/deploy-pages@v4
         if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
+        continue-on-error: true
 
       - name: Fehler melden
         if: failure()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          # Repo-Variable pflegbar unter Settings → Variables; Fallback = bisherige ID.
+          ALERT_CHAT_ID: ${{ vars.TELEGRAM_ALERT_CHAT_ID || '8962080832' }}
         run: |
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d chat_id=8962080832 \
+            -d chat_id="$ALERT_CHAT_ID" \
             -d text="❌ NYT Briefing: GitHub-Lauf fehlgeschlagen. Logs: https://github.com/unurk/auf-stand/actions"

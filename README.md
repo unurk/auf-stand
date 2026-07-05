@@ -1,8 +1,11 @@
 # Copilot — MVP
 
-Prototyp für das Konzept „Die Presse als Hintergrund-Dienst": 1–2x täglich ein
-**Lagebild** (3–5 materielle Entwicklungen je nach Nachrichtenlage, rund 90 Sekunden
-Lesezeit) statt eines Artikel-Feeds. Hintergrund siehe `CLAUDE.md` und das Konzeptpapier.
+Prototyp für das Konzept „Die Presse als Hintergrund-Dienst": **4× täglich**
+(06:00 · 11:00 · 16:00 · 20:00, der Presse-Kuratierungstakt) ein **Lagebild**
+(3–5 materielle Entwicklungen je nach Nachrichtenlage, rund 90 Sekunden Lesezeit)
+statt eines Artikel-Feeds. Zustellung per Telegram (mit 👍/👎-Feedback und
+Audio-Version), E-Mail und als PWA mit Web-Push; dazu Themen-Dossiers und eine
+Wochen-Quittung. Hintergrund siehe `CLAUDE.md` und das Konzeptpapier.
 
 ## Setup (einmalig, ~5 Minuten)
 
@@ -35,12 +38,38 @@ python -m copilot.main catchup
 
 `--keep-seen` verhindert beim Testen, dass Artikel als „gesehen" markiert werden.
 
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+Läuft auch in CI (`.github/workflows/test.yml`) bei jedem Push auf Code/Config.
+
+## Synthese-Provider (Claude oder GLM)
+
+Standard ist die Anthropic-API (`provider: anthropic`, Modell in `config.yaml`).
+Zum A/B-Testen kann in `config.yaml` `provider: glm` gesetzt werden — dann läuft
+die Synthese über GLM via OpenRouter (OpenAI-kompatibel, braucht `ZAI_API_KEY`
+in `.env` bzw. als GitHub-Secret).
+
 ## Volltexte nutzen (Premium-Abo)
 
 RSS liefert nur Teaser. Für tiefere Synthese: Volltexte als .txt/.md in
 `manual_input/` ablegen (erste Zeile = Titel) — sie haben bei der Synthese Vorrang.
 Für den echten Pilot: offiziellen Content-Feed über die Presse-IT anfragen,
 kein Login-Scraping bauen.
+
+## Telegram-Rückkanal
+
+Der Bot beantwortet freie Fragen auf Basis der aktuellen Artikel und versteht:
+
+- `/themen EZB Miet Börse` — Themen-Präferenzen setzen (Schlagworte aus config.yaml)
+- `/thema-neu Name|Schlagwort` — eigenes Thema als Tracker hinzufügen
+- `/push <Code aus der PWA>` — Web-Push-Benachrichtigungen aktivieren
+
+Der Rückkanal läuft nach jeder Ausgabe in der Pipeline (`python -m copilot.main rueckkanal`).
 
 ## Englische NYT-Edition (`config.nyt.yaml`)
 

@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 
 import feedparser
+import httpx
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -71,13 +72,22 @@ def _parse_date(entry) -> datetime | None:
 
 
 def fetch_feed(name: str, url: str, max_articles: int) -> tuple[list[Article], str | None]:
-    """Holt einen Feed. Liefert (Artikel, Fehlermeldung oder None)."""
-    parsed = feedparser.parse(url, agent=USER_AGENT)
-    status = getattr(parsed, "status", None)
+    """Holt einen Feed. Liefert (Artikel, Fehlermeldung oder None).
+
+    HTTP läuft über httpx mit Timeout — feedparser.parse(url) hätte keinen und
+    ein hängender Feed würde sonst den ganzen Lauf blockieren.
+    """
+    try:
+        resp = httpx.get(
+            url, headers={"User-Agent": USER_AGENT}, timeout=20, follow_redirects=True
+        )
+    except httpx.HTTPError as exc:
+        return [], f"{name}: Feed nicht erreichbar ({url}, {exc})"
+    if resp.status_code >= 400:
+        return [], f"{name}: HTTP {resp.status_code} fuer {url}"
+    parsed = feedparser.parse(resp.content)
     if parsed.bozo and not parsed.entries:
-        return [], f"{name}: Feed nicht lesbar ({url}, Status {status}, {parsed.bozo_exception})"
-    if status and status >= 400:
-        return [], f"{name}: HTTP {status} fuer {url}"
+        return [], f"{name}: Feed nicht lesbar ({url}, {parsed.bozo_exception})"
     articles: list[Article] = []
     for entry in parsed.entries[:max_articles]:
         link = entry.get("link", "")
