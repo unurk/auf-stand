@@ -12,14 +12,16 @@ feeds:
     url: https://www.diepresse.com/rss/Wirtschaft
   - name: Unternehmen
     url: https://www.diepresse.com/rss/Unternehmen
-  - name: Außenpolitik
-    url: https://www.diepresse.com/rss/Aussenpolitik
-  - name: EU
-    url: https://www.diepresse.com/rss/EU
+  # Folgende URLs liefern 404 (Presse hat URL-Schema geändert).
+  # Mit `python -m copilot.main feeds` korrekte URLs lokal testen und eintragen:
+  # - name: Außenpolitik
+  #   url: https://www.diepresse.com/rss/Aussenpolitik
+  # - name: EU
+  #   url: https://www.diepresse.com/rss/EU
+  # - name: Tech
+  #   url: https://www.diepresse.com/rss/Tech
   - name: Recht
     url: https://www.diepresse.com/rss/Recht
-  - name: Tech
-    url: https://www.diepresse.com/rss/Tech
   - name: Science
     url: https://www.diepresse.com/rss/Science
 
