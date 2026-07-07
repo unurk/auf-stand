@@ -294,7 +294,14 @@ def _complete_glm(prompt: str, config: dict, max_tokens: int) -> str:
     if resp.status_code != 200:
         raise RuntimeError(f"GLM-Fehler (HTTP {resp.status_code}): {resp.text[:300]}")
     data = resp.json()
-    content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+    choice = (data.get("choices") or [{}])[0]
+    content = choice.get("message", {}).get("content", "")
+    finish_reason = choice.get("finish_reason", "")
     if not content or not content.strip():
-        raise RuntimeError(f"GLM-Antwort ohne Inhalt: {str(data)[:300]}")
+        # finish_reason 'length' mit leerem Content: API-Bug oder Input zu lang → Wiederholungsversuch
+        if finish_reason == "length":
+            raise _TransientError(f"GLM leere Antwort mit finish_reason=length: {str(data)[:500]}")
+        raise RuntimeError(f"GLM-Antwort ohne Inhalt: {str(data)[:500]}")
+    if finish_reason == "length":
+        print(f"Warnung: GLM-Antwort bei max_tokens abgeschnitten (finish_reason=length). Inhalt wird trotzdem verwendet.")
     return content.strip()
