@@ -283,6 +283,11 @@ def _complete_glm(prompt: str, config: dict, max_tokens: int) -> str:
             json={
                 "model": glm_cfg.get("model", "z-ai/glm-5.2"),
                 "max_tokens": max_tokens,
+                # GLM ist ein Reasoning-Modell und denkt per Default. OpenRouter
+                # zählt die Reasoning-Tokens gegen max_tokens — bei langem Denken
+                # ist das Budget aufgebraucht, bevor Inhalt kommt (finish_reason=
+                # length, content leer). Fürs Lagebild reicht die direkte Antwort.
+                "reasoning": {"enabled": False},
                 "messages": [{"role": "user", "content": prompt}],
             },
             timeout=180,
@@ -296,5 +301,8 @@ def _complete_glm(prompt: str, config: dict, max_tokens: int) -> str:
     data = resp.json()
     content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
     if not content or not content.strip():
-        raise RuntimeError(f"GLM-Antwort ohne Inhalt: {str(data)[:300]}")
+        # Passiert v. a., wenn ein Upstream-Provider das reasoning-Flag ignoriert
+        # und das Denken das Token-Budget frisst — nicht deterministisch, ein
+        # neuer Versuch (ggf. anderer Provider) hat gute Chancen.
+        raise _TransientError(f"GLM-Antwort ohne Inhalt: {str(data)[:300]}")
     return content.strip()

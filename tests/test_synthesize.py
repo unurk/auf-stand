@@ -50,6 +50,7 @@ def test_glm_provider_wird_genutzt(monkeypatch):
         calls["url"] = url
         calls["model"] = json["model"]
         calls["auth"] = headers["Authorization"]
+        calls["reasoning"] = json["reasoning"]
         return httpx.Response(
             200, json={"choices": [{"message": {"content": "Das Lagebild."}}]}
         )
@@ -60,6 +61,23 @@ def test_glm_provider_wird_genutzt(monkeypatch):
     assert calls["url"] == "https://openrouter.ai/api/v1/chat/completions"
     assert calls["model"] == "z-ai/glm-5.2"
     assert calls["auth"] == "Bearer test-key"
+    # Reasoning aus: sonst frisst das Denken das max_tokens-Budget und die
+    # Antwort kommt mit finish_reason=length ohne Inhalt zurück.
+    assert calls["reasoning"] == {"enabled": False}
+
+
+def test_glm_leere_antwort_ist_transient(monkeypatch):
+    monkeypatch.setenv("ZAI_API_KEY", "test-key")
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": ""}, "finish_reason": "length"}]},
+        )
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    with pytest.raises(synthesize._TransientError, match="ohne Inhalt"):
+        synthesize._complete_glm("prompt", {"provider": "glm"}, 100)
 
 
 def test_glm_ohne_key_bricht_ab(monkeypatch):
