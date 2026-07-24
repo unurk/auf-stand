@@ -88,6 +88,11 @@ def fetch_feed(name: str, url: str, max_articles: int) -> tuple[list[Article], s
     parsed = feedparser.parse(resp.content)
     if parsed.bozo and not parsed.entries:
         return [], f"{name}: Feed nicht lesbar ({url}, {parsed.bozo_exception})"
+    if not parsed.entries:
+        # Ein Feed, der sauber mit 200 antwortet und trotzdem nichts liefert, ist
+        # der gefährlichste Fall: Er sieht gesund aus und fällt niemandem auf.
+        # Genau so blieb das Ressort „Unternehmen" monatelang tot im Material.
+        return [], f"{name}: Feed antwortet, liefert aber keine Einträge ({url})"
     articles: list[Article] = []
     for entry in parsed.entries[:max_articles]:
         link = entry.get("link", "")

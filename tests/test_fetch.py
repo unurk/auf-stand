@@ -43,6 +43,23 @@ def test_fetch_feed_http_error(monkeypatch):
     assert "503" in error
 
 
+def test_fetch_feed_meldet_leeren_feed(monkeypatch):
+    """200 mit null Einträgen ist ein Defekt — nicht „einfach nichts Neues".
+
+    Genau so blieb das Ressort „Unternehmen" unbemerkt tot: Der Feed antwortete
+    sauber, lieferte aber seit Monaten keine Artikel mehr.
+    """
+    leer = (
+        b'<?xml version="1.0"?><rss version="2.0"><channel>'
+        b"<title>Leer</title><link>https://example.com</link>"
+        b"<description>nichts</description></channel></rss>"
+    )
+    _mock_get(monkeypatch, content=leer)
+    articles, error = fetch.fetch_feed("Unternehmen", "https://example.com/rss", 15)
+    assert articles == []
+    assert "keine Einträge" in error
+
+
 def test_fetch_feed_network_error(monkeypatch):
     def fake_get(url, **kwargs):
         raise httpx.ConnectTimeout("timeout")
