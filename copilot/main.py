@@ -37,9 +37,11 @@ def cmd_feeds(config: dict) -> int:
     by_ressort: dict[str, int] = {}
     for article in result.articles:
         by_ressort[article.ressort] = by_ressort.get(article.ressort, 0) + 1
+    kaputt = 0
     for feed in config.get("feeds", []):
         count = by_ressort.get(feed["name"], 0)
         status = f"OK, {count} Artikel" if count else "KEINE Artikel"
+        kaputt += 0 if count else 1
         print(f"  {feed['name']:<14} {status}   {feed['url']}")
     for error in result.errors:
         print(f"  FEHLER: {error}")
@@ -48,6 +50,12 @@ def cmd_feeds(config: dict) -> int:
             "\nKein Feed lieferbar. URLs auf diepresse.com prüfen "
             "(Schema kann sich geändert haben) und config.yaml anpassen."
         )
+        return 1
+    if kaputt:
+        # Auch ein einzelner toter Feed ist ein Befund: Fehlt ein Ressort, fehlt
+        # es still — die Ausgabe wird einfach ein bisschen ärmer. Exit-Code 1,
+        # damit das beim manuellen Lauf und in CI auffällt.
+        print(f"\n{kaputt} Feed(s) ohne Artikel — config.yaml prüfen.")
         return 1
     return 0
 

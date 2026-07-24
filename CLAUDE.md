@@ -66,7 +66,11 @@ Ist nichts Neues da, geht statt Schweigen eine kurze Ruhe-Ausgabe raus.
 ## Content-Zugang (wichtig)
 
 - RSS-Feeds (diepresse.com/rss/<Ressort>) sind öffentlich: Headlines + Teaser.
-  Feed-URLs beim ersten Lauf verifizieren (`python -m copilot.main feeds`).
+  Feed-URLs regelmäßig verifizieren (`python -m copilot.main feeds` — Exit-Code 1,
+  sobald auch nur ein Feed leer bleibt). Das Ressort-Schema ändert sich: Zuletzt
+  waren Aussenpolitik, EU und Tech auf 404 gelaufen und Unternehmen antwortete mit
+  200, aber ohne Einträge — vier von neun Feeds still tot. Ein Feed ohne Artikel
+  gilt darum als Fehler, nicht als „heute nichts Neues".
 - Volltexte: Der User hat ein Premium-Abo und arbeitet bei der Presse. Für den
   Prototyp werden Volltexte manuell in `manual_input/` abgelegt (Datei pro Artikel).
   KEIN Login-Scraping mit persönlichen Zugangsdaten bauen — für den echten Pilot
