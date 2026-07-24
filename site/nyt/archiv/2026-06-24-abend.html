@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -429,19 +496,19 @@
   <p><strong>What&#x27;s new:</strong> The Trump administration removed six intelligence officials and reassigned nearly 50 others to agencies outside the intelligence community, according to former officials. The moves represent a significant personnel shake-up at the spy agencies but fall short of the wholesale restructuring that had been anticipated. Separately, Trump has proposed putting his face on a new $250 bill — a step that would require congressional approval and would make him the first sitting president to appear on U.S. currency during his term.</p>
   <p><strong>Why it matters:</strong> The intelligence purge signals continued tension between Trump and the career intelligence bureaucracy, a dynamic that will shape how the administration conducts foreign policy and national security operations. The currency proposal, while largely symbolic given the declining use of cash, reflects Trump&#x27;s broader effort to reshape institutions in his image and will test Republican appetite for such moves on Capitol Hill.</p>
   <p><strong>What&#x27;s next:</strong> More reassignments within the intelligence community are possible as the administration completes its review. The currency bill faces uncertain odds in Congress, where some Republicans may balk at the precedent. (Politics · By: Julian E. Barnes and Dustin Volz; Alan Rappeport) <a href="https://www.nytimes.com/2026/06/24/us/politics/pulte-cuts-national-intelligence-trump.html">→ Articles</a></p>
-<div class="article-fb" data-key="2026-06-24|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>New York Democrats shift decisively left in primaries; Jewish leaders express alarm</h2>
+<div class="article-fb" data-key="2026-06-24|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump administration fires six intelligence officials, reassigns dozens more" data-karte="2026-06-24-abend-karte.png">↗ Share</button></div><h2>New York Democrats shift decisively left in primaries; Jewish leaders express alarm</h2>
   <p><strong>What&#x27;s new:</strong> Democratic primary voters in New York delivered victories to three anti-establishment candidates backed by Mayor Zohran Mamdani, signaling a notable leftward push within the state party. Pro-Israel Jewish leaders expressed concern at the results, while progressive Jewish groups celebrated the outcome. The wins raise questions about how unified Democrats will be heading into November&#x27;s general elections across the state.</p>
   <p><strong>Why it matters:</strong> New York is a crucial state for Democrats, and the primary results suggest internal fractures on issues like Israel policy that could complicate general election messaging. The tension between establishment and progressive wings of the party may affect both fundraising and turnout dynamics in competitive races this fall. (Politics · By: Benjamin Oreskes, Grace Ashford, and Liam Stack) <a class="source-link" href="https://www.nytimes.com/2026/06/24/us/politics/new-york-primary-election-democrats-midterms.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-06-24|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Europe breaks heat records as continent becomes fastest-warming region</h2>
+<div class="article-fb" data-key="2026-06-24|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="New York Democrats shift decisively left in primaries; Jewish leaders express alarm">↗ Share</button></div><h2>Europe breaks heat records as continent becomes fastest-warming region</h2>
   <p><strong>What&#x27;s new:</strong> Multiple European countries broke temperature records on Wednesday as an extreme heat wave swept across the continent. Scientists point to both global fossil fuel emissions and regional factors—including land and sea conditions—that are making Europe warm significantly faster than the global average.</p>
   <p><strong>Why it matters:</strong> Europe&#x27;s accelerating warming has direct consequences for agriculture, energy grids, and public health across the continent and will likely strain relations with North Africa and the Middle East as water and food security deteriorate. <span class="ressort" style="--h:130">Climate</span> <span class="byline-source">By: Raymond Zhong</span> <a class="source-link" href="https://www.nytimes.com/2026/06/24/climate/europe-fastest-warming-continent.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-06-24|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Antiabortion movement shifts strategy toward prosecuting women</h2>
+<div class="article-fb" data-key="2026-06-24|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Europe breaks heat records as continent becomes fastest-warming region">↗ Share</button></div><h2>Antiabortion movement shifts strategy toward prosecuting women</h2>
   <p>Sentiment is shifting within the antiabortion movement toward supporting prosecution of women who obtain abortions, driven by frustration that abortion rates have risen since Roe v. Wade was overturned. This marks a notable change in messaging and priorities for a movement that had long insisted women were victims rather than criminals. <span class="ressort" style="--h:245">Politics</span> <span class="byline-source">By: Caroline Kitchener</span> <a class="source-link" href="https://www.nytimes.com/2026/06/24/us/politics/abortion-prosecution-women.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-06-24|abend|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Utah Republican Senate president loses primary over data center opposition</h2>
+<div class="article-fb" data-key="2026-06-24|abend|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Antiabortion movement shifts strategy toward prosecuting women">↗ Share</button></div><h2>Utah Republican Senate president loses primary over data center opposition</h2>
   <p>Utah&#x27;s state Senate president J. Stuart Adams lost his Republican primary, an upset attributed primarily to voter backlash over data center development in his district. The result underscores how local land-use and development issues are reshaping state politics. <a class="source-link" href="https://www.nytimes.com/2026/06/24/us/j-stuart-adams-utah-senate-data-center.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-06-24|abend|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-06-24|abend|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Utah Republican Senate president loses primary over data center opposition">↗ Share</button></div><hr>
   <p class="reporters">Today&#x27;s reporting by: Julian E. Barnes and Dustin Volz; Alan Rappeport, Benjamin Oreskes, Grace Ashford, and Liam Stack, Raymond Zhong and Caroline Kitchener · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — reading time ca. 210 seconds. Next briefing: tomorrow at 06:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — reading time ca. 210 seconds. Next briefing: tomorrow at 06:00.</div>
   <hr>
 </div>
 </div>
@@ -549,9 +616,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -559,7 +629,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -583,6 +653,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

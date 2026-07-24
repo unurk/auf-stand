@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -429,30 +496,30 @@
   <p><strong>What&#x27;s new:</strong> President Trump announced that punishing 50 percent tariffs on Canada will begin August 19, significantly escalating a trade dispute that began over a year ago. The trade representative told the Senate that the administration remains committed to tariffs as a negotiating tool, even as it prepares to replace duties the Supreme Court recently struck down. Trump is simultaneously pursuing trade deals with some partners while threatening others—a pattern his administration has resumed with what experts describe as substantial new risks.</p>
   <p><strong>Why it matters:</strong> For your wallet and work, this matters directly. A 50 percent tariff on Canadian goods will likely raise prices for everything from food to automobiles and materials used across American manufacturing. Canada is the U.S.&#x27;s largest trading partner. The broad tariff strategy signals that trade tensions will remain a defining feature of economic policy, adding uncertainty to business investment and consumer costs through the election cycle and beyond.</p>
   <p><strong>What&#x27;s next:</strong> The tariffs take effect in less than four weeks, giving businesses little time to adjust supply chains or pricing. Expect negotiations to intensify as the deadline approaches. (Business · By: Ana Swanson · <a class="source-link" href="https://www.nytimes.com/2026/07/22/business/economy/trump-tariffs-jamieson-greer.html">Read in the NYT →</a>)</p>
-<div class="article-fb" data-key="2026-07-22|nachmittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-22|nachmittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump escalates trade war with 50% Canadian tariffs" data-karte="2026-07-22-nachmittag-karte.png">↗ Share</button></div><hr>
   <h2>U.S. seals controversial nuclear technology transfer to Saudi Arabia</h2>
   <p><strong>What&#x27;s new:</strong> The United States is expected to finalize a deal today transferring American nuclear technology to Saudi Arabia—a long-sought arrangement for the Saudi Crown Prince that had been contentious for years. Israel views the deal with alarm, fearing it could trigger a regional nuclear arms race, with other Middle Eastern countries rushing to develop their own programs or weapons. An Israeli minister sought to downplay concerns, but critics warn the agreement sets a dangerous precedent.</p>
   <p><strong>Why it matters:</strong> This shapes the Middle East&#x27;s military balance for decades. A nuclear-capable Saudi Arabia changes the calculation of regional power and could accelerate proliferation across the Gulf. For U.S. foreign policy, it signals deepening alignment with Saudi Arabia at a moment of heightened tensions with Iran—a calculation that assumes long-term stability but carries significant risks if regional conflict escalates.</p>
   <p>(World · By: Vivian Nereim · <a class="source-link" href="https://www.nytimes.com/2026/07/22/world/middleeast/us-saudi-arabia-nuclear-deal.html">Read in the NYT →</a>)</p>
-<div class="article-fb" data-key="2026-07-22|nachmittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-22|nachmittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="U.S. seals controversial nuclear technology transfer to Saudi Arabia">↗ Share</button></div><hr>
   <h2>A.I. investment drives stock gains and economic spending, but risks mount</h2>
   <p><strong>What&#x27;s new:</strong> Heavy investment in artificial intelligence and related companies is lifting both the stock market and overall economic spending. The gains reflect genuine optimism about A.I.&#x27;s productive potential, yet the rally also carries concentration risk—much of the market&#x27;s strength depends on a narrow set of technology stocks, and the economic benefits remain uncertain at scale.</p>
   <p><strong>Why it matters:</strong> If you hold stocks or a retirement account, you&#x27;ve likely benefited from this rally. But concentration in a few names means the market is vulnerable to disappointment if A.I. adoption slows or fails to deliver on inflated expectations. For the economy, sustained A.I. investment could fuel productivity and wage growth—or it could inflate another bubble if expectations outpace reality.</p>
   <p>(Business · By: Ben Casselman and Joe Rennison · <a class="source-link" href="https://www.nytimes.com/2026/07/22/business/economy/stocks-economy-ai.html">Read in the NYT →</a>)</p>
-<div class="article-fb" data-key="2026-07-22|nachmittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-22|nachmittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="A.I. investment drives stock gains and economic spending, but risks mount">↗ Share</button></div><hr>
   <h2>Trump threatens Iranian civilian targets if Tehran strikes Hormuz</h2>
   <p>President Trump said the United States would target Iranian bridges or power plants—including near Tehran—if Iran attacked the Strait of Hormuz. Secretary of State Marco Rubio suggested Iran is &quot;not serious&quot; about diplomacy. Oil prices jumped on the threat, though stock investors are awaiting tech earnings. (World · <a class="source-link" href="https://www.nytimes.com/live/2026/07/22/world/iran-war-strikes-trump-hormuz">Read in the NYT →</a>)</p>
-<div class="article-fb" data-key="2026-07-22|nachmittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-22|nachmittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump threatens Iranian civilian targets if Tehran strikes Hormuz">↗ Share</button></div><hr>
   <h2>Ukraine replaces top general as military strategy shifts</h2>
   <p>Ukraine fired Gen. Oleksandr Syrskyi, who oversaw major battles and drone warfare expansion, and appointed Maj. Gen. Mykhailo Drapatyi as his successor. Drapatyi faces pressure to balance military independence with political input on battlefield decisions—a shift reflecting debate over how aggressively Ukraine should pursue its war aims. (World · By: Carlotta Gall · <a class="source-link" href="https://www.nytimes.com/2026/07/22/world/europe/ukraine-syrskyi-general-russia-war.html">Read in the NYT →</a>)</p>
-<div class="article-fb" data-key="2026-07-22|nachmittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-22|nachmittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Ukraine replaces top general as military strategy shifts">↗ Share</button></div><hr>
   <h2 class="topic-summary-head">Your Topics</h2>
   <p>- <strong>Wall Street:</strong> Markets rallied on A.I. investment, though gains are concentrated in a narrow set of tech stocks. Oil prices spiked on Iran war threats, but stock investors are focused on upcoming tech earnings from Alphabet and Tesla.</p>
   <p>- <strong>US foreign policy:</strong> Trump administration has shifted toward aggressive tariffs on Canada while deepening ties with Saudi Arabia through a nuclear deal and signaling readiness to target Iranian civilian infrastructure. Secretary Rubio is also preparing a Trump-Xi summit in Washington.</p>
   <p>- <strong>Russia&#x27;s war in Ukraine:</strong> Ukraine replaced its top military commander, signaling a strategic recalibration in how the country balances military independence with political oversight of battlefield decisions.</p>
   <hr>
   <p class="reporters">Today&#x27;s reporting by: Ana Swanson, Vivian Nereim, Ben Casselman and Joe Rennison and Carlotta Gall · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 29 in a row — reading time ca. 270 seconds. Next briefing: today at 20:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 29 in a row — reading time ca. 270 seconds. Next briefing: today at 20:00.</div>
   <hr>
 </div>
 </div>
@@ -560,9 +627,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -570,7 +640,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -594,6 +664,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

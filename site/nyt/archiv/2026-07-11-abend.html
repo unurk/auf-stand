@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -427,17 +494,17 @@
   <p><strong>What&#x27;s new:</strong> A federal judge in Washington has granted the Trump administration&#x27;s request to dismiss the sedition case against members of the Proud Boys, the far-right militia group. Judge Timothy J. Kelly, himself a Trump appointee, indicated he had little choice but to accept the motion, effectively ending one of the most significant prosecutions stemming from the January 6 Capitol riot. The case had resulted in convictions of several members on sedition charges — the most serious charges brought against any Capitol riot defendants.</p>
   <p><strong>Why it matters:</strong> This marks a material shift in how the Trump administration is handling accountability for January 6. The dismissal signals the administration&#x27;s willingness to unwind prosecutions it views as politically motivated, which reshapes the legal and political landscape around that day. For you as a citizen tracking institutional consequences for the riot, this represents a concrete reversal of the prior administration&#x27;s enforcement priorities.</p>
   <p><strong>What&#x27;s next:</strong> Other January 6 cases may face similar pressure for dismissal under the same rationale. <span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Alan Feuer</span> <a class="source-link" href="https://www.nytimes.com/2026/07/11/us/politics/judge-proud-boys-sedition-dismissal.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-11|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-11|abend|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump administration ends Proud Boys sedition prosecution" data-karte="2026-07-11-abend-karte.png">↗ Share</button></div><hr>
   <h2>Surveillance video complicates narrative of Houston ICE shooting</h2>
   <p><strong>What&#x27;s new:</strong> The Times obtained surveillance footage showing ICE agents driving aggressively in unmarked vehicles during the pursuit that ended with the fatal shooting of Lorenzo Salgado Araujo in Houston. However, the footage does not clearly capture the moment of the shooting itself, leaving key questions about the justification for lethal force unresolved. The video provides new context but does not settle the central dispute over whether the shooting was justified.</p>
   <p><strong>Why it matters:</strong> This case has drawn scrutiny over ICE tactics and use of force. The partial visibility the footage provides underscores the opacity surrounding how federal immigration enforcement operates and how accountability is established when lives are lost. (US · By: Robin Stein, Devon Lum, Sam Lerma, Mimi Dwyer, Alexander Cardia, Aric Toler, Dmitriy Khavin, Charlie Smart and Allison McCann) <a class="source-link" href="https://www.nytimes.com/2026/07/11/us/houston-ice-video-shooting-salgado-araujo.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-11|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-11|abend|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Surveillance video complicates narrative of Houston ICE shooting">↗ Share</button></div><hr>
   <h2>Trump&#x27;s post about Somali schoolchildren provokes Minnesota outcry</h2>
   <p><strong>What&#x27;s new:</strong> President Trump reposted a video of a kindergarten promotion ceremony that included Somali schoolchildren in hijabs, along with comments highlighting the girls&#x27; religious dress. Minnesota&#x27;s large Muslim and Somali communities responded with anger to the post and its framing. The repost amplified content many saw as divisive commentary on a routine school event.</p>
   <p><strong>Why it matters:</strong> The incident reflects ongoing tensions over how the administration engages with immigrant and Muslim communities. Minnesota has one of the nation&#x27;s largest Somali populations, making this particularly resonant in a key electoral state. <span class="ressort" style="--h:245">HomePage</span> <span class="byline-source">By: Erica L. Green and Dylan Freedman</span> <a class="source-link" href="https://www.nytimes.com/2026/07/11/us/politics/trump-somali-kindergartners.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-11|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-11|abend|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump&amp;#x27;s post about Somali schoolchildren provokes Minnesota outcry">↗ Share</button></div><hr>
   <p class="reporters">Today&#x27;s reporting by: Alan Feuer, Robin Stein, Devon Lum, Sam Lerma, Mimi Dwyer, Alexander Cardia, Aric Toler, Dmitriy Khavin, Charlie Smart and Allison McCann and Erica L. Green and Dylan Freedman · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 18 in a row — reading time ca. 165 seconds. Next briefing: tomorrow at 06:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 18 in a row — reading time ca. 165 seconds. Next briefing: tomorrow at 06:00.</div>
   <hr>
 </div>
 </div>
@@ -545,9 +612,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -555,7 +625,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -579,6 +649,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

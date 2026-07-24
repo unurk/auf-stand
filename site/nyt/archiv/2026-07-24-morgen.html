@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -428,21 +495,21 @@
   <p><strong>What&#x27;s new:</strong> The Trump administration has imposed duties of around 10 percent on more than 80 nations, tied to those countries&#x27; imports of goods made with forced labor. The move replaces a flat 10 percent tariff that expired, establishing a more targeted framework after the Supreme Court struck down his original across-the-board levies. The new system amounts to a continuation of the trade war by different means, with tariffs now anchored to specific procurement practices rather than blanket rates.</p>
   <p><strong>Why it matters:</strong> These duties will raise costs for American importers and likely ripple through consumer prices—from apparel to electronics to manufacturing inputs. The reframing around forced labor gives the administration legal cover while maintaining protectionist pressure on trading partners, a core Trump priority heading into the election season.</p>
   <p><strong>What&#x27;s next:</strong> Expect trading partners to challenge the forced-labor rationale and potentially retaliate with their own duties. <span class="ressort" style="--h:175">Business/Economy</span> <span class="byline-source">By: Ana Swanson</span> <a class="source-link" href="https://www.nytimes.com/2026/07/23/business/economy/trump-tariffs.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-24|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Iran Rejects U.S. Cease-Fire as War Expands</h2>
+<div class="article-fb" data-key="2026-07-24|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump&amp;#x27;s New Tariff System Targets 80+ Nations" data-karte="2026-07-24-morgen-karte.png">↗ Share</button></div><h2>Iran Rejects U.S. Cease-Fire as War Expands</h2>
   <p><strong>What&#x27;s new:</strong> Iraq, acting as intermediary, delivered a U.S. cease-fire proposal to Tehran, but Iran rejected it. Meanwhile, the U.S. military conducted its 13th consecutive night of strikes on Iran early Friday local time. The conflict now extends beyond direct military engagement to commercial targets, with Ukraine hitting Russian logistics warehouses to pressure ordinary Russians&#x27; daily life.</p>
   <p><strong>Why it matters:</strong> The rejection closes off immediate diplomatic off-ramps and signals Iran&#x27;s intent to sustain the conflict. With no pause in sight, the war will continue eroding global supply chains and oil stability—already reflected in crude prices. <span class="ressort" style="--h:265">World</span> <span class="byline-source">By: The New York Times</span> <a class="source-link" href="https://www.nytimes.com/live/2026/07/23/world/iran-war-strikes-oil-trump">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-24|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Pentagon Gives Conflicting Accounts of Iran War Deaths</h2>
+<div class="article-fb" data-key="2026-07-24|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Iran Rejects U.S. Cease-Fire as War Expands">↗ Share</button></div><h2>Pentagon Gives Conflicting Accounts of Iran War Deaths</h2>
   <p><strong>What&#x27;s new:</strong> Three military officials and a Pentagon spokesman offered different explanations for why the number of U.S. service members killed in the Iran war changed on the Department of Defense website. The discrepancy raises questions about the accuracy of casualty reporting and whether the numbers reflected genuine revisions or data errors.</p>
   <p><strong>Why it matters:</strong> Credible casualty counts are essential to public trust in military operations, particularly as Congress debates war authorization. The conflicting accounts undermine confidence in official figures and invite scrutiny over whether the administration is managing information about the conflict&#x27;s human cost. <span class="ressort" style="--h:245">Politics</span> <span class="byline-source">By: Helene Cooper, Lara Jakes and John Ismay</span> <a class="source-link" href="https://www.nytimes.com/2026/07/23/us/politics/iran-troop-deaths.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-24|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><h2>Oil Surges Past $100; Asian Markets Plunge</h2>
+<div class="article-fb" data-key="2026-07-24|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Pentagon Gives Conflicting Accounts of Iran War Deaths">↗ Share</button></div><h2>Oil Surges Past $100; Asian Markets Plunge</h2>
   <p><strong>What&#x27;s new:</strong> Brent crude crossed $100 a barrel for the first time since May, driven by escalating Iran conflict and tightening inventories. Asian stock markets tumbled in response, alongside concern over U.S. borrowing costs and weakness in the technology sector.</p>
   <p><strong>Why it matters:</strong> A sustained oil spike above $100 feeds inflation pressures the Federal Reserve has worked to control, complicating monetary policy ahead of the late-July FOMC meeting. Higher energy costs also hit consumer wallets and corporate margins directly. <span class="ressort" style="--h:175">Business/Economy</span> <span class="byline-source">By: Laura Stevens</span> <a class="source-link" href="https://www.nytimes.com/2026/07/24/technology/oil-prices-global-stocks-shipping.html">Read in the NYT →</a></p>
   <h2 class="topic-summary-head">Your Topics</h2>
   <p><strong>Middle East:</strong> Since your last update: Iran rejected a U.S. cease-fire proposal delivered through Iraq, and U.S. military strikes continued for a 13th consecutive night. The Trump administration has also tied a proposed U.S.-Saudi nuclear deal to Saudi Arabia&#x27;s agreement to join the Abraham Accords—a condition that could derail the agreement itself.</p>
   <p><strong>Wall Street:</strong> Since your last update: Asian markets sold off sharply on rising oil prices, elevated borrowing costs, and technology sector weakness.</p>
-<div class="article-fb" data-key="2026-07-24|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-24|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Oil Surges Past $100; Asian Markets Plunge">↗ Share</button></div><hr>
   <p class="reporters">Today&#x27;s reporting by: Ana Swanson, The New York Times, Helene Cooper, Lara Jakes and John Ismay and Laura Stevens · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 31 in a row — reading time ca. 210 seconds. Next briefing: today at 11:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 31 in a row — reading time ca. 210 seconds. Next briefing: today at 11:00.</div>
   <hr>
 </div>
 </div>
@@ -550,9 +617,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -560,7 +630,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -584,6 +654,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -428,21 +495,21 @@
   <h2>Uber übernimmt Delivery Hero für 12,7 Milliarden Euro</h2>
   <p><strong>Was ist neu:</strong> Der Fahrdienstvermittler Uber hat ein Angebot für den deutschen Essenslieferanten Delivery Hero vorgelegt. Das Übernahmeangebot beläuft sich auf rund 12,7 Milliarden Euro beziehungsweise 41,50 Euro je Anteilsschein. Damit verschmilzt einer der größten Player im Personenverkehr mit einem der weltweit führenden Anbieter von Essenslieferungen, was die digitale Lieferlandschaft grundlegend verändert.</p>
   <p><strong>Warum es zählt:</strong> Für die österreichische Wirtschaft ist diese Marktverdichtung direkt spürbar, da beide Dienste hierzulande stark genutzt werden und vielen Restaurants als Vertriebskanal dienen. Abseits der unmittelbaren Konsumwelt signalisiert der Deal, wie aggressiv große US-Techplattformen derzeit in Europa expandieren und Wettbewerber schlucken, um durch Daten- und Logistiksynergien Profitabilität zu erzwingen. <span class="ressort" style="--h:175">Wirtschaft</span> <a class="source-link" href="https://www.diepresse.com/37667007/uber-uebernimmt-delivery-hero-um-etwa-12-7-milliarden-euro">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-07-16|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>EU-Kommissar Brunner fordert Ende der Binnengrenzkontrollen</h2>
+<div class="article-fb" data-key="2026-07-16|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Uber übernimmt Delivery Hero für 12,7 Milliarden Euro" data-karte="2026-07-16-mittag-karte.png">↗ Teilen</button></div><h2>EU-Kommissar Brunner fordert Ende der Binnengrenzkontrollen</h2>
   <p><strong>Was ist neu:</strong> EU-Migrationskommissar Magnus Brunner ortet eine dramatisch gesunkene Zahl irregulärer Ankünfte und fordert in Folge die Abschaffung der Binnengrenzkontrollen in der EU.</p>
   <p><strong>Warum es zählt:</strong> Österreich und Deutschland haben in den letzten Jahren ihre Grenzen kontrolliert, was den freien Personenverkehr spürbar ausbremst. Brunners Vorstoß zielt direkt auf die Wiederherstellung des Schengen-Raums, dürfte aber bei innerstaatlich noch skeptischen Regierungen auf Widerstand stoßen. <span class="ressort" style="--h:265">International</span> <a class="source-link" href="https://www.diepresse.com/37658232/brunner-es-ist-zeit-die-binnengrenzkontrollen-abzuschaffen">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-07-16|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>VfGH: Staatsnahe Banken müssen Informationen herausgeben</h2>
+<div class="article-fb" data-key="2026-07-16|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="EU-Kommissar Brunner fordert Ende der Binnengrenzkontrollen">↗ Teilen</button></div><h2>VfGH: Staatsnahe Banken müssen Informationen herausgeben</h2>
   <p><strong>Was ist neu:</strong> Der Verfassungsgerichtshof bestätigt in zwei richtungsweisenden Erkenntnissen, dass das Informationsfreiheitsgesetz auch für staatsnahe Unternehmen gilt und Auskunftspflichten klar definiert, soweit diese Banken nicht unmittelbar wirtschaftliche Kerninteressen berühren.</p>
   <p><strong>Warum es zählt:</strong> Der Beschluss stärkt die Transparenz gegenüber Bürgern und Journalisten bei mit Bundesgeld finanzierten Betrieben. Geheimhaltungsversuche staatlicher Institutionen werden künftig juristisch deutlich schwerer durchsetzbar sein. <span class="ressort" style="--h:35">Recht/Justiz</span> <a class="source-link" href="https://www.diepresse.com/37630479/vfgh-entscheidet-zu-informationsfreiheit-staatsnahe-bank-muss-infos-herausgeben">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-07-16|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Niedrigwasser blockiert Donauschifffahrt in Ungarn</h2>
+<div class="article-fb" data-key="2026-07-16|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="VfGH: Staatsnahe Banken müssen Informationen herausgeben">↗ Teilen</button></div><h2>Niedrigwasser blockiert Donauschifffahrt in Ungarn</h2>
   <p>Extreme Pegelstände legen Teile der Flusskreuzfahrt und des Güterverkehrs auf der Donau still. <a class="source-link" href="https://www.diepresse.com/37677379/niedrigwasser-auf-der-donau-kreuzfahrtschiffe-sitzen-in-ungarn-fest">Weiterlesen bei der Presse →</a></p>
-<div class="article-fb" data-key="2026-07-16|mittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Steuerliche Begünstigung für private Vorsorge geplant</h2>
+<div class="article-fb" data-key="2026-07-16|mittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Niedrigwasser blockiert Donauschifffahrt in Ungarn">↗ Teilen</button></div><h2>Steuerliche Begünstigung für private Vorsorge geplant</h2>
   <p>Staatssekretärin Eibinger-Miedl will die private finanzielle Vorsorge steuerlich begünstigen und verweist dabei auf noch zu klärende budgetäre Effekte der Wehrdienstreform. <a class="source-link" href="https://www.diepresse.com/37658266/staatssekretaerin-eibinger-miedl-will-private-vorsorge-steuerlich-beguenstigen">Weiterlesen bei der Presse →</a></p>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>EZB:</strong> Seit deinem letzten Stand ortet Notenbankchef Kocher keine Zweitrundeneffekte bei der Inflation, was die Consideration für künftige Zinsschritte unmittelbar beeinflusst.</p>
   <p>- <strong>Energiepreise und Stromkosten in Österreich:</strong> Seit deinem letzten Stand ergänzen die USA ihre physische Hafenblockade durch umfassende Finanzsanktionen gegen den iranischen Ölhandel. Das Risiko für Ölpreisschübe und höhere Energiekosten in Österreich bleibt dadurch unverändert hoch.</p>
-<div class="article-fb" data-key="2026-07-16|mittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — 31. Tag in Folge — Lesezeit ca. 150 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
+<div class="article-fb" data-key="2026-07-16|mittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Steuerliche Begünstigung für private Vorsorge geplant">↗ Teilen</button></div><hr>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert — 31. Tag in Folge — Lesezeit ca. 150 Sekunden. Nächstes Lagebild: heute 16:00 Uhr.</div>
   <hr>
 </div>
 </div>
@@ -550,9 +617,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -560,7 +630,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -584,6 +654,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Als gelesen markieren');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>Du warst weg — '+verpasst.length+
+      (verpasst.length===1?' Ausgabe':' Ausgaben')+' verpasst.</b>'+
+      'Das hier zeigt nur das jüngste Delta. Nachholen:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -430,29 +497,29 @@
   <p><strong>Why it matters:</strong> The pause, however fragile, buys time for diplomatic channels to function before another escalation triggers a broader regional conflict. For you, this affects energy prices, military posture in the Middle East, and the calculus around any military intervention. The window for negotiation is narrow—both sides have demonstrated willingness to strike, and miscalculation could quickly unwind the ceasefire.</p>
   <p><strong>What&#x27;s next:</strong> Mediators will need to address the root causes of the escalation within days. Any new incident in the Strait of Hormuz or repeated attacks could collapse the pause entirely.</p>
   <p><span class="ressort" style="--h:265">World</span> <span class="byline-source">By: Adam Rasgon and Euan Ward</span> <a class="source-link" href="https://www.nytimes.com/2026/07/10/world/middleeast/iran-us-ceasefire-talks.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-10|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-10|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="U.S. and Iran Step Back From Escalation as Mediators Intervene" data-karte="2026-07-10-mittag-karte.png">↗ Share</button></div><hr>
   <h2>Meta Hit With E.U. Order to Redesign Instagram and Facebook</h2>
   <p><strong>What&#x27;s new:</strong> European Union regulators have ordered Meta to alter the &quot;addictive design&quot; features of Instagram and Facebook, citing violations of the bloc&#x27;s digital safety law. The company faces mandatory changes to how it deploys recommendation algorithms and engagement mechanisms that keep users on the platforms longer.</p>
   <p><strong>Why it matters:</strong> This is the first major regulatory action forcing a tech giant to fundamentally redesign its core product. If Meta cannot comply, it faces significant fines under E.U. law—and the decision may embolden regulators in the U.S. and elsewhere to pursue similar orders. For investors and Meta shareholders, this creates operational and financial risk.</p>
   <p><span class="ressort" style="--h:175">Business</span> <span class="byline-source">By: Adam Satariano</span> <a class="source-link" href="https://www.nytimes.com/2026/07/10/business/meta-instagram-facebook-europe.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-10|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-10|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Meta Hit With E.U. Order to Redesign Instagram and Facebook">↗ Share</button></div><hr>
   <h2>Iran&#x27;s Supreme Leader Absent From Father&#x27;s Funeral, Fueling Succession Questions</h2>
   <p><strong>What&#x27;s new:</strong> Ayatollah Mojtaba Khamenei did not appear at his father&#x27;s funeral this week, raising questions about his physical condition and capacity to assume leadership. The absence has left a power vacuum within Iran&#x27;s divided regime at a moment when the country faces both internal instability and external pressure.</p>
   <p><strong>Why it matters:</strong> Iran&#x27;s succession and internal stability directly affect U.S. foreign policy, regional military posture, and the durability of any diplomatic agreements. An unclear succession could lead to internal power struggles that destabilize negotiations or trigger unpredictable moves in the region.</p>
   <p><span class="ressort" style="--h:265">World</span> <span class="byline-source">By: Yeganeh Torbati</span> <a class="source-link" href="https://www.nytimes.com/2026/07/10/world/middleeast/iran-supreme-leader-mojtaba-khamenei.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-10|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-10|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Iran&amp;#x27;s Supreme Leader Absent From Father&amp;#x27;s Funeral, Fueling Succession Questions">↗ Share</button></div><hr>
   <h2>Democratic Senate PAC Raises Record Midyear Sum</h2>
   <p>Senate Majority PAC entered July with $126 million after raising $147 million in the second quarter, a new midyear record. However, the G.O.P. remains competitive in the money race. <span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Bayliss Wagner</span> <a class="source-link" href="https://www.nytimes.com/2026/07/10/us/politics/senate-majority-pac-democrat-fundraising.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-10|mittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-10|mittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Democratic Senate PAC Raises Record Midyear Sum">↗ Share</button></div><hr>
   <h2>Oil Prices Climb as Shipping Attacks Disrupt Hormuz Strait</h2>
   <p>Crude rose above prewar levels after three commercial vessels were attacked in the Strait of Hormuz. The disruptions to shipping have revived supply concerns that briefly receded during the recent pause in hostilities. <span class="ressort" style="--h:175">Business</span> <span class="byline-source">By: Jason Karaian</span> <a class="source-link" href="https://www.nytimes.com/2026/07/10/business/oil-gas-stocks-shipping-iran-hormuz.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-10|mittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-10|mittag|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Oil Prices Climb as Shipping Attacks Disrupt Hormuz Strait">↗ Share</button></div><hr>
   <h2 class="topic-summary-head">Your Topics</h2>
   <p>- <strong>Middle East:</strong> Since your last update: U.S.-Iran hostilities have paused with Qatari mediation underway, but Iranian leadership succession remains uncertain following the absent appearance of Mojtaba Khamenei at his father&#x27;s funeral.</p>
   <p>- <strong>Wall Street:</strong> Since your last update: Goldman Sachs and other major firms are restricting employee use of prediction market platforms amid growing regulatory scrutiny.</p>
   <hr>
   <p class="reporters">Today&#x27;s reporting by: Adam Rasgon and Euan Ward, Adam Satariano, Yeganeh Torbati, Bayliss Wagner and Jason Karaian · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 17 in a row — reading time ca. 225 seconds. Next briefing: today at 16:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 17 in a row — reading time ca. 225 seconds. Next briefing: today at 16:00.</div>
   <hr>
 </div>
 </div>
@@ -560,9 +627,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -570,7 +640,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -594,6 +664,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
