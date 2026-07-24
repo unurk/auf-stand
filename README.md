@@ -34,6 +34,9 @@ python -m copilot.main abend
 
 # Nach Urlaub/Pause:
 python -m copilot.main catchup
+
+# Teilbare Bild-Karte zum wichtigsten Punkt der jüngsten Ausgabe:
+python -m copilot.main karte
 ```
 
 `--keep-seen` verhindert beim Testen, dass Artikel als „gesehen" markiert werden.
@@ -68,6 +71,43 @@ Der Bot beantwortet freie Fragen auf Basis der aktuellen Artikel und versteht:
 - `/themen EZB Miet Börse` — Themen-Präferenzen setzen (Schlagworte aus config.yaml)
 - `/thema-neu Name|Schlagwort` — eigenes Thema als Tracker hinzufügen
 - `/push <Code aus der PWA>` — Web-Push-Benachrichtigungen aktivieren
+- `/profil` — Wirkungs-Profil per Knopfdruck ausfüllen (`/profil <Code aus der PWA>`
+  übernimmt es aus der App, `/profil loeschen` verwirft es)
+- `/fehlt <Thema>` — melden, was im Lagebild gefehlt hat
+- `/gelesen` — Lese-Signal setzen (z. B. nach der Audio-Version)
+
+Unter jeder Ausgabe stehen zusätzlich die Knöpfe **✓ Gelesen** und
+**🔍 Hat was gefehlt?**.
+
+## Wirkungs-Profil (Betroffenheit statt Interesse)
+
+Themen-Tracker sagen, was interessiert. Das Wirkungs-Profil (zehn Fragen:
+Miete/Eigentum, Kredit variabel/fix, Heizung, Mobilität, Ersparnisse …) sagt, wie
+eine Entscheidung *trifft*. Die Synthese hängt damit an passende Punkte eine Zeile
+**„Für dich konkret: …"**. Es steuert ausschließlich die Einordnung, nie die
+Auswahl der Entwicklungen — und wird selbst deklariert, nicht aus Klicks
+erschlossen. Ausfüllen im Themen-Screen der PWA oder per `/profil` im Chat.
+
+## Was die Ausgabe im Zeitbudget hält
+
+`copilot/qualitaet.py` zieht nach der Synthese die Produktregeln nach: Themen-Deltas
+ohne materielle Änderung fliegen raus, der Abschnitt „Deine Themen" wird auf drei
+Zeilen gedeckelt. Reißt die Lesezeit im Schnitt der letzten Ausgaben das Budget
+(`lesezeit_budget_sekunden`, Standard 90), geht ein Kürzungs-Hinweis als
+Kalibrierung in den nächsten Prompt.
+
+## Podcast-Feed
+
+Jeder Site-Build erzeugt `site/feed.xml` aus den Audio-Ausgaben im Archiv — die
+Adresse in Apple Podcasts, Overcast oder Pocket Casts eingefügt, läuft das Lagebild
+im Auto und auf dem Lautsprecher. Die Feed-Adresse steht im Themen-Screen der PWA.
+
+## Ruhige Blöcke
+
+Erreicht in einem Block nichts die Schwelle, wird das **zugestellt** statt
+verschwiegen: eine Zeile „Ruhige Lage — keine der N geprüften Meldungen hat die
+Schwelle erreicht". Ohne diese Meldung ist ein ruhiger Nachrichtentag von einem
+kaputten Dienst nicht unterscheidbar.
 
 Der Rückkanal läuft nach jeder Ausgabe in der Pipeline (`python -m copilot.main rueckkanal`).
 

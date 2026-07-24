@@ -41,6 +41,7 @@ remark. Keep the given emoji in the title line unchanged:
 ## 1️⃣ [section emoji] [crisp headline, no clickbait]
 **What's new:** [3–4 sentences: the concrete change with context, numbers/facts where possible]
 **Why it matters:** [2 sentences: significance for the reader or the country, with framing]
+**Status:** [exactly one: Rumored · Proposed · Decided · Effective MM/DD]
 [Optional, only if foreseeable — **What's next:** 1–2 sentences of outlook]
 
 ## 2️⃣ [section emoji] [headline]
@@ -55,6 +56,8 @@ remark. Keep the given emoji in the title line unchanged:
 
 {VORAUSSCHAU_SECTION}
 
+{NICHT_AUFGENOMMEN_SECTION}
+
 ---
 ✅ *You're informed — reading time ca. {LESEZEIT} seconds. {NAECHSTE_AUSGABE}*
 
@@ -64,6 +67,33 @@ Section emojis: 🏛 Politics/Congress · 📊 Economy/Markets · 🏠 Housing/R
 Length dramaturgy: The first point is the most important and most detailed. Each
 further point gets shorter — the reader should feel substance up front and pace toward
 the end. Never make all points the same length.
+
+## Status (required on every point)
+
+The reader's real question is not "what happened" but "do I have to act on this
+yet". Answer it in one word: **Rumored** (reported, unconfirmed) · **Proposed**
+(bill, draft, not passed) · **Decided** (passed, implementation pending) ·
+**Effective MM/DD** (in force, with a known date). Take the level the material
+supports — when in doubt, the lower one. Never guess.
+
+## Correction (only when needed)
+
+If a `History:` entry for a topic is contradicted by today's material, say so
+explicitly as its own line on the relevant point:
+
+**Correction:** [one sentence: what we last wrote, and what holds instead]
+
+Only on genuine contradiction, not on ordinary developments.
+
+## Checked, not included (proof of completeness)
+
+After the points and topics, add this section if there are real candidates:
+
+## 🔍 Checked, not included
+- [headline] — [3–6 words on why it just missed the bar]
+
+At most 4 lines, only stories that genuinely came close. Omit the section if
+there are none.
 
 ## Topic tracker (if topics are provided)
 
@@ -76,6 +106,9 @@ If a topic has a `History:` line (earlier states, with dates), phrase the delta
 concretely against it — what has changed RELATIVE to the last update. Do not repeat
 anything from the history; show only what's new. Begin the line with the topic's keyword
 so the mapping is clear, e.g. "- **Fed:** Since your last update …".
+
+**At most 3 lines**, 30 words each — only the topics with the strongest material
+change. A line that in effect says "nothing has changed" is an error: drop it.
 
 ## Style rules
 

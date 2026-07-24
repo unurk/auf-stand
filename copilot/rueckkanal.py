@@ -125,6 +125,62 @@ def cmd_rueckkanal(config: dict) -> int:
                 tg.send_alert("Format: /thema-neu Name|Schlagwort", [chat_id])
             continue
 
+        # /profil — Wirkungs-Profil setzen (Fragen mit Knöpfen), importieren
+        # (base64-Code aus der PWA) oder löschen.
+        if text.startswith("/profil"):
+            from . import profil as profil_mod
+            payload = text[7:].strip()
+            if payload in ("loeschen", "löschen", "reset"):
+                profil_mod.profil_loeschen(current_state)
+                state_module.save_state(current_state)
+                tg.send_alert("✅ Wirkungs-Profil gelöscht.", [chat_id])
+                continue
+            if payload:
+                try:
+                    n = profil_mod.code_uebernehmen(current_state, payload)
+                except Exception as exc:
+                    print(f"Profil-Code ungültig: {exc}")
+                    tg.send_alert("❌ Profil-Code ungültig. Bitte in der App neu erzeugen.", [chat_id])
+                    continue
+                if n:
+                    state_module.save_state(current_state)
+                    antworten = profil_mod.get_profil(current_state)
+                    tg.send_alert(
+                        f"✅ Profil übernommen ({n} Angaben): "
+                        f"{profil_mod.kurzfassung(antworten)}",
+                        [chat_id],
+                    )
+                else:
+                    tg.send_alert("❌ Profil-Code enthielt keine gültigen Angaben.", [chat_id])
+                continue
+            _frage_stellen(current_state, chat_id, tg)
+            continue
+
+        # /fehlt <Thema> — was aus Sicht der Leserin gefehlt hat (Fehler 2. Art)
+        if text.startswith("/fehlt"):
+            fehlt = text[6:].strip()
+            if not fehlt:
+                tg.send_alert(
+                    "Was hat gefehlt? Format: /fehlt <Thema oder Schlagzeile>", [chat_id]
+                )
+                continue
+            state_module.record_missing_feedback(current_state, fehlt, chat_id)
+            state_module.save_state(current_state)
+            tg.send_alert(
+                "✅ Notiert — das fließt in die Auswahl der nächsten Ausgaben ein.",
+                [chat_id],
+            )
+            print(f"Fehlend gemeldet: {fehlt[:80]}")
+            continue
+
+        # /gelesen — manuelles Lese-Signal (z. B. nach der Audio-Version)
+        if text.startswith("/gelesen"):
+            state_module.record_read(current_state, "befehl")
+            state_module.save_state(current_state)
+            tage = state_module.read_streak(current_state)
+            tg.send_alert(f"✅ Notiert — {tage}. Tag in Folge informiert.", [chat_id])
+            continue
+
         # /push <base64-blob> — Web-Push-Subscription aus der PWA registrieren
         if text.startswith("/push"):
             payload = text[5:].strip()
@@ -164,6 +220,29 @@ def cmd_rueckkanal(config: dict) -> int:
     return 0
 
 
+def _frage_stellen(current_state: dict, chat_id: str, tg) -> None:
+    """Schickt die nächste offene Profil-Frage — oder die Zusammenfassung."""
+    from . import profil as profil_mod
+
+    antworten = profil_mod.get_profil(current_state)
+    frage = profil_mod.naechste_frage(antworten)
+    if frage is None:
+        tg.send_alert(
+            "✅ Dein Wirkungs-Profil steht: "
+            f"{profil_mod.kurzfassung(antworten)}\n\n"
+            "Damit wird „Warum es zählt“ konkret statt allgemein. "
+            "Ändern: /profil loeschen und neu starten.",
+            [chat_id],
+        )
+        return
+    beantwortet, gesamt = profil_mod.fortschritt(antworten)
+    tg.send_question(
+        f"Frage {beantwortet + 1} von {gesamt}: {frage['frage']}",
+        chat_id,
+        tg.profil_keyboard(frage),
+    )
+
+
 def _handle_callback(cq: dict, allowed_ids: set[str], current_state: dict, tg) -> int:
     """Verarbeitet einen Button-Tap. Gibt 1 zurück, wenn Feedback notiert wurde."""
     from . import state as state_module
@@ -177,6 +256,34 @@ def _handle_callback(cq: dict, allowed_ids: set[str], current_state: dict, tg) -
         tg.answer_callback(cq.get("id", ""))
         return 0
 
+    # Profil-Antwort: prof|key|wert
+    if parts[0] == "prof" and len(parts) == 3:
+        from . import profil as profil_mod
+        if profil_mod.antwort_speichern(current_state, parts[1], parts[2]):
+            tg.answer_callback(cq.get("id", ""), "Notiert ✓")
+            _frage_stellen(current_state, chat_id, tg)
+            return 1
+        tg.answer_callback(cq.get("id", ""))
+        return 0
+
+    # Lese-Signal: read|datum|edition
+    if parts[0] == "read" and len(parts) == 3:
+        state_module.record_read(current_state, "telegram_tap", parts[1], parts[2])
+        tage = state_module.read_streak(current_state)
+        tg.answer_callback(cq.get("id", ""), f"Gelesen ✓ — {tage}. Tag in Folge")
+        return 1
+
+    # „Hat was gefehlt?": fehlt|datum|edition — erklärt den Befehl, notiert später
+    if parts[0] == "fehlt":
+        tg.answer_callback(cq.get("id", ""), "Sag uns was ✓")
+        tg.send_alert(
+            "Was hat gefehlt? Antworte mit:\n/fehlt <Thema oder Schlagzeile>\n\n"
+            "Das ist die einzige Rückmeldung, die wir sonst nie bekommen — "
+            "wir sehen nur, was drin war, nie was fehlte.",
+            [chat_id],
+        )
+        return 0
+
     # Per-Artikel-Feedback: artfb|datum|edition|idx|rating
     if parts[0] == "artfb" and len(parts) == 5:
         _, datum, edition, idx_str, rating = parts
@@ -186,6 +293,8 @@ def _handle_callback(cq: dict, allowed_ids: set[str], current_state: dict, tg) -
             tg.answer_callback(cq.get("id", ""))
             return 0
         state_module.record_article_feedback(current_state, datum, edition, article_idx, rating, chat_id)
+        # Wer einzelne Punkte bewertet, hat die Ausgabe gelesen.
+        state_module.record_read(current_state, "artfb", datum, edition)
         tg.answer_callback(cq.get("id", ""), "Notiert ✓")
         print(f"Artikel-Feedback: {edition} Artikel {article_idx} {'👍' if rating == 'up' else '👎'}")
         return 1
@@ -197,6 +306,7 @@ def _handle_callback(cq: dict, allowed_ids: set[str], current_state: dict, tg) -
 
     _, datum, edition, rating = parts
     state_module.record_feedback(current_state, datum, edition, rating, chat_id)
+    state_module.record_read(current_state, "fb", datum, edition)
     tg.answer_callback(cq.get("id", ""))
     message_id = msg.get("message_id")
     if message_id is not None:

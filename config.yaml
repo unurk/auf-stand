@@ -161,3 +161,15 @@ feedback_enabled: true
 # E-Paper-Link am Ende jeder Ausgabe. Zeigt auf die offizielle E-Paper-Seite;
 # eingeloggte Abonnent:innen werden zur aktuellen Ausgabe geleitet.
 epaper_url: https://www.diepresse.com/epaper
+
+# Basis-URL der PWA — für Web-Push und den Podcast-Feed (site/feed.xml).
+site_url: https://unurk.github.io/auf-stand/
+
+# Zeitbudget der Ausgabe in Sekunden. Wird nicht erzwungen (Kürzen würde Inhalt
+# zerstören), aber gemessen: Reißen die letzten Ausgaben das Budget im Schnitt,
+# geht ein Kürzungs-Hinweis als Kalibrierung in den nächsten Prompt.
+lesezeit_budget_sekunden: 90
+
+# Wochen-Quiz am Samstag (3 Fragen als Telegram-Quiz zur Wochen-Quittung).
+# Misst Informiertheit statt Zustellung — false schaltet es ab.
+quiz_enabled: true

@@ -252,6 +252,106 @@ def article_feedback_hint(state: dict, cutoff_date: str) -> str:
     return "\n".join(lines) + "\n"
 
 
+def record_missing_feedback(state: dict, text: str, chat_id: str) -> None:
+    """Hält fest, was aus Sicht der Leserin GEFEHLT hat (Fehler zweiter Art).
+
+    Das Artikel-Feedback bewertet nur, was drin war — die teuerste Fehlerklasse
+    (zu Unrecht weggelassen) ist damit unsichtbar. Diese Meldungen fließen als
+    Kalibrierung in den nächsten Prompt.
+    """
+    now = datetime.now(timezone.utc)
+    text = (text or "").strip()
+    if not text:
+        return
+    entries = state.setdefault("missing_feedback", [])
+    entries.append({
+        "date": now.date().isoformat(),
+        "text": text[:300],
+        "chat_id": chat_id,
+        "ts": now.isoformat(),
+    })
+    cutoff = now.date().toordinal() - 30
+    state["missing_feedback"] = [
+        e for e in entries
+        if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+    ][-20:]
+
+
+def missing_feedback_hint(state: dict, cutoff_date: str) -> str:
+    """Kalibrierungshinweis aus „hat gefehlt"-Meldungen."""
+    entries = [
+        e for e in state.get("missing_feedback", [])
+        if e.get("date", "") >= cutoff_date
+    ]
+    if not entries:
+        return ""
+    letzte = [e["text"] for e in entries[-4:]]
+    aufzaehlung = " · ".join(f"„{t}“" for t in letzte)
+    return (
+        f"❗ Als fehlend gemeldet wurde zuletzt: {aufzaehlung} — prüfe vergleichbare "
+        "Entwicklungen künftig großzügiger an der Materialitäts-Schwelle; hier war "
+        "die Auswahl zu streng.\n"
+    )
+
+
+def record_read(state: dict, quelle: str, datum: str = "", edition: str = "") -> None:
+    """Hält ein LESE-Signal fest (Telegram-Tap, /gelesen, Audio zu Ende gehört).
+
+    Unterschied zu `stats`: dort steht, dass wir geliefert haben. Hier steht,
+    dass jemand es aufgenommen hat. Nur das darf einen Streak tragen.
+    """
+    now = datetime.now(timezone.utc)
+    entries = state.setdefault("read_events", [])
+    entries.append({
+        "date": now.date().isoformat(),
+        "edition": edition,
+        "for_date": datum,
+        "quelle": quelle,
+        "ts": now.isoformat(),
+    })
+    cutoff = now.date().toordinal() - 60
+    state["read_events"] = [
+        e for e in entries
+        if datetime.fromisoformat(e["date"]).toordinal() >= cutoff
+    ]
+
+
+def has_read_events(state: dict) -> bool:
+    return bool(state.get("read_events"))
+
+
+def read_streak(state: dict) -> int:
+    """Aufeinanderfolgende Tage mit mindestens einem Lese-Signal."""
+    from datetime import date, timedelta
+    days = {e["date"] for e in state.get("read_events", [])}
+    if not days:
+        return 0
+    d, streak = date.today(), 0
+    if d.isoformat() not in days:  # heute noch nicht gelesen → ab gestern zählen
+        d -= timedelta(days=1)
+    while d.isoformat() in days:
+        streak += 1
+        d -= timedelta(days=1)
+    return streak
+
+
+def streak(state: dict) -> tuple[int, bool]:
+    """Der Streak, der angezeigt werden soll: (Tage, misst_lesen).
+
+    Sobald es überhaupt Lese-Signale gibt, zählt nur noch Gelesenes — vorher
+    bleibt es beim Zustell-Streak, damit bestehende Installationen ohne
+    Rückkanal nicht plötzlich bei 0 stehen.
+    """
+    if has_read_events(state):
+        return read_streak(state), True
+    return current_streak(state), False
+
+
+def letzte_lesezeiten(state: dict, n: int = 6) -> list[int]:
+    """Lesezeiten (Sekunden) der letzten Ausgaben — Grundlage fürs Längen-Budget."""
+    return [s.get("secs", 0) for s in state.get("stats", [])[-n:] if s.get("secs")]
+
+
 def save_user_topic_prefs(state: dict, topic_names: list[str]) -> None:
     """Speichert vom Nutzer gewählte Themen-Präferenzen (via App-Assessment oder Telegram)."""
     state["user_topic_prefs"] = topic_names
@@ -313,8 +413,20 @@ def current_streak(state: dict) -> int:
     return streak
 
 
-def record_stats(state: dict, edition: str, points: int, words: int, new_articles: int) -> None:
-    """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung."""
+def record_stats(
+    state: dict,
+    edition: str,
+    points: int,
+    words: int,
+    new_articles: int,
+    secs: int = 0,
+    geprueft: int = 0,
+) -> None:
+    """Zeichnet pro Ausgabe Kennzahlen auf — Grundlage für die Wochen-Quittung.
+
+    `secs` = Lesezeit der Ausgabe, `geprueft` = Zahl der geprüften Meldungen:
+    beides für die Wirkungs-Rechnung („in 6 Minuten auf Stand, aus 214 Meldungen").
+    """
     now = datetime.now(timezone.utc)
     stats = state.setdefault("stats", [])
     stats.append({
@@ -324,6 +436,8 @@ def record_stats(state: dict, edition: str, points: int, words: int, new_article
         "points": points,
         "words": words,
         "new_articles": new_articles,
+        "secs": secs,
+        "geprueft": geprueft,
     })
     # Nur die letzten 30 Tage behalten
     cutoff = now.date().toordinal() - 30

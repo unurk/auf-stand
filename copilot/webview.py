@@ -11,6 +11,7 @@ from pathlib import Path
 import yaml
 
 from . import i18n as _i18n
+from . import podcast as _podcast
 from . import render as _render
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -477,6 +478,73 @@ _PAGE_TEMPLATE = """\
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -597,9 +665,12 @@ __CONTENT__
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -607,7 +678,7 @@ __CONTENT__
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -631,6 +702,81 @@ __CONTENT__
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Als gelesen markieren');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>Du warst weg — '+verpasst.length+
+      (verpasst.length===1?' Ausgabe':' Ausgaben')+' verpasst.</b>'+
+      'Das hier zeigt nur das jüngste Delta. Nachholen:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
@@ -702,6 +848,19 @@ _NYT_PAGE_TEMPLATE = (
     .replace(
         "if(cap) cap.innerHTML='Nächste Aktualisierung <b>'+fmtDur(until)+'</b> · '\n        +when+' '+pad(SLOTS[nextIdx])+':00 Uhr';",
         "if(cap) cap.innerHTML='Next update <b>'+fmtDur(until)+'</b> · '\n        +when+' at '+pad(SLOTS[nextIdx])+':00';"
+    )
+    # Nachhol-Leiste und Lese-Signal: deutsche JS-Strings → Englisch
+    .replace(
+        "done.setAttribute('title','Als gelesen markieren');",
+        "done.setAttribute('title','Mark as read');"
+    )
+    .replace(
+        "bar.innerHTML='<b>Du warst weg — '+verpasst.length+\n"
+        "      (verpasst.length===1?' Ausgabe':' Ausgaben')+' verpasst.</b>'+\n"
+        "      'Das hier zeigt nur das jüngste Delta. Nachholen:<ul>'+items+'</ul>';",
+        "bar.innerHTML='<b>You were away — '+verpasst.length+\n"
+        "      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+\n"
+        "      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';"
     )
 )
 
@@ -1018,19 +1177,92 @@ def _add_article_feedback(content: str, datum: str, edition: str, lang: str = "d
     idx = 0
     less_label = "Less" if lang == "en" else "Weniger"
 
+    share_label = "Share" if lang == "en" else "Teilen"
+
     def _insert(m: re.Match) -> str:
         nonlocal idx
         key = f"{datum}|{edition}|{idx}"
+        titel = re.search(r"<h2[^>]*>(.*?)</h2>", m.group(0), re.DOTALL)
+        titel_text = re.sub(r"<[^>]+>", "", titel.group(1)).strip() if titel else ""
+        # Teilen exportiert die Session, statt sie zu verlängern — der einzige
+        # organische Verbreitungsweg, den ein Hintergrund-Dienst haben kann.
+        karte_attr = (
+            f' data-karte="{datum}-{edition}-karte.png"' if idx == 0 else ""
+        )
         idx += 1
         bar = (
             f'\n<div class="article-fb" data-key="{key}">'
             f'<button class="fb-btn" data-vote="up">Relevant</button>'
             f'<button class="fb-btn" data-vote="down">{less_label}</button>'
+            f'<button class="share-btn" data-title="{_html.escape(titel_text, quote=True)}"'
+            f'{karte_attr}>↗ {share_label}</button>'
             f"</div>"
         )
         return m.group(0).rstrip() + bar
 
     return re.sub(r"<h2>(?!Deine Themen|Your Topics).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
+
+
+_REIFEGRAD_KLASSEN = [
+    ("rg-gilt", ("gilt ab", "in kraft", "effective", "in force")),
+    ("rg-beschlossen", ("beschlossen", "decided", "passed")),
+    ("rg-entwurf", ("entwurf", "vorlage", "proposed", "draft")),
+    ("rg-geruecht", ("gerücht", "geruecht", "kolportiert", "rumored", "rumoured")),
+]
+
+
+def _reifegrad_klasse(text: str) -> str:
+    low = text.lower()
+    for klasse, marker in _REIFEGRAD_KLASSEN:
+        if any(m in low for m in marker):
+            return klasse
+    return "rg-beschlossen"
+
+
+def _enhance_neu(content: str, lang: str = "de") -> str:
+    """Rendert die neuen redaktionellen Elemente: Reifegrad, Nachtrag, Prüf-Block.
+
+    Alle drei kommen als schlichte `**Label:** Text`-Zeilen aus der Synthese und
+    werden hier zu eigenständigen UI-Elementen.
+    """
+    label_reifegrad = "Status" if lang == "en" else "Reifegrad"
+    label_nachtrag = "Correction" if lang == "en" else "Nachtrag"
+    label_fuerdich = "What it means for you" if lang == "en" else "Für dich konkret"
+
+    def _rg(m: re.Match) -> str:
+        wert = m.group(1).strip().rstrip(".")
+        return (
+            f'<p class="reifegrad"><span class="rg {_reifegrad_klasse(wert)}">'
+            f"{wert}</span></p>"
+        )
+
+    content = re.sub(
+        rf"<p><strong>{label_reifegrad}:</strong>\s*(.*?)</p>", _rg, content, flags=re.DOTALL
+    )
+    content = re.sub(
+        rf"<p>(<strong>{label_nachtrag}:</strong>.*?)</p>",
+        r'<p class="nachtrag">\1</p>', content, flags=re.DOTALL,
+    )
+    content = re.sub(
+        rf"<p>(<strong>{label_fuerdich}:</strong>.*?)</p>",
+        r'<p class="fuer-dich">\1</p>', content, flags=re.DOTALL,
+    )
+    # Prüf-Zeile („🔍 62 Meldungen geprüft · 3 aufgenommen.")
+    content = re.sub(
+        r"<p>(🔍\s*<em>.*?)</p>", r'<p class="geprueft">\1</p>', content, flags=re.DOTALL
+    )
+    # Abschnitt „Geprüft, nicht aufgenommen" — startet eingeklappt (siehe JS).
+    marker = _i18n.t(lang, "nicht_aufgenommen_marker")
+    head = f'<h2 class="pruef-head">🔍 {marker}</h2>'
+    content = re.sub(rf"<h2>[^<]*{re.escape(marker)}</h2>", head, content)
+    # Die Zähl-Zeile steht im Markdown hinter dem Abschnitt — dort würde der
+    # Accordion-Aufbau sie in den eingeklappten Body ziehen. Sie gehört aber
+    # sichtbar davor: Sie IST der Beweis, der Abschnitt nur sein Beleg.
+    if head in content:
+        m = re.search(r'<p class="geprueft">.*?</p>', content, re.DOTALL)
+        if m:
+            content = content.replace(m.group(0), "", 1).replace(head, m.group(0) + head, 1)
+    return content
 
 
 def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str = "de") -> str:
@@ -1057,15 +1289,6 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
         r'\1',
         content,
     )
-    # Nummern-Emojis aus "Heute wichtig"/"Today's headlines"-Einträgen entfernen
-    content = re.sub(
-        r'(<div class="highlights">)(.*?)(</div>)',
-        lambda m: m.group(1)
-            + re.sub(r'\d️?⃣?\s*', '', m.group(2))
-            + m.group(3),
-        content,
-        flags=re.DOTALL,
-    )
     # Quell-Links als Pill auszeichnen (sprachspezifischer Link-Text)
     if lang == "en":
         content = re.sub(
@@ -1087,8 +1310,11 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
         r'<div class="done"><span class="done-check">✓</span> \1</div>',
         content, flags=re.DOTALL,
     )
+    # Idempotent: Der Site-Build läuft über bereits gebrandete Archiv-Dateien.
+    # Ohne das Verschlucken vorhandener Haken sammelte die Abschlusszeile bei
+    # jedem Lauf ein weiteres ✓ an (im Archiv bis zu 51 Stück).
     content = re.sub(
-        r'<div class="done">[✅\s]*(.*?)</div>',
+        r'<div class="done">(?:\s*<span class="done-check">✓</span>)*[✅\s]*(.*?)</div>',
         r'<div class="done"><span class="done-check">✓</span> \1</div>',
         content, flags=re.DOTALL,
     )
@@ -1157,6 +1383,16 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
                 r'<div class="highlights">\1</div>',
                 content, count=1, flags=re.DOTALL,
             )
+    # Nummern-Emojis aus „Heute wichtig"/„Today's headlines" entfernen. MUSS nach
+    # dem Bündeln stehen: Vorher existiert die .highlights-Box noch nicht — frisch
+    # erzeugte Ausgaben behielten die Keycaps sonst bis zum nächsten Site-Build.
+    content = re.sub(
+        r'(<div class="highlights">)(.*?)(</div>)',
+        lambda m: m.group(1) + re.sub(r'\d️?⃣?\s*', '', m.group(2)) + m.group(3),
+        content,
+        flags=re.DOTALL,
+    )
+    content = _enhance_neu(content, lang)
     if datum:
         content = _add_article_feedback(content, datum, edition, lang)
     return content.strip()
@@ -1258,6 +1494,8 @@ def build_dossier(
     topics: list,
     topic_articles: dict,
     assessment_questions: list | None = None,
+    profil_state: dict | None = None,
+    site_url: str = "https://unurk.github.io/auf-stand/",
 ) -> None:
     """Erzeugt site/dossier.html mit Toggle-Karten-Assessment und Topic-Karten."""
     from .synthesize import topic_keyword, topic_name as get_topic_name
@@ -1445,7 +1683,12 @@ window.asReset=function(){{
 </script>
 """
 
-    content = "<h1>Meine Themen</h1>\n" + assessment_html + _PUSH_SECTION
+    content = (
+        "<h1>Meine Themen</h1>\n" + assessment_html
+        + _profil_section(profil_state)
+        + _podcast_section(site_url)
+        + _PUSH_SECTION
+    )
     html = _render_page("Meine Themen", content, "dossier")
     (SITE_DIR / "dossier.html").write_text(html, encoding="utf-8")
 
@@ -1569,6 +1812,138 @@ window.asReset=function(){{window.asOpen();}};
 
     html = _render_nyt_page("My Topics", content, "dossier", epaper_url=epaper_url)
     (site_dir / "dossier.html").write_text(html, encoding="utf-8")
+
+
+def _profil_section(profil_state: dict | None = None) -> str:
+    """Wirkungs-Profil im Themen-Screen: zehn Fragen, ein Code für den Bot.
+
+    Dieselbe Mechanik wie die Push-Aktivierung: Die PWA ist statisch, also
+    erzeugt sie einen Code, den der Telegram-Rückkanal einliest.
+    """
+    from . import profil as profil_mod
+
+    gesetzt = (profil_state or {}).get("antworten", {}) or {}
+    bloecke = []
+    for frage in profil_mod.FRAGEN:
+        optionen = "".join(
+            f'<button class="prof-opt{" selected" if gesetzt.get(frage["key"]) == wert else ""}" '
+            f'data-key="{frage["key"]}" data-wert="{wert}">{_html.escape(label)}</button>'
+            for wert, label, _satz in frage["optionen"]
+        )
+        bedingt = ""
+        if frage.get("nur_wenn"):
+            key, werte = frage["nur_wenn"]
+            bedingt = f' data-nur-wenn="{key}" data-nur-werte="{",".join(werte)}"'
+        bloecke.append(
+            f'<div class="prof-block" data-key="{frage["key"]}"{bedingt}>'
+            f'<p class="prof-frage">{_html.escape(frage["frage"])}</p>'
+            f'<div class="prof-optionen">{optionen}</div>'
+            "</div>"
+        )
+    stand = (
+        f'<p class="as-intro-text" style="margin-bottom:6px">Aktuell hinterlegt: '
+        f'{_html.escape(profil_mod.kurzfassung(gesetzt))}</p>'
+        if gesetzt else ""
+    )
+    return f"""
+<div id="profil-section" style="border-top:1px solid var(--border);padding-top:24px;margin-top:36px">
+  <p style="font-size:15px;font-weight:600;font-family:var(--sans);margin:0 0 4px">🎯 Dein Wirkungs-Profil</p>
+  <p class="as-intro-text">
+    Themen sagen, was dich interessiert. Diese zehn Angaben sagen, wie dich eine
+    Entscheidung <em>trifft</em> — damit aus „betrifft Kreditnehmer“ ein konkreter
+    Satz für dich wird. Die Auswahl der Entwicklungen ändert sich dadurch nicht,
+    nur ihre Einordnung.
+  </p>
+  {stand}
+  {"".join(bloecke)}
+  <div id="profil-cmd-wrap" style="display:none;margin-top:18px">
+    <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 6px">
+      Sende diesen Code an deinen Telegram-Bot, um das Profil zu übernehmen:
+    </p>
+    <div class="as-cmd-box" id="profil-cmd-text"></div>
+    <button class="tg-copy-btn" onclick="profilCopy()">Kopieren</button>
+  </div>
+</div>
+
+<script>
+(function(){{
+  var antworten={{}};
+  try{{ antworten=JSON.parse(localStorage.getItem('profil')||'{{}}'); }}catch(e){{}}
+  var bloecke=document.querySelectorAll('.prof-block');
+  function sichtbarkeit(){{
+    bloecke.forEach(function(b){{
+      var wenn=b.dataset.nurWenn;
+      if(!wenn) return;
+      var erlaubt=(b.dataset.nurWerte||'').split(',');
+      var passt=erlaubt.indexOf(antworten[wenn])>-1;
+      b.style.display=passt?'':'none';
+      if(!passt) delete antworten[b.dataset.key];
+    }});
+  }}
+  function code(){{
+    var wrap=document.getElementById('profil-cmd-wrap');
+    if(!Object.keys(antworten).length){{ wrap.style.display='none'; return; }}
+    var blob=btoa(unescape(encodeURIComponent(JSON.stringify(antworten))))
+      .replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+    document.getElementById('profil-cmd-text').textContent='/profil '+blob;
+    wrap.style.display='';
+  }}
+  window.profilCopy=function(){{
+    var t=document.getElementById('profil-cmd-text').textContent;
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){{
+      var b=document.querySelector('#profil-cmd-wrap .tg-copy-btn');
+      b.textContent='✓ Kopiert'; setTimeout(function(){{ b.textContent='Kopieren'; }},2000);
+    }});
+  }};
+  document.querySelectorAll('.prof-opt').forEach(function(btn){{
+    if(antworten[btn.dataset.key]===btn.dataset.wert) btn.classList.add('selected');
+    btn.addEventListener('click',function(){{
+      var key=btn.dataset.key;
+      if(antworten[key]===btn.dataset.wert){{ delete antworten[key]; btn.classList.remove('selected'); }}
+      else {{
+        antworten[key]=btn.dataset.wert;
+        btn.parentNode.querySelectorAll('.prof-opt').forEach(function(o){{o.classList.remove('selected');}});
+        btn.classList.add('selected');
+      }}
+      try{{ localStorage.setItem('profil',JSON.stringify(antworten)); }}catch(e){{}}
+      sichtbarkeit(); code();
+    }});
+  }});
+  sichtbarkeit(); code();
+}})();
+</script>
+"""
+
+
+def _podcast_section(site_url: str, lang: str = "de") -> str:
+    """Abo-Block für den privaten Podcast-Feed (Apple Podcasts, Spotify, CarPlay)."""
+    base = site_url if site_url.endswith("/") else site_url + "/"
+    feed = f"{base}feed.xml"
+    if lang == "en":
+        titel, kopf = "🎧 Listen as a podcast", "Subscribe"
+        text = ("Paste this feed URL into Apple Podcasts, Overcast or Pocket Casts — "
+                "your briefing then arrives in the car and on the speaker, no app needed.")
+    else:
+        titel, kopf = "🎧 Als Podcast hören", "Abonnieren"
+        text = ("Diese Feed-Adresse in Apple Podcasts, Overcast oder Pocket Casts einfügen — "
+                "dann läuft das Lagebild im Auto und auf dem Lautsprecher, ganz ohne App.")
+    return f"""
+<div style="border-top:1px solid var(--border);padding-top:24px;margin-top:36px">
+  <p style="font-size:15px;font-weight:600;font-family:var(--sans);margin:0 0 4px">{titel}</p>
+  <p class="as-intro-text">{text}</p>
+  <div class="as-cmd-box" id="podcast-feed-url">{_html.escape(feed)}</div>
+  <button class="tg-copy-btn" onclick="podcastCopy()">{kopf}</button>
+</div>
+<script>
+window.podcastCopy=function(){{
+  var t=document.getElementById('podcast-feed-url').textContent;
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){{
+    var b=document.querySelector('#podcast-feed-url + .tg-copy-btn');
+    if(b){{ b.textContent='✓'; setTimeout(function(){{ b.textContent='{kopf}'; }},2000); }}
+  }});
+}};
+</script>
+"""
 
 
 # Push-Aktivierung — eigenständiger Block am Ende des Themen-Screens.
@@ -1796,6 +2171,44 @@ def _write_pwa_assets(site_dir: Path | None = None, manifest: dict | None = None
     )
 
 
+def _erster_punkt(html_text: str) -> str:
+    """Titel des ersten Punktes einer archivierten Ausgabe (für die Nachhol-Leiste)."""
+    for m in re.finditer(r"<h2(?![^>]*class=)[^>]*>(.*?)</h2>", html_text, re.DOTALL):
+        titel = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        if titel:
+            return titel[:70]
+    return ""
+
+
+def _ausgaben_script(editions: list, lang: str = "de", root: str = "") -> str:
+    """Liefert die letzten Ausgaben an den Client — Basis der Nachhol-Leiste.
+
+    Die Site ist statisch, es gibt keinen Server, der den Lese-Stand kennt. Also
+    bekommt der Client die Liste und vergleicht sie mit seinem lokalen Stand.
+    """
+    eintraege = []
+    for (d, _rank, edition), path in editions[:8]:
+        try:
+            roh = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        eintraege.append({
+            "id": f"{d.isoformat()}-{edition}",
+            "url": f"{root}archiv/{path.name}",
+            "label": _label(d, edition, lang),
+            "top": _erster_punkt(roh),
+        })
+    if not eintraege:
+        return ""
+    return (
+        "<script>window.__AUSGABEN__="
+        + json.dumps(eintraege, ensure_ascii=False)
+        + ";window.__AKTUELLE_AUSGABE__="
+        + json.dumps(eintraege[0]["id"])
+        + ";</script>"
+    )
+
+
 def _audio_player(src: str) -> str:
     return (
         '<div class="audio-player">'
@@ -1829,6 +2242,22 @@ def _prune_old_audio(archiv_dir: Path, days: int = 14) -> None:
             mp3.unlink()
 
 
+def _prune_old_karten(archiv_dir: Path, days: int = 14) -> None:
+    """Löscht Teilen-Karten, die älter als `days` Tage sind (wie beim Audio)."""
+    from datetime import timedelta
+    cutoff = date.today() - timedelta(days=days)
+    for png in archiv_dir.glob("*-karte.png"):
+        m = re.match(rf"^(\d{{4}})-(\d{{2}})-(\d{{2}})-({_EDITIONS_RE})-karte\.png$", png.name)
+        if not m:
+            continue
+        try:
+            d = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            continue
+        if d < cutoff:
+            png.unlink()
+
+
 def _build_presse_site() -> Path:
     """Baut die deutsche Presse-Edition (site/)."""
     state: dict = {}
@@ -1845,6 +2274,8 @@ def _build_presse_site() -> Path:
         all_topics,
         state.get("topic_articles", {}),
         assessment_questions=state.get("assessment_questions"),
+        profil_state=state.get("profil"),
+        site_url=config.get("site_url", "https://unurk.github.io/auf-stand/"),
     )
 
     out_dir = _render.OUT_DIR
@@ -1857,7 +2288,11 @@ def _build_presse_site() -> Path:
         for mp3 in out_dir.glob("*.mp3"):
             if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})\.mp3$", mp3.name):
                 shutil.copy2(mp3, archiv_dir / mp3.name)
+        for png in out_dir.glob("*-karte.png"):
+            if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})-karte\.png$", png.name):
+                shutil.copy2(png, archiv_dir / png.name)
     _prune_old_audio(archiv_dir)
+    _prune_old_karten(archiv_dir)
 
     editions = [
         (parsed, path)
@@ -1891,11 +2326,11 @@ def _build_presse_site() -> Path:
             latest_content, _audio_player(f"archiv/{latest_mp3}")
         )
     from . import state as state_mod
-    streak = state_mod.current_streak(state)
+    streak, misst_lesen = state_mod.streak(state)
     if streak >= 2:
+        label = "Tage in Folge informiert" if misst_lesen else "Tage in Folge geliefert"
         latest_content = _insert_after_header(
-            latest_content,
-            f'<div class="streak">🔥 {streak} Tage in Folge informiert</div>\n',
+            latest_content, f'<div class="streak">🔥 {streak} {label}</div>\n'
         )
     timeline = _timeline_panel(latest_edition, "de")
     if timeline:
@@ -1905,9 +2340,17 @@ def _build_presse_site() -> Path:
         if hint:
             latest_content = _insert_after_header(latest_content, hint)
 
+    # Nachhol-Leiste: Liste der letzten Ausgaben für den Client (statische Site,
+    # der Lese-Stand liegt im Browser).
+    latest_content += "\n" + _ausgaben_script(editions, "de")
+
     title = _label(latest_d, latest_edition, "de")
     index_html = _render_page(title, latest_content, "lagebild")
     index.write_text(index_html, encoding="utf-8")
+
+    # Podcast-Feed: bringt die Audio-Ausgabe nach CarPlay, Spotify und Co.
+    config_site_url = config.get("site_url", "https://unurk.github.io/auf-stand/")
+    _podcast.build_feed(archiv_dir, SITE_DIR / "feed.xml", config_site_url, "de")
 
     print(f"Web-App gebaut: {index} ({len(editions)} Ausgabe(n) im Archiv)")
     return index
@@ -1940,7 +2383,11 @@ def _build_nyt_site(config: dict) -> Path:
         for mp3 in out_dir.glob("*.mp3"):
             if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})\.mp3$", mp3.name):
                 shutil.copy2(mp3, archiv_dir / mp3.name)
+        for png in out_dir.glob("*-karte.png"):
+            if re.match(rf"^\d{{4}}-\d{{2}}-\d{{2}}-({_EDITIONS_RE})-karte\.png$", png.name):
+                shutil.copy2(png, archiv_dir / png.name)
     _prune_old_audio(archiv_dir)
+    _prune_old_karten(archiv_dir)
 
     editions = [
         (parsed, path)
@@ -1975,9 +2422,14 @@ def _build_nyt_site(config: dict) -> Path:
         if hint:
             latest_content = _insert_after_header(latest_content, hint)
 
+    latest_content += "\n" + _ausgaben_script(editions, lang)
+
     title = _label(latest_d, latest_edition, lang)
     index_html = _render_nyt_page(title, latest_content, "lagebild", epaper_url=epaper_url)
     index.write_text(index_html, encoding="utf-8")
+
+    site_url = config.get("site_url", "https://unurk.github.io/auf-stand/nyt/")
+    _podcast.build_feed(archiv_dir, site_dir / "feed.xml", site_url, lang)
 
     print(f"NYT site built: {index} ({len(editions)} edition(s) in archive)")
     return index

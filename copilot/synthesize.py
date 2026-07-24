@@ -75,6 +75,9 @@ def build_prompt(
     show_vorausschau: bool = False,
     lang: str = "de",
     prompt_file: str = "lagebild.md",
+    profil: dict | None = None,
+    missing_hint: str = "",
+    budget_hint: str = "",
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -86,11 +89,17 @@ def build_prompt(
         .replace("{DATUM_LABEL}", date_label(edition_label, lang))
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
         .replace("{VORAUSSCHAU_SECTION}", vorausschau)
+        .replace("{NICHT_AUFGENOMMEN_SECTION}", i18n.t(lang, "nicht_aufgenommen_hint"))
         .replace("{LESEZEIT}", "90")
         .replace("{NAECHSTE_AUSGABE}", next_edition)
     )
 
     lines = [template]
+    if profil:
+        from .profil import prompt_block
+        block = prompt_block(profil, lang)
+        if block:
+            lines.append(block)
     if user_topic_prefs:
         pref_hint = (
             "\n\n---\n\n# Nutzerpräferenzen\n"
@@ -99,8 +108,9 @@ def build_prompt(
             "Priorisiere diese Themen im Lagebild, sofern es relevante Entwicklungen gibt.\n"
         )
         lines.append(pref_hint)
-    if article_feedback_hint:
-        lines.append(f"\n\n---\n\n# Kalibrierung\n{article_feedback_hint}")
+    kalibrierung = "".join([article_feedback_hint, missing_hint, budget_hint])
+    if kalibrierung:
+        lines.append(f"\n\n---\n\n# Kalibrierung\n{kalibrierung}")
     lines.append("\n\n---\n\n# Material\n")
 
     if topics:
@@ -193,6 +203,63 @@ def generate_assessment_questions(articles: list, topics: list, config: dict) ->
     except Exception as exc:
         print(f"generate_assessment_questions Fehler: {exc}")
         return []
+
+
+def generate_quiz(material: list[str], config: dict, lang: str = "de", anzahl: int = 3) -> list[dict]:
+    """Baut Quizfragen aus den Punkten der Woche — die einzige echte Wirkungsmessung.
+
+    Zustellung lässt sich zählen, Informiertheit nicht. Drei Fragen am Samstag
+    schließen die Lücke — und liefern nebenbei die ehrlichste Prompt-Kalibrierung,
+    die es gibt: Was nicht hängen blieb, war zu schwach erzählt.
+    """
+    import json as _json
+    if not _provider_configured(config) or not material:
+        return []
+    stoff = "\n".join(f"- {m}" for m in material[:40])
+    if lang == "en":
+        prompt = (
+            "You write a short weekly quiz for a news briefing product.\n\n"
+            f"These were this week's points:\n{stoff}\n\n"
+            f"Write exactly {anzahl} multiple-choice questions about the FACTS in "
+            "these points. Each: 3 options, exactly one correct, plausible distractors, "
+            "question max 120 characters, options max 60. No trick questions.\n"
+            'Reply ONLY with JSON: [{"frage": "...", "optionen": ["a","b","c"], '
+            '"richtig": 0, "erklaerung": "one short sentence"}]'
+        )
+    else:
+        prompt = (
+            "Du schreibst ein kurzes Wochen-Quiz für ein Nachrichten-Briefing.\n\n"
+            f"Das waren die Punkte dieser Woche:\n{stoff}\n\n"
+            f"Formuliere genau {anzahl} Multiple-Choice-Fragen zu den FAKTEN aus diesen "
+            "Punkten. Je 3 Optionen, genau eine richtig, plausible Ablenker, Frage max. "
+            "120 Zeichen, Optionen max. 60. Keine Fangfragen, kein Marketing-Ton.\n"
+            'Antworte NUR mit JSON: [{"frage": "...", "optionen": ["a","b","c"], '
+            '"richtig": 0, "erklaerung": "ein kurzer Satz"}]'
+        )
+    try:
+        text = _complete(prompt, config, max_tokens=1200)
+        m = re.search(r"\[.*\]", text, re.DOTALL)
+        if not m:
+            return []
+        fragen = _json.loads(m.group())
+    except Exception as exc:
+        print(f"generate_quiz Fehler: {exc}")
+        return []
+    sauber = []
+    for f in fragen:
+        optionen = f.get("optionen") or []
+        richtig = f.get("richtig")
+        if not f.get("frage") or len(optionen) < 2 or not isinstance(richtig, int):
+            continue
+        if not 0 <= richtig < len(optionen):
+            continue
+        sauber.append({
+            "frage": str(f["frage"]),
+            "optionen": [str(o) for o in optionen],
+            "richtig": richtig,
+            "erklaerung": str(f.get("erklaerung", "")),
+        })
+    return sauber[:anzahl]
 
 
 def synthesize(prompt: str, config: dict) -> str:

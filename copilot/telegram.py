@@ -148,7 +148,13 @@ def send_alert(text: str, chat_ids: list[str]) -> None:
 
 
 def _feedback_keyboard(feedback_key: str, article_headings: list[str] | None = None) -> dict:
-    """Inline-Tastatur: optional 👍/👎 pro Artikel, danach Ausgaben-Gesamtbewertung."""
+    """Inline-Tastatur: optional 👍/👎 pro Artikel, danach Ausgaben-Gesamtbewertung.
+
+    Die letzte Zeile trägt die beiden Signale, die das Produkt bisher nicht hatte:
+    „gelesen" (misst die Leserin statt unseren Cron) und „hat was gefehlt"
+    (Fehler zweiter Art — die einzige Fehlerklasse, die ein Auswahl-Prompt aus
+    sich heraus nie korrigieren kann).
+    """
     rows = []
     if article_headings:
         datum_edition = feedback_key  # Format: "YYYY-MM-DD|edition"
@@ -162,7 +168,73 @@ def _feedback_keyboard(feedback_key: str, article_headings: list[str] | None = N
         {"text": "👍 Ausgabe", "callback_data": f"fb|{feedback_key}|up"},
         {"text": "👎 Ausgabe", "callback_data": f"fb|{feedback_key}|down"},
     ])
+    rows.append([
+        {"text": "✓ Gelesen", "callback_data": f"read|{feedback_key}"},
+        {"text": "🔍 Hat was gefehlt?", "callback_data": f"fehlt|{feedback_key}"},
+    ])
     return {"inline_keyboard": rows}
+
+
+def profil_keyboard(frage: dict) -> dict:
+    """Tastatur für eine Profil-Frage: je Option ein Knopf (prof|key|wert)."""
+    return {
+        "inline_keyboard": [
+            [{"text": label, "callback_data": f"prof|{frage['key']}|{wert}"}]
+            for wert, label, _satz in frage["optionen"]
+        ]
+    }
+
+
+def send_question(text: str, chat_id: str, keyboard: dict) -> None:
+    """Schickt eine Frage mit Antwort-Knöpfen (Klartext, kein Markdown)."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token:
+        return
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        httpx.post(
+            url,
+            json={"chat_id": chat_id, "text": text, "reply_markup": keyboard},
+            timeout=15,
+        )
+    except Exception as exc:
+        print(f"Telegram-Frage-Fehler ({chat_id}): {exc}")
+
+
+def send_quiz(frage: str, optionen: list[str], richtig: int, chat_ids: list[str],
+              erklaerung: str = "") -> bool:
+    """Schickt eine Quizfrage als natives Telegram-Quiz. True bei Erfolg.
+
+    Wirkungsmessung statt Zustellmessung: ob jemand informiert IST, zeigt sich
+    nur an der Antwort — nicht daran, dass wir geliefert haben.
+    """
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    if not token or not chat_ids:
+        print("Telegram nicht konfiguriert — Quiz übersprungen.")
+        return False
+    url = f"https://api.telegram.org/bot{token}/sendPoll"
+    ok = False
+    for chat_id in chat_ids:
+        payload = {
+            "chat_id": chat_id,
+            "question": frage[:300],
+            "options": [o[:100] for o in optionen[:10]],
+            "type": "quiz",
+            "correct_option_id": richtig,
+            "is_anonymous": False,
+        }
+        if erklaerung:
+            payload["explanation"] = erklaerung[:200]
+        try:
+            resp = httpx.post(url, json=payload, timeout=15)
+        except Exception as exc:
+            print(f"Telegram-Quiz-Fehler ({chat_id}): {exc}")
+            continue
+        if resp.status_code == 200:
+            ok = True
+        else:
+            print(f"Telegram-Quiz-Fehler ({chat_id}): {resp.text[:200]}")
+    return ok
 
 
 def send_telegram(

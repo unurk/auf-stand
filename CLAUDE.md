@@ -19,7 +19,13 @@ widerspricht dem Produkt und wird nicht gebaut.
 ```
 copilot/
   fetch.py       RSS-Feeds holen & normalisieren (nur öffentliche Teaser; httpx + Timeout)
-  state.py       Laufzeit-Zustand: gesehene Artikel, Feedback, Dossier, Push-Abos, Stats
+  state.py       Laufzeit-Zustand: gesehene Artikel, Feedback, Dossier, Push-Abos, Stats,
+                 Lese-Signale, Wirkungs-Profil, „hat gefehlt"-Meldungen
+  qualitaet.py   Qualitäts-Gate nach der Synthese: leere Themen-Deltas raus,
+                 Tracker-Abschnitt gedeckelt, Lesezeit-Budget gemessen
+  profil.py      Wirkungs-Profil (Betroffenheit statt Interesse) → „Für dich konkret"
+  karte.py       Teilbare Bild-Karte zum wichtigsten Punkt (matplotlib)
+  podcast.py     RSS-Feed der Audio-Ausgaben (Apple Podcasts, Spotify, CarPlay)
   synthesize.py  Prompt bauen + Synthese über Provider (anthropic | glm via OpenRouter)
   render.py      Markdown- und HTML-Ausgabe nach out/
   deliver.py     Optionaler E-Mail-Versand (SMTP via .env), sonst nur Datei
@@ -32,7 +38,7 @@ copilot/
   epaper.py      E-Paper-Verweis am Ende jeder Ausgabe
   vorausschau.py Termin-Vorausschau in der Morgen-Ausgabe
   i18n.py        Deutsche/englische Textbausteine (Presse- vs. NYT-Edition)
-  main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site [--dry-run]
+  main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
 manual_input/    Hier können Volltexte (Premium) als .txt/.md abgelegt werden
@@ -43,8 +49,9 @@ tests/           pytest-Suite (hermetisch, ohne Netz) — läuft in CI bei jedem
 ```
 
 Ablauf einer Ausgabe: fetch -> state filtert auf „neu seit letzter Ausgabe" ->
-synthesize (Claude oder GLM, je nach `provider` in config.yaml) -> render ->
-deliver/telegram/tts/webpush -> state aktualisieren.
+synthesize (Claude oder GLM, je nach `provider` in config.yaml) -> qualitaet
+(Gate) -> render -> deliver/telegram/tts/karte/webpush -> state aktualisieren.
+Ist nichts Neues da, geht statt Schweigen eine kurze Ruhe-Ausgabe raus.
 
 ## Konventionen
 
@@ -72,12 +79,25 @@ Gebaut und in Betrieb: 4 Ausgaben/Tag via GitHub Actions, Telegram (inkl.
 👍/👎-Feedback, Rückkanal, Audio), E-Mail, PWA mit Web-Push, Themen-Dossiers,
 Wochen-Quittung, NYT-Parallel-Edition, pytest-Suite in CI.
 
+Dazugekommen (Konsumenten-Ausbau):
+
+- **Qualitäts-Gate** (`qualitaet.py`): hält Themen-Abschnitt und Lesezeit im Budget
+- **Wirkungs-Profil** (`profil.py`): „Für dich konkret"-Zeile statt behaupteter Relevanz
+- **Lese-Signale statt Zustell-Zählung**: Streak, Quittung und Nachhol-Leiste
+  messen die Leserin, nicht unseren Cron
+- **Vollständigkeits-Beweis**: „geprüft, nicht aufgenommen" + `/fehlt`-Rückmeldung
+- **Reifegrad** je Punkt (Gerücht → Entwurf → Beschlossen → Gilt ab) und **Nachtrag**
+- **Ruhe-Ausgabe**, **Podcast-Feed** (`podcast.py`), **Teilen-Karte** (`karte.py`),
+  **Wochen-Quiz**
+
 Als Nächstes sinnvoll:
 
 1. Prompt-Qualität weiter iterieren (Feedback-Daten aus data/state.json nutzen)
 2. E-Mail-Versand an kleine Testgruppe (Concierge-MVP, siehe Konzeptpapier)
 3. Offiziellen Content-Feed/API über die Presse-IT anfragen (Volltexte statt Teaser)
-4. webview.py entflechten (1900+ Zeilen: Templates auslagern, Presse/NYT trennen)
+4. webview.py entflechten (2000+ Zeilen: Templates auslagern, Presse/NYT trennen)
+5. Mehrbenutzer-Fähigkeit: State ist einbenutzerlich (ein Profil, ein Lese-Stand) —
+   vor der Testgruppe (Punkt 2) muss er pro Empfänger:in getrennt werden
 
 ## Was bewusst NICHT gebaut wird
 
