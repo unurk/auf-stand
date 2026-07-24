@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -430,25 +497,25 @@
   <p><strong>Why it matters:</strong> The collapse of Platner&#x27;s candidacy upends Democratic hopes in what was seen as a winnable seat in a competitive cycle. The abrupt change forces a compressed timeline for vetting and launching a new nominee against an entrenched incumbent, reducing preparation time and potentially hampering fund-raising momentum. Democrats have moved quickly to distance themselves; the swift exit also contrasts with Republican handling of similar allegations, reflecting divergent party standards.</p>
   <p><strong>What&#x27;s next:</strong> The nominating convention will determine Maine&#x27;s Democratic nominee. The condensed schedule gives the chosen candidate limited time to build name recognition and campaign infrastructure before the general election.</p>
   <p><span class="ressort" style="--h:245">Politics</span> <span class="byline-source">By: Bayliss Wagner, Lisa Lerer and Katie Glueck</span> <a class="source-link" href="https://www.nytimes.com/2026/07/08/us/politics/graham-platner-maine-senate.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-09|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-09|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Democratic Maine Senate Candidate Suspends Bid After Rape Accusation" data-karte="2026-07-09-morgen-karte.png">↗ Share</button></div><hr>
   <h2>U.S. Launches Fresh Strikes on Iran as Cease-Fire Collapses</h2>
   <p><strong>What&#x27;s new:</strong> The United States launched a second day of strikes against Iran on Wednesday after President Trump declared the three-week-old cease-fire &quot;over.&quot; U.S. Central Command said it was protecting shipping in the Strait of Hormuz following Iranian attacks on tankers. Oil prices jumped and remained volatile as markets absorbed the renewed hostilities and the risk of further escalation in a critical waterway through which much of global energy supplies flow.</p>
   <p><strong>Why it matters:</strong> The collapse of the cease-fire, cobbled together hastily without resolution of core disputes, signals the conflict remains uncontained. The resumption of tit-for-tat strikes threatens to disrupt energy markets and inject new inflation pressures into a global economy already facing headwinds. Investors grew anxious about the war&#x27;s effects on both inflation and economic growth, reflected in choppy trading across stocks and bonds.</p>
   <p><span class="ressort" style="--h:265">World</span> <span class="byline-source">By: The New York Times</span> <a class="source-link" href="https://www.nytimes.com/live/2026/07/08/world/iran-war-us-trump">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-09|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-09|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="U.S. Launches Fresh Strikes on Iran as Cease-Fire Collapses">↗ Share</button></div><hr>
   <h2>Fed Officials Signal Support for Rate Increases Amid Rising Inflation Concerns</h2>
   <p><strong>What&#x27;s new:</strong> Minutes from Federal Reserve Chair Kevin M. Warsh&#x27;s first meeting showed several officials signaled openness to raising interest rates. The discussion reflected heightened unease about inflation, which is now running at a three-year high—a significant shift after months of disinflation.</p>
   <p><strong>Why it matters:</strong> Inflation resurging to three-year highs threatens the Fed&#x27;s credibility on price control and complicates the economic outlook for households and businesses. Rate increases would raise borrowing costs for mortgages, auto loans, and credit cards, directly affecting consumer spending and business investment. The pivot toward tightening also signals the Fed may abandon plans for rate cuts later in the year.</p>
   <p><span class="ressort" style="--h:175">Business</span> <span class="byline-source">By: Colby Smith</span> <a class="source-link" href="https://www.nytimes.com/2026/07/08/business/fed-meeting-minutes-warsh-interest-rates.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-09|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-09|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Fed Officials Signal Support for Rate Increases Amid Rising Inflation Concerns">↗ Share</button></div><hr>
   <h2>Trump Ordered to Pay $5 Million E. Jean Carroll Judgment</h2>
   <p>A federal judge ordered President Trump to pay the $5 million judgment awarded by a jury that found he sexually abused and defamed writer E. Jean Carroll, ending his resistance to the ruling.</p>
   <p><span class="ressort" style="--h:25">US Politics</span> <span class="byline-source">By: Abbie VanSickle and Benjamin Weiser</span> <a class="source-link" href="https://www.nytimes.com/2026/07/08/us/politics/trump-e-jean-carroll-5-million-payment.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-09|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-09|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump Ordered to Pay $5 Million E. Jean Carroll Judgment">↗ Share</button></div><hr>
   <h2>Trump Grants Ukraine Authority to Manufacture Patriot Missiles</h2>
   <p>President Trump announced he would allow Ukraine to build Patriot defense systems under license—a long-sought capability to defend against Russian missile attacks. With interceptors in short supply, the move provides Kyiv a significant boost, though manufacturing capacity will take time to establish.</p>
   <p><span class="ressort" style="--h:265">World</span> <span class="byline-source">By: Constant Méheut, Nicholas Kulish and John Ismay</span> <a class="source-link" href="https://www.nytimes.com/2026/07/08/world/europe/a-license-to-make-patriot-defense-systems-may-be-a-big-boost-for-ukraine.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-09|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-09|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump Grants Ukraine Authority to Manufacture Patriot Missiles">↗ Share</button></div><hr>
   <h2 class="topic-summary-head">Your Topics</h2>
   <p>- <strong>US politics, Congress:</strong> Graham Platner&#x27;s suspension scrambles the Maine Senate race; Democrats have until July 27 to nominate a replacement.</p>
   <p>- <strong>Federal Reserve:</strong> Officials at Warsh&#x27;s first meeting signaled potential openness to raising rates, a reversal from earlier expectations, as inflation hits a three-year high.</p>
@@ -456,7 +523,7 @@
   <p>- <strong>Russia&#x27;s war in Ukraine:</strong> Trump authorized Ukraine to manufacture Patriot missiles under license, strengthening air defense capability.</p>
   <hr>
   <p class="reporters">Today&#x27;s reporting by: Bayliss Wagner, Lisa Lerer and Katie Glueck, The New York Times, Colby Smith, Abbie VanSickle and Benjamin Weiser and Constant Méheut, Nicholas Kulish and John Ismay · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 16 in a row — reading time ca. 255 seconds. Next briefing: today at 11:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 16 in a row — reading time ca. 255 seconds. Next briefing: today at 11:00.</div>
   <hr>
 </div>
 </div>
@@ -564,9 +631,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -574,7 +644,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -598,6 +668,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

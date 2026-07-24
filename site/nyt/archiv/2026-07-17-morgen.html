@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -429,30 +496,30 @@
   <p><strong>What&#x27;s new:</strong> American forces launched fresh strikes targeting Iranian infrastructure—bridges and a railway junction—according to Iranian state media, escalating tensions in a conflict that began weeks ago. The strikes coincide with a sharp contraction in shipping through the Strait of Hormuz, one of the world&#x27;s most critical oil passages: very few vessels transited the waterway on the first full day of the U.S. naval blockade. Diesel prices have surged to $5 a gallon, up 33 percent since the war began, with reduced refinery capacity compounding the pressure.</p>
   <p><strong>Why it matters:</strong> The disruption to global energy flows has immediate consequences for your wallet and supply chains. Higher diesel costs ripple through freight, groceries, and heating. For the political picture: President Trump, who campaigned on ending American wars, now risks entanglement in what analysts warn could become another &quot;forever war&quot;—a familiar presidential trap with no clear exit strategy or defined objectives.</p>
   <p><strong>What&#x27;s next:</strong> Oil markets will likely remain volatile as long as shipping remains constrained. Watch for any negotiated de-escalation or further military action that could either unlock the strait or deepen the crisis. <span class="ressort" style="--h:265">World</span> <span class="byline-source">By: The New York Times</span> <a class="source-link" href="https://www.nytimes.com/live/2026/07/16/world/iran-war-trump-hormuz">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-17|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-17|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="U.S. Intensifies Iran War With New Strikes; Oil and Shipping Disrupted" data-karte="2026-07-17-morgen-karte.png">↗ Share</button></div><hr>
   <h2>Trump Administration Guts Election Security While Repeating Unproven Fraud Claims</h2>
   <p><strong>What&#x27;s new:</strong> The federal agency responsible for helping states secure elections has shed roughly one-third of its workforce under the Trump administration. Simultaneously, the president released documents and made public claims about Chinese interference and noncitizen voting—allegations that officials and intelligence agents have found either unsubstantiated or misleading. Nevada immediately rejected Trump&#x27;s claims of noncitizen voting; dozens of prior investigations, audits, and court proceedings found no evidence of widespread fraud that altered the 2020 outcome.</p>
   <p><strong>Why it matters:</strong> Weakening election infrastructure while amplifying unfounded fraud narratives undermines public confidence in voting systems ahead of 2026 midterms. The combination signals a potential pattern: raising questions about election integrity while simultaneously reducing the resources meant to protect it. For you as a voter, this creates uncertainty about the systems meant to secure your ballot and verify results.</p>
   <p><span class="ressort" style="--h:25">US</span> <span class="byline-source">By: Dustin Volz and Julian E. Barnes</span> <a class="source-link" href="https://www.nytimes.com/2026/07/16/us/politics/trump-election-security-cisa.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-17|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-17|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Trump Administration Guts Election Security While Repeating Unproven Fraud Claims">↗ Share</button></div><hr>
   <h2>Ukraine&#x27;s Defense Minister Publicly Attacks Military Leadership Over War Strategy</h2>
   <p><strong>What&#x27;s new:</strong> Mykhailo Fedorov, Ukraine&#x27;s recently dismissed defense minister, has lodged the most dramatic public critique of the military command to emerge during the war, airing his grievances from an underground parking garage. Fedorov, who championed drone warfare and modernization efforts, was forced out after conflicts with generals and military contractors over the role of innovative weaponry. His dismissal has sparked street protests among Ukrainians who viewed him as a symbol of military innovation.</p>
   <p><strong>Why it matters:</strong> The public rift reveals fractures within Ukraine&#x27;s military leadership at a critical moment. It signals tension between modernizing the armed forces and traditional command structures—a conflict that could affect military effectiveness and decision-making as the war continues. The protests underscore that domestic Ukrainian politics, not just Russian pressure, shape the course of the conflict.</p>
   <p><span class="ressort" style="--h:265">World</span> <span class="byline-source">By: Andrew E. Kramer</span> <a class="source-link" href="https://www.nytimes.com/2026/07/16/world/europe/ukraine-military-defense-minister-drones.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-17|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-17|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Ukraine&amp;#x27;s Defense Minister Publicly Attacks Military Leadership Over War Strategy">↗ Share</button></div><hr>
   <h2>Wildfire Smoke From Canada Blankets U.S. Midwest and East With Hazardous Air Quality</h2>
   <p>As overnight temperatures climb across Canada, wildfires that once spread more slowly after dark are now burning around the clock. The resulting smoke plume swept across the Midwest and New England, with some cities recording extremely high pollution indexes on Thursday. The haze should ease in the East this weekend but is expected to linger in the Upper Midwest. (US · By: Judson Jones, Nicholas Bogel-Burroughs and Michael Levenson) <a class="source-link" href="https://www.nytimes.com/2026/07/16/us/wildfire-smoke-air-quality.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-17|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-17|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Wildfire Smoke From Canada Blankets U.S. Midwest and East With Hazardous Air Quality">↗ Share</button></div><hr>
   <h2>TSMC Pledges Additional $100 Billion to Arizona Chip Operations</h2>
   <p>Taiwan Semiconductor Manufacturing Company announced a $100 billion expansion of its U.S. investments, bringing its total Arizona commitment to $265 billion. The move reflects intensifying competition for advanced chip production and underscores the strategic importance of semiconductor supply chains to the American economy. <span class="ressort" style="--h:175">Business</span> <span class="byline-source">By: Steve Lohr</span> <a class="source-link" href="https://www.nytimes.com/2026/07/16/business/tsmc-chips-investment-arizona.html">Read in the NYT →</a></p>
-<div class="article-fb" data-key="2026-07-17|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button></div><hr>
+<div class="article-fb" data-key="2026-07-17|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="TSMC Pledges Additional $100 Billion to Arizona Chip Operations">↗ Share</button></div><hr>
   <h2 class="topic-summary-head">Your Topics</h2>
   <p>- <strong>Middle East:</strong> Since your last update: U.S. forces have launched fresh strikes on Iranian infrastructure, with American naval assets conducting a blockade of the Strait of Hormuz. Shipping traffic has nearly halted, pushing diesel prices to $5 per gallon—up 33 percent since fighting began.</p>
   <p>- <strong>Russia&#x27;s war in Ukraine:</strong> Since your last update: Ukraine&#x27;s defense minister has been dismissed after public disagreements with military command over drone warfare and modernization strategy, triggering street protests and exposing internal strategic divisions.</p>
   <p>- <strong>US politics:</strong> Since your last update: The Trump administration has reduced the federal election security agency&#x27;s workforce by roughly one-third while releasing documents supporting unfounded claims of Chinese interference and noncitizen voting. Nevada rejected the noncitizen allegations.</p>
   <hr>
   <p class="reporters">Today&#x27;s reporting by: The New York Times, Dustin Volz and Julian E. Barnes, Andrew E. Kramer, Judson Jones, Nicholas Bogel-Burroughs and Michael Levenson and Steve Lohr · The New York Times</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> You&#x27;re informed — day 24 in a row — reading time ca. 285 seconds. Next briefing: today at 16:00.</div>
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 24 in a row — reading time ca. 285 seconds. Next briefing: today at 16:00.</div>
   <hr>
 </div>
 </div>
@@ -560,9 +627,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -570,7 +640,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -594,6 +664,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Mark as read');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>You were away — '+verpasst.length+
+      (verpasst.length===1?' briefing':' briefings')+' missed.</b>'+
+      'This page shows only the latest delta. Catch up:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

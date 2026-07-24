@@ -405,6 +405,73 @@
       font: 400 12px var(--sans); color: var(--muted);
       padding: 12px 22px 0; display: block;
     }
+    /* ── Reifegrad-Ampel: beantwortet „muss ich mich jetzt kümmern?" ── */
+    .reifegrad { margin: 10px 0 2px !important; }
+    .rg {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 999px; padding: 4px 11px; border: 1px solid transparent;
+    }
+    .rg::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; opacity: .85;
+    }
+    .rg-geruecht { color: #8a7a52; background: #fbf6e8; border-color: #efe2bf; }
+    .rg-entwurf { color: #7a6a9a; background: #f4f1fa; border-color: #ded6ef; }
+    .rg-beschlossen { color: #2d4f9e; background: #eef2fb; border-color: #d5def3; }
+    .rg-gilt { color: #2e6b3f; background: #eef6f0; border-color: #cfe4d6; }
+    /* ── Nachtrag: was wir zuletzt schrieben, gilt so nicht mehr ── */
+    .nachtrag {
+      border-left: 3px solid #b5543b; background: #fdf5f2;
+      padding: 10px 14px; margin: 12px 0 !important; border-radius: 0 8px 8px 0;
+      font-size: 15px !important;
+    }
+    .nachtrag strong { color: #b5543b; }
+    /* ── „Für dich konkret" — die Profil-Zeile ── */
+    .fuer-dich {
+      background: var(--accent-soft); border-radius: 10px;
+      padding: 11px 14px; margin: 12px 0 !important; font-size: 15px !important;
+    }
+    .fuer-dich strong { color: var(--accent); }
+    /* ── Vollständigkeits-Beweis ── */
+    .geprueft {
+      font: 400 13px var(--sans) !important; color: var(--muted);
+      margin: 18px 0 4px !important;
+    }
+    .pruef-head { font-size: 15px !important; }
+    .story-card.pruef-card .story-body p { font-size: 14px; color: var(--muted); }
+    .fehlt-hint {
+      font: 400 12.5px var(--sans); color: var(--muted); line-height: 1.6;
+      border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;
+    }
+    /* ── Nachhol-Leiste: du warst weg ── */
+    .nachholen {
+      background: var(--accent-soft); border: 1px solid rgba(45,79,158,.18);
+      border-radius: 14px; padding: 14px 16px; margin: 0 0 18px;
+      font: 400 14px var(--sans); line-height: 1.55;
+    }
+    .nachholen b { display: block; font-size: 14.5px; margin-bottom: 4px; }
+    .nachholen a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .nachholen ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .nachholen li { padding: 3px 0; font-size: 13.5px; }
+    /* ── Teilen ── */
+    .share-btn {
+      background: var(--surface-tint); border: 1px solid var(--card-border);
+      border-radius: 999px; padding: 8px 16px; font: 600 12px var(--sans);
+      color: var(--muted); cursor: pointer; line-height: 1;
+    }
+    .share-btn:hover { filter: brightness(.97); }
+    /* ── Profil-Karten (Themen-Screen) ── */
+    .prof-frage { margin: 16px 0 6px; font: 600 14px var(--sans); }
+    .prof-optionen { display: flex; flex-wrap: wrap; gap: 7px; }
+    .prof-opt {
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 14px;
+      font: 400 13px var(--sans); cursor: pointer; background: var(--surface);
+      color: var(--fg); transition: all .15s;
+    }
+    .prof-opt.selected {
+      border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -429,24 +496,24 @@
   <p><strong>Was ist neu:</strong> Das US-Höchstgericht hat die von Trump verhängten Einfuhrzölle im Februar gekippt. Die US-Regierung ist nun zur Rückzahlung verpflichtet. Noch immer warten jedoch zahlreiche österreichische Firmen mit US-Geschäften auf die Auszahlung der rechtswidrig eingehobenen Summen.</p>
   <p><strong>Warum es zählt:</strong> Es geht um gebundene Liquidität österreichischer Exporteure. Je länger die Rückzahlungen auf sich warten lassen, desto mehr fehlt dieses Kapital im operativen Geschäft und bei Investitionen am Standort.</p>
   <p><strong>Was kommt:</strong> Der Rückzahlungsstau könnte die ohnehin angespannte Handelssituation für heimische Unternehmen weiter verkomplizieren, bis die US-Behörden die administrativen Hürden beseitigen. (Wirtschaft · Bericht: <a class="source-link" href="https://www.diepresse.com/36812333/rechtswidrige-trump-zoelle-oesterreichische-firmen-warten-auf-rueckzahlungen">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-07-18|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Wifo-Chef Felbermayr: EU braucht Rohstoffclub mit USA</h2>
+<div class="article-fb" data-key="2026-07-18|morgen|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Rechtswidrige Trump-Zölle blockieren österreichisches Geld" data-karte="2026-07-18-morgen-karte.png">↗ Teilen</button></div><h2>Wifo-Chef Felbermayr: EU braucht Rohstoffclub mit USA</h2>
   <p><strong>Was ist neu:</strong> Wifo-Direktor Gabriel Felbermayr warnt vor anhaltenden Krisen für den Welthandel und sieht die Lebensmittelversorgung als größte Sorge. Um die EU-Abhängigkeit von China zu reduzieren, schlägt er einen Rohstoffclub mit den USA vor, in dem Mindestpreise festgelegt werden.</p>
   <p><strong>Warum es zählt:</strong> Dieser Vorschlag richtet sich direkt gegen die Verwundbarkeit der österreichischen Industrie. Ein solcher Rohstoffclub würde künftige Lieferketten und Preisstabilität politisch neu ordnen. (Wirtschaft · Bericht: <a class="source-link" href="https://www.diepresse.com/37430497/wifo-chef-felbermayr-meine-groesste-sorge-ist-die-lebensmittelversorgung">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-07-18|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Apple löst Nvidia als wertvollstes Unternehmen ab</h2>
+<div class="article-fb" data-key="2026-07-18|morgen|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Wifo-Chef Felbermayr: EU braucht Rohstoffclub mit USA">↗ Teilen</button></div><h2>Apple löst Nvidia als wertvollstes Unternehmen ab</h2>
   <p><strong>Was ist neu:</strong> Nach deutlichen Kursverlusten bei Nvidia ist Apple wieder das wertvollste börsennotierte Unternehmen der Welt.</p>
   <p><strong>Warum es zählt:</strong> Das ist ein Indikator für ein mögliches Marktumrouting. Anleger könnten Gewinne im KI-Sektor realisieren und verstärkt in als stabil geltende Konsumwerte umschichten. (Wirtschaft · Bericht: <a class="source-link" href="https://www.diepresse.com/38193484/apple-loest-nvidia-als-wertvollstes-unternehmen-der-welt-ab">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-07-18|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>ÖBB-Reform auf Eis: SPÖ-Minister Hanke braucht die Koalition</h2>
+<div class="article-fb" data-key="2026-07-18|morgen|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Apple löst Nvidia als wertvollstes Unternehmen ab">↗ Teilen</button></div><h2>ÖBB-Reform auf Eis: SPÖ-Minister Hanke braucht die Koalition</h2>
   <p>Der Plan, den ÖBB eine effizientere Struktur zu geben, ist verschoben. SPÖ-Verkehrsminister Peter Hanke benötigt die Zustimmung der Koalitionsparteien, die politische Einigkeit fehlt jedoch. (Wirtschaft · Bericht: <a class="source-link" href="https://www.diepresse.com/37854936/warum-die-reform-der-oebb-warten-muss">Weiterlesen bei der Presse →</a>)</p>
-<div class="article-fb" data-key="2026-07-18|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>Merz und Macron bauen nukleare Zusammenarbeit aus</h2>
+<div class="article-fb" data-key="2026-07-18|morgen|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="ÖBB-Reform auf Eis: SPÖ-Minister Hanke braucht die Koalition">↗ Teilen</button></div><h2>Merz und Macron bauen nukleare Zusammenarbeit aus</h2>
   <p>Beim Regierungstreffen in Brühl berieten Bundeskanzler Friedrich Merz und Frankreichs Präsident Emmanuel Macron über Sicherheits- und Verteidigungsfragen und bauen die Zusammenarbeit bei nuklearer Abschreckung aus. (International · Bericht: <a class="source-link" href="https://www.diepresse.com/38215526/merz-und-macron-bauen-zusammenarbeit-bei-nuklearer-abschreckung-aus">Weiterlesen bei der Presse →</a>)</p>
   <h2 class="topic-summary-head">Deine Themen</h2>
   <p>- <strong>US-Zölle und Folgen für die österreichische Exportwirtschaft:</strong> Seit deinem letzten Stand hat das US-Höchstgericht die Trump-Zölle zwar gekippt, österreichische Firmen warten aber noch immer auf die staatlichen Rückzahlungen der rechtswidrig eingehobenen Summen.</p>
   <p>- <strong>Energiepreise und Stromkosten in Österreich:</strong> Seit deinem letzten Stand hat das US-Militär einen iranischen Überwachungsturm zerstört. Das Eskalationsniveau der Militärschläge bleibt hoch, womit das Risiko für Ölpreisschübe und höhere Energiekosten unverändert besteht.</p>
-<div class="article-fb" data-key="2026-07-18|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><h2>📅 Diese Woche noch</h2>
+<div class="article-fb" data-key="2026-07-18|morgen|4"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Merz und Macron bauen nukleare Zusammenarbeit aus">↗ Teilen</button></div><h2>📅 Diese Woche noch</h2>
   <p>- <strong>Do 23. Jul.</strong> · EZB-Ratssitzung · Zinsentscheid — betrifft Tracker „EZB-Zinsentscheidungen und Folgen für Österreich“</p>
-<div class="article-fb" data-key="2026-07-18|morgen|5"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button></div><hr>
+<div class="article-fb" data-key="2026-07-18|morgen|5"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="📅 Diese Woche noch">↗ Teilen</button></div><hr>
   <p class="reporters">Heute mit Berichterstattung von: [→ Artikel](https://www.diepresse.com/36812333/rechtswidrige-trump-zoelle-oesterreichische-firmen-warten-auf-rueckzahlungen, [→ Artikel](https://www.diepresse.com/37430497/wifo-chef-felbermayr-meine-groesste-sorge-ist-die-lebensmittelversorgung, [→ Artikel](https://www.diepresse.com/38193484/apple-loest-nvidia-als-wertvollstes-unternehmen-der-welt-ab, [→ Artikel](https://www.diepresse.com/37854936/warum-die-reform-der-oebb-warten-muss und [→ Artikel](https://www.diepresse.com/38215526/merz-und-macron-bauen-zusammenarbeit-bei-nuklearer-abschreckung-aus · Die Presse</p>
-  <div class="done"><span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> <span class="done-check">✓</span> Du bist informiert — 32. Tag in Folge — Lesezeit ca. 165 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
+  <div class="done"><span class="done-check">✓</span> Du bist informiert — 32. Tag in Folge — Lesezeit ca. 165 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
 </div>
 </div>
@@ -554,9 +621,12 @@
       body.className='story-body';
       var sib=h2.nextSibling;
       while(sib){ var nx=sib.nextSibling; body.appendChild(sib); sib=nx; }
+      // Der Vollständigkeits-Beweis startet eingeklappt: Er ist Beleg, kein Inhalt.
+      var zu=h2.classList.contains('pruef-head');
+      if(zu) card.classList.add('pruef-card');
       // Chevron-Button
       var chev=document.createElement('span');
-      chev.className='chev'; chev.textContent='–';
+      chev.className='chev'; chev.textContent=zu?'+':'–';
       // Head-Wrapper
       var head=document.createElement('div');
       head.className='story-head';
@@ -564,7 +634,7 @@
       head.appendChild(h2);
       head.appendChild(chev);
       card.appendChild(body);
-      card.classList.add('open');
+      if(!zu) card.classList.add('open');
       head.addEventListener('click',function(){
         card.classList.toggle('open');
         chev.textContent=card.classList.contains('open')?'–':'+';
@@ -588,6 +658,81 @@
       btn.addEventListener('click',function(){castVote(btn);});
     });
   });
+  // Teilen: erst die Bild-Karte (wenn vorhanden), sonst Text+Link, sonst Zwischenablage.
+  document.querySelectorAll('.share-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var titel=btn.dataset.title||document.title;
+      var url=location.href;
+      var karte=btn.dataset.karte;
+      function textShare(){
+        if(navigator.share) return navigator.share({title:titel,text:titel,url:url});
+        if(navigator.clipboard) return navigator.clipboard.writeText(titel+' — '+url)
+          .then(function(){ btn.textContent='✓ Kopiert'; });
+        return Promise.resolve();
+      }
+      if(karte&&navigator.canShare){
+        var pfad=(location.pathname.indexOf('/archiv/')>-1?'':'archiv/')+karte;
+        fetch(pfad).then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            var f=new File([b],karte,{type:'image/png'});
+            if(navigator.canShare({files:[f]})) return navigator.share({files:[f],title:titel,text:titel});
+            throw 0;
+          }).catch(textShare);
+      } else { textShare(); }
+    });
+  });
+  // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
+  // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
+  // Streak aus Zustellungen nur uns misst, nicht die Leserin.
+  (function(){
+    var done=document.querySelector('.done');
+    var akt=window.__AKTUELLE_AUSGABE__;
+    if(!done||!akt) return;
+    done.style.cursor='pointer';
+    done.setAttribute('title','Als gelesen markieren');
+    function merken(){
+      try{
+        localStorage.setItem('gelesen_bis',akt);
+        localStorage.setItem('gelesen_'+akt,'1');
+        done.classList.add('gelesen');
+        var bar=document.querySelector('.nachholen');
+        if(bar) bar.remove();
+      }catch(e){}
+    }
+    done.addEventListener('click',merken);
+    // Wer bis zur Abschlusszeile gescrollt hat, hat gelesen.
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){ if(e.isIntersecting){ merken(); obs.disconnect(); } });
+      },{threshold:0.9}).observe(done);
+    }
+  })();
+  // Nachhol-Leiste: Wer zwei Ausgaben verpasst hat, ist nicht auf Stand — auch
+  // wenn die aktuelle Ausgabe nur das jüngste Delta zeigt.
+  (function(){
+    var liste=window.__AUSGABEN__;
+    if(!liste||!liste.length) return;
+    var wrap=document.querySelector('.wrap');
+    if(!wrap) return;
+    var bis=null;
+    try{ bis=localStorage.getItem('gelesen_bis'); }catch(e){ return; }
+    if(!bis) return;
+    var verpasst=[];
+    for(var i=0;i<liste.length;i++){
+      if(liste[i].id===bis) break;
+      if(i>0) verpasst.push(liste[i]);  // die aktuelle Ausgabe liest man ja gerade
+    }
+    if(verpasst.length<1) return;
+    var bar=document.createElement('div');
+    bar.className='nachholen';
+    var items=verpasst.slice(0,3).map(function(a){
+      return '<li>· <a href="'+a.url+'">'+a.label+'</a> — '+a.top+'</li>';
+    }).join('');
+    bar.innerHTML='<b>Du warst weg — '+verpasst.length+
+      (verpasst.length===1?' Ausgabe':' Ausgaben')+' verpasst.</b>'+
+      'Das hier zeigt nur das jüngste Delta. Nachholen:<ul>'+items+'</ul>';
+    wrap.insertBefore(bar,wrap.firstChild);
+  })();
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
