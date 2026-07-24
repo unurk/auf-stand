@@ -10,10 +10,18 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import deliver, epaper, i18n, render, state, synthesize, telegram, tts, vorausschau, webpush
+from . import (
+    deliver, epaper, i18n, karte, profil, qualitaet, render, state, synthesize,
+    telegram, tts, vorausschau, webpush,
+)
 from .fetch import fetch_all, filter_recent
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Zeitbudget der Ausgabe in Sekunden — das Produktversprechen („rund 90 Sekunden").
+# Wird nicht erzwungen (das würde Inhalt zerstören), aber gemessen und als
+# Kalibrierung in den nächsten Prompt gegeben.
+LESEZEIT_BUDGET = 90
 
 
 def load_config(path: str = "config.yaml") -> dict:
@@ -91,24 +99,32 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     articles = filter_recent(result.articles, float(edition_config.get("lookback_hours", 18)))
     new_articles, _ = state.split_new(articles, current_state)
 
-    # Morgen-Ausgabe: grosszuegig (auch ueber Nacht Gesehenes kann rein, solange im
-    # Zeitfenster). Abend-Ausgabe: strikt nur Neues seit der letzten Ausgabe.
-    selection = articles if edition == "morgen" else new_articles
-    if not selection:
-        print("Nichts Neues seit der letzten Ausgabe — kein Lagebild nötig. (Feature!)")
-        return 0
-    print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
-
-    all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
-    cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
-    fb_hint = state.article_feedback_hint(current_state, cutoff)
-
     # Nächste Ausgabe im Presse-Takt bestimmen (Reihenfolge = config-Reihenfolge).
     nxt = order[(rank + 1) % len(order)]
     when_key = "when_tomorrow" if rank == len(order) - 1 else "when_today"
     next_edition = i18n.t(lang, "next_edition_fmt").format(
         when=i18n.t(lang, when_key), time=editions[nxt].get("time", "")
     )
+
+    # Morgen-Ausgabe: grosszuegig (auch ueber Nacht Gesehenes kann rein, solange im
+    # Zeitfenster). Abend-Ausgabe: strikt nur Neues seit der letzten Ausgabe.
+    selection = articles if edition == "morgen" else new_articles
+    if not selection:
+        # Stille wird zugestellt, nicht verschwiegen: Sonst ist „ruhiger Nachrichtentag"
+        # von „Dienst kaputt" nicht unterscheidbar — und Vertrauen in die
+        # Vollständigkeit ist die einzige Währung eines Hintergrund-Dienstes.
+        return _ruhe_ausgabe(
+            edition, edition_config, config, current_state, len(articles),
+            next_edition, dry_run=dry_run, keep_seen=keep_seen, lang=lang,
+        )
+    print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
+
+    all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
+    cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
+    fb_hint = state.article_feedback_hint(current_state, cutoff)
+    missing_hint = state.missing_feedback_hint(current_state, cutoff)
+    budget = int(config.get("lesezeit_budget_sekunden", LESEZEIT_BUDGET))
+    budget_hint = qualitaet.budget_hinweis(state.letzte_lesezeiten(current_state), budget)
 
     prompt = synthesize.build_prompt(
         selection,
@@ -123,6 +139,9 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         show_vorausschau=(edition == "morgen"),
         lang=lang,
         prompt_file=prompt_file,
+        profil=profil.get_profil(current_state),
+        missing_hint=missing_hint,
+        budget_hint=budget_hint,
     )
 
     if dry_run:
@@ -134,10 +153,24 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
 
     lagebild = synthesize.synthesize(prompt, config)
+    # Qualitäts-Gate VOR der Lesezeit-Rechnung: leere Themen-Deltas („hat sich
+    # nichts geändert") raus, Abschnitt auf 3 Zeilen kappen. Der Prompt verbietet
+    # das zwar, hielt es im Archiv aber nachweislich nicht ein.
+    lagebild, tracker_report = qualitaet.trim_tracker_section(
+        lagebild, heading=i18n.t(lang, "tracker_heading")
+    )
+    if tracker_report["entfernt"] or tracker_report["gekappt"]:
+        print(
+            f"Qualitäts-Gate: {tracker_report['entfernt']} Themen-Zeile(n) entfernt, "
+            f"{tracker_report['gekappt']} gekürzt, {tracker_report['behalten']} behalten."
+        )
     # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
     words = len(re.findall(r"\w+", lagebild))
     wps = float(i18n.t(lang, "words_per_sec"))
     secs = max(60, round(words / wps / 15) * 15)  # Wörter/Sek je Sprache, auf 15s gerundet
+    warnung = qualitaet.pruefe_budget(lagebild, budget, wps)
+    if warnung:
+        print(warnung)
     lagebild = re.sub(
         i18n.t(lang, "reading_time_re"),
         i18n.t(lang, "reading_time_fmt").format(secs=secs),
@@ -150,12 +183,24 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         teaser = vorausschau.format_morgen_teaser(config.get("termine", []), lang)
         if teaser:
             lagebild = render.insert_before_footer(lagebild, teaser, lang)
-    # Streak in die Abschlusszeile: current_streak zählt heute erst nach record_stats
-    # (läuft NACH dem Versand) — die heutige Zustellung darum selbst dazurechnen.
+    # Vollständigkeits-Beweis: wie viel geprüft wurde, wie wenig durchkam. Die
+    # Zahl kommt aus der Pipeline (nicht vom Modell), die knapp verfehlten Titel
+    # liefert der Prompt-Abschnitt „Geprüft, nicht aufgenommen".
+    punkte_im_text = len(re.findall(r"^## [0-9]", lagebild, re.MULTILINE))
+    lagebild = render.insert_before_footer(
+        lagebild,
+        i18n.t(lang, "geprueft_fmt").format(n=len(selection), p=punkte_im_text),
+        lang,
+    )
+    # Streak in die Abschlusszeile. Sobald es Lese-Signale gibt, zählt Gelesenes
+    # statt Zugestelltes — ein Streak, den unser eigener Cron erzeugt, misst uns,
+    # nicht die Leserin.
     heute = f"{datetime.now():%Y-%m-%d}"
-    streak = state.current_streak(current_state)
-    if not any(s.get("date") == heute for s in current_state.get("stats", [])):
-        streak += 1
+    streak, misst_lesen = state.streak(current_state)
+    if not misst_lesen and not any(
+        s.get("date") == heute for s in current_state.get("stats", [])
+    ):
+        streak += 1  # current_streak zählt heute erst nach record_stats (läuft später)
     lagebild = render.insert_streak(lagebild, streak, lang)
     lagebild += epaper.epaper_section(epaper.get_epaper_url(config), lang)
     md_path, html_path = render.write_output(lagebild, edition, lang)
@@ -202,6 +247,16 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         except Exception as exc:
             print(f"Audio-Schritt übersprungen: {exc}")
 
+    # Teilbare Karte zum wichtigsten Punkt (best-effort). Sie wird bewusst NICHT
+    # gepusht — sie liegt in der App bereit, wenn jemand teilen will.
+    karte.karte_fuer_ausgabe(
+        lagebild,
+        edition,
+        edition_config.get("label", edition),
+        out_dir=render.OUT_DIR,
+        lang=lang,
+    )
+
     # Web-Push an PWA-Abonnenten (nur wenn VAPID konfiguriert ist).
     if webpush.webpush_configured():
         title_match = re.search(r"^#\s+(.+)$", lagebild, re.MULTILINE)
@@ -215,7 +270,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         state.save_topic_articles(current_state, all_topics, result.articles)
         state.mark_seen(articles, current_state, edition)
         state.record_stats(
-            current_state, edition, points, len(lagebild.split()), len(new_articles)
+            current_state, edition, points, len(lagebild.split()), len(new_articles),
+            secs=secs, geprueft=len(selection),
         )
         state.update_dossier(
             current_state, lagebild, all_topics, f"{datetime.now():%Y-%m-%d}"
@@ -225,6 +281,94 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
             current_state["assessment_questions"] = questions
         state.save_state(current_state)
     return 0
+
+
+def _ruhe_ausgabe(
+    edition: str,
+    edition_config: dict,
+    config: dict,
+    current_state: dict,
+    geprueft: int,
+    next_edition: str,
+    dry_run: bool,
+    keep_seen: bool,
+    lang: str,
+) -> int:
+    """Zustellung an ruhigen Blöcken: „Nichts Wesentliches. Du bist auf Stand."
+
+    Früher endete der Lauf hier lautlos. Für die Leserin war damit nicht
+    unterscheidbar, ob die Nachrichtenlage ruhig oder der Dienst kaputt war —
+    und genau diese Unsicherheit zerstört das Vertrauen, von dem ein
+    Hintergrund-Dienst als einzigem lebt. Kostet 3 Sekunden Lesezeit,
+    braucht keinen API-Call.
+    """
+    heute = datetime.now()
+    label = edition_config.get("label", edition)
+    body = (
+        i18n.t(lang, "ruhe_body_fmt").format(n=geprueft)
+        if geprueft
+        else i18n.t(lang, "ruhe_body_leer")
+    )
+    md = (
+        f"# {edition_config.get('emoji', '☀️')} "
+        f"{i18n.t(lang, 'default_title')} — "
+        f"{synthesize.date_label(label, lang)}\n\n"
+        f"## {i18n.t(lang, 'ruhe_headline')}\n"
+        f"{body}\n\n"
+        "---\n"
+        + i18n.t(lang, "ruhe_informed_fmt").format(next=next_edition)
+    )
+    print(f"Ruhiger Block: nichts Neues, {geprueft} Meldungen geprüft.")
+    if dry_run:
+        print("Dry-Run: Ruhe-Ausgabe nicht zugestellt.")
+        return 0
+
+    streak, misst_lesen = state.streak(current_state)
+    if not misst_lesen and not any(
+        s.get("date") == f"{heute:%Y-%m-%d}" for s in current_state.get("stats", [])
+    ):
+        streak += 1
+    md = render.insert_streak(md, streak, lang)
+    md_path, html_path = render.write_output(md, edition, lang)
+    print(f"Ruhe-Ausgabe erzeugt:\n  {md_path}\n  {html_path}")
+
+    telegram.send_telegram(md, config.get("telegram_chat_ids", []))
+    if not keep_seen:
+        state.record_stats(
+            current_state, edition, 0, len(md.split()), 0,
+            secs=qualitaet.lesezeit_sekunden(md, float(i18n.t(lang, "words_per_sec"))),
+            geprueft=geprueft,
+        )
+        state.save_state(current_state)
+    return 0
+
+
+def cmd_karte(config: dict) -> int:
+    """Erzeugt die Teilen-Karte zur jüngsten Ausgabe neu (out/…-karte.png)."""
+    lang = config.get("language", "de")
+    editions = config.get("editions", {})
+    dateien = sorted(render.OUT_DIR.glob("*-*.md"), reverse=True)
+    for pfad in dateien:
+        m = re.match(r"^(\d{4}-\d{2}-\d{2})-([a-z]+)\.md$", pfad.name)
+        if not m or m.group(2) not in editions:
+            continue
+        datum = datetime.strptime(m.group(1), "%Y-%m-%d").date()
+        edition = m.group(2)
+        ziel = karte.karte_fuer_ausgabe(
+            pfad.read_text(encoding="utf-8"),
+            edition,
+            editions[edition].get("label", edition),
+            datum=datum,
+            out_dir=render.OUT_DIR,
+            lang=lang,
+        )
+        if ziel:
+            print(f"Karte erzeugt: {ziel}")
+            return 0
+        print("Kein Punkt zum Rendern gefunden.")
+        return 1
+    print("Keine Ausgabe in out/ gefunden.")
+    return 1
 
 
 def cmd_catchup(config: dict, dry_run: bool) -> int:
@@ -259,7 +403,7 @@ def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", nargs="?", default="auto",
-                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "vapid-keys"])
+                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -304,6 +448,8 @@ def main() -> int:
             from . import webview
             webview.build_site(config)
             return 0
+        if args.command == "karte":
+            return cmd_karte(config)
         if args.command == "vapid-keys":
             pub, priv = webpush.generate_vapid_keys()
             print("VAPID-Schlüsselpaar erzeugt — als GitHub-Secrets / in .env hinterlegen:\n")

@@ -40,6 +40,25 @@ STRINGS: dict[str, dict] = {
             "## Deine Themen\n[Nur falls es zu verfolgten Themen materielle "
             "Änderungen gibt — sonst Abschnitt weglassen]"
         ),
+        # Vollständigkeits-Beweis (synthesize.build_prompt / webview-Rendering)
+        "nicht_aufgenommen_hint": (
+            "## 🔍 Geprüft, nicht aufgenommen\n[Nur wenn es ernsthafte Kandidaten "
+            "gibt — max. 4 Zeilen, sonst Abschnitt weglassen]"
+        ),
+        "nicht_aufgenommen_marker": "Geprüft, nicht aufgenommen",
+        "tracker_heading": "Deine Themen",
+        "geprueft_fmt": "🔍 *{n} Meldungen geprüft* · {p} aufgenommen.",
+        # Ruhe-Ausgabe (main.run_edition, wenn nichts die Schwelle erreicht)
+        "ruhe_headline": "Ruhige Lage",
+        "ruhe_body_fmt": (
+            "**Ruhige Lage.** Seit der letzten Ausgabe hat keine der {n} geprüften "
+            "Meldungen die Schwelle erreicht. Kein Handlungsbedarf."
+        ),
+        "ruhe_body_leer": (
+            "**Ruhige Lage.** Seit der letzten Ausgabe ist nichts Wesentliches "
+            "dazugekommen. Kein Handlungsbedarf."
+        ),
+        "ruhe_informed_fmt": "✅ *Du bist informiert — nichts zu tun. {next}*",
         "section_topics": "## Verfolgte Themen\n",
         "section_fulltexts": "## Volltexte (haben Vorrang)\n",
         "section_articles_fmt": "## Artikel aus den RSS-Feeds ({n} Stück)\n",
@@ -72,6 +91,15 @@ STRINGS: dict[str, dict] = {
         "push_title_fallback": "Dein Lagebild",
         "push_body_fallback": "Dein Lagebild ist da.",
         "catchup_label": "Catch-up · die letzten Tage in 4 Minuten",
+        # Teilbare Punkt-Karte (karte.py) und Podcast-Feed (podcast.py)
+        "karte_footer": "Dein Lagebild · 4× täglich · diepresse.com",
+        "podcast_title": "Die Presse · Copilot — Dein Lagebild",
+        "podcast_subtitle": "Vier Ausgaben täglich. In 90 Sekunden auf Stand.",
+        "podcast_description": (
+            "Das Lagebild der „Presse“ zum Hören: viermal täglich (6, 11, 16 und 20 Uhr) "
+            "die Entwicklungen, die sich materiell geändert haben — in rund 90 Sekunden."
+        ),
+        "podcast_author": "Die Presse",
     },
     "en": {
         "weekdays": [
@@ -98,6 +126,23 @@ STRINGS: dict[str, dict] = {
             "## Your Topics\n[Only if there are material changes to tracked "
             "topics — otherwise omit this section]"
         ),
+        "nicht_aufgenommen_hint": (
+            "## 🔍 Checked, not included\n[Only if there are real candidates — "
+            "max. 4 lines, otherwise omit the section]"
+        ),
+        "nicht_aufgenommen_marker": "Checked, not included",
+        "tracker_heading": "Your Topics",
+        "geprueft_fmt": "🔍 *{n} stories checked* · {p} included.",
+        "ruhe_headline": "A quiet stretch",
+        "ruhe_body_fmt": (
+            "**A quiet stretch.** None of the {n} stories checked since the last "
+            "briefing cleared the bar. Nothing to act on."
+        ),
+        "ruhe_body_leer": (
+            "**A quiet stretch.** Nothing material has come in since the last "
+            "briefing. Nothing to act on."
+        ),
+        "ruhe_informed_fmt": "✅ *You're informed — nothing to do. {next}*",
         "section_topics": "## Tracked Topics\n",
         "section_fulltexts": "## Full texts (take priority)\n",
         "section_articles_fmt": "## Articles from the RSS feeds ({n})\n",
@@ -122,6 +167,14 @@ STRINGS: dict[str, dict] = {
         "push_title_fallback": "Your Briefing",
         "push_body_fallback": "Your briefing is ready.",
         "catchup_label": "Catch-up · the last few days in 4 minutes",
+        "karte_footer": "Your Briefing · 4× daily · nytimes.com",
+        "podcast_title": "NYT Briefing · Copilot",
+        "podcast_subtitle": "Four editions a day. Informed in 90 seconds.",
+        "podcast_description": (
+            "Your briefing to listen to: four times a day (6, 11, 16 and 20:00) the "
+            "developments that materially changed — in about 90 seconds."
+        ),
+        "podcast_author": "The New York Times",
     },
 }
 

@@ -48,7 +48,9 @@ def test_split_teilt_an_absatzgrenzen():
 def test_feedback_keyboard_format():
     kb = telegram._feedback_keyboard("2026-07-04|morgen", ["Mietpreisbremse beschlossen"])
     rows = kb["inline_keyboard"]
-    # Eine Artikel-Zeile + eine Ausgaben-Zeile
-    assert len(rows) == 2
+    # Eine Artikel-Zeile + Ausgaben-Zeile + Lese-/Fehlt-Zeile
+    assert len(rows) == 3
     assert rows[0][0]["callback_data"] == "artfb|2026-07-04|morgen|0|up"
     assert rows[1][0]["callback_data"] == "fb|2026-07-04|morgen|up"
+    assert rows[2][0]["callback_data"] == "read|2026-07-04|morgen"
+    assert rows[2][1]["callback_data"] == "fehlt|2026-07-04|morgen"
