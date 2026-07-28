@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
-  <link rel="manifest" href="manifest.webmanifest">
-  <script src="push-config.js"></script>
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../push-config.js"></script>
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Copilot">
@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <title>My Topics · NYT Briefing</title>
+  <title>Tuesday, July 28 · Afternoon Update · NYT Briefing</title>
   <style>
     /* Copilot · Die Presse — Richtung C „Briefing-Timeline" (Light, Presse-Stil)
        Schriften: Newsreader (editoriale Serif für Schlagzeilen), Archivo (UI + Text).
@@ -485,97 +485,51 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<h1>My Topics</h1>
-<div id="as-intro">
-  <p class="as-intro-text">Select the topics you want to follow. The questions help you gauge what's relevant to you.</p>
-  <button class="as-btn-primary" onclick="asOpen()">Select topics →</button>
-</div>
-<div id="as-cards" style="display:none">
-  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">Tap a topic to select or deselect it.</p>
-  <div class="as-toggle-card" data-name="US politics, Congress and the White House" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US politics, Congress and the White House</div><div class="as-card-q">Do you follow US federal politics and decisions out of Washington?</div></div></div>
-<div class="as-toggle-card" data-name="Federal Reserve: interest rates and monetary policy" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Federal Reserve: interest rates and monetary policy</div><div class="as-card-q">Does the Fed&#x27;s rate path affect you — via a mortgage, savings or loans?</div></div></div>
-<div class="as-toggle-card" data-name="Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers</div><div class="as-card-q">Do you hold stocks, ETFs or a brokerage account, or follow the markets?</div></div></div>
-<div class="as-toggle-card" data-name="US economy, jobs and inflation" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US economy, jobs and inflation</div><div class="as-card-q">Do you notice the economy in daily life — prices, your job, the job market?</div></div></div>
-<div class="as-toggle-card" data-name="US foreign policy and national security" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US foreign policy and national security</div><div class="as-card-q">Do you follow US foreign policy and its global consequences?</div></div></div>
-<div class="as-toggle-card" data-name="Middle East" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Middle East</div><div class="as-card-q">Do you follow developments in the Middle East?</div></div></div>
-<div class="as-toggle-card" data-name="Russia&#x27;s war in Ukraine" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Russia&#x27;s war in Ukraine</div><div class="as-card-q">Do you follow the war in Ukraine and its consequences?</div></div></div>
-<div class="as-toggle-card" data-name="Artificial intelligence and Big Tech" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Artificial intelligence and Big Tech</div><div class="as-card-q">Does AI affect you — as a user, at work, or because you follow the field?</div></div></div>
-<div class="as-toggle-card" data-name="Supreme Court and the law" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Supreme Court and the law</div><div class="as-card-q">Do you follow Supreme Court rulings and major legal decisions?</div></div></div>
-<div class="as-toggle-card" data-name="Immigration and the border" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Immigration and the border</div><div class="as-card-q">Is immigration policy relevant to you professionally or socially?</div></div></div>
-<div class="as-toggle-card" data-name="Climate and the environment" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Climate and the environment</div><div class="as-card-q">Do you care about climate policy and the environment — personally or at work?</div></div></div>
-  <div class="as-confirm-row">
-    <span id="as-count" style="font-size:13px;color:var(--muted);font-family:var(--sans)">0 selected</span>
-    <button class="as-btn-primary" onclick="asConfirm()">Save</button>
-  </div>
-</div>
-<div id="topic-list" style="display:none">
-<div class="dossier-topic" data-topic-name="US politics, Congress and the White House"><h2>US politics, Congress and the White House<span class="schlagwort-badge">#Politics</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Federal Reserve: interest rates and monetary policy"><h2>Federal Reserve: interest rates and monetary policy<span class="schlagwort-badge">#Fed</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/07/27/us/politics/comey-seeks-dismissal-of-charges.html" target="_blank" rel="noopener"><span class="topic-article-title">Comey Seeks Dismissal of Charges Accusing Him of Threatening Trump</span><span class="topic-article-date">27.07</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers"><h2>Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers<span class="schlagwort-badge">#Markets</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/07/28/business/stocks-ai-chips.html" target="_blank" rel="noopener"><span class="topic-article-title">Tech Stocks Tumble on Worries Over A.I. Spending and China’s Chips</span><span class="topic-article-date">28.07</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/07/28/business/kalshi-polymarket-prediction-market-drugs.html" target="_blank" rel="noopener"><span class="topic-article-title">Prediction Market Betting on Drug Trials and Approvals Sparks Concern About Undermining Research</span><span class="topic-article-date">28.07</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/07/27/business/minnesota-kalshi-polymarket-ban.html" target="_blank" rel="noopener"><span class="topic-article-title">Minnesota Judge Blocks First State Ban on Prediction Markets Like Kalshi and Polymarket</span><span class="topic-article-date">28.07</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="US economy, jobs and inflation"><h2>US economy, jobs and inflation<span class="schlagwort-badge">#Economy</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="US foreign policy and national security"><h2>US foreign policy and national security<span class="schlagwort-badge">#Foreign</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Middle East"><h2>Middle East<span class="schlagwort-badge">#MiddleEast</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Russia&#x27;s war in Ukraine"><h2>Russia&#x27;s war in Ukraine<span class="schlagwort-badge">#Ukraine</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/07/28/world/middleeast/iran-ukraine-ship-strikes-caspian.html" target="_blank" rel="noopener"><span class="topic-article-title">Ukraine’s Strike on an Iranian Ship Could Bring Two Wars Closer</span><span class="topic-article-date">28.07</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Artificial intelligence and Big Tech"><h2>Artificial intelligence and Big Tech<span class="schlagwort-badge">#AI</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/07/28/world/middleeast/iran-war-us-trump.html" target="_blank" rel="noopener"><span class="topic-article-title">As U.S. Pauses Strikes, Iran Is No Rush to Resume Cease-Fire Talks</span><span class="topic-article-date">28.07</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/07/27/us/montana-hiker-impaled-pole.html" target="_blank" rel="noopener"><span class="topic-article-title">Hiker Trekked 10 Miles to Safety After Impaling Himself on Pole</span><span class="topic-article-date">28.07</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/07/28/world/europe/wildfires-france-spain.html" target="_blank" rel="noopener"><span class="topic-article-title">France and Spain Race to Contain Fires Before Some Areas Reach 104 Degrees</span><span class="topic-article-date">28.07</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Supreme Court and the law"><h2>Supreme Court and the law<span class="schlagwort-badge">#Court</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/07/27/us/politics/supreme-court-trump-mail-ballots.html" target="_blank" rel="noopener"><span class="topic-article-title">Trump Asks Supreme Court to Allow Order Restricting Mail Voting</span><span class="topic-article-date">27.07</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Immigration and the border"><h2>Immigration and the border<span class="schlagwort-badge">#Immigration</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Climate and the environment"><h2>Climate and the environment<span class="schlagwort-badge">#Climate</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-  <button class="reset-link" onclick="asReset()">Edit topic selection</button>
-</div>
-<script>
-(function(){
-var TOPICS=[{"name": "US politics, Congress and the White House", "kw": "Politics", "q": "Do you follow US federal politics and decisions out of Washington?"}, {"name": "Federal Reserve: interest rates and monetary policy", "kw": "Fed", "q": "Does the Fed's rate path affect you — via a mortgage, savings or loans?"}, {"name": "Wall Street: S&P 500, Nasdaq, Dow — direction and drivers", "kw": "Markets", "q": "Do you hold stocks, ETFs or a brokerage account, or follow the markets?"}, {"name": "US economy, jobs and inflation", "kw": "Economy", "q": "Do you notice the economy in daily life — prices, your job, the job market?"}, {"name": "US foreign policy and national security", "kw": "Foreign", "q": "Do you follow US foreign policy and its global consequences?"}, {"name": "Middle East", "kw": "MiddleEast", "q": "Do you follow developments in the Middle East?"}, {"name": "Russia's war in Ukraine", "kw": "Ukraine", "q": "Do you follow the war in Ukraine and its consequences?"}, {"name": "Artificial intelligence and Big Tech", "kw": "AI", "q": "Does AI affect you — as a user, at work, or because you follow the field?"}, {"name": "Supreme Court and the law", "kw": "Court", "q": "Do you follow Supreme Court rulings and major legal decisions?"}, {"name": "Immigration and the border", "kw": "Immigration", "q": "Is immigration policy relevant to you professionally or socially?"}, {"name": "Climate and the environment", "kw": "Climate", "q": "Do you care about climate policy and the environment — personally or at work?"}];
-var PREF_KEY='nyt_prefs';
-var selected=new Set();
-function show(id){['as-intro','as-cards','topic-list'].forEach(function(i){
-  document.getElementById(i).style.display=i===id?'':'none';
-});}
-function filterTopics(prefs){
-  document.getElementById('topic-list').querySelectorAll('.dossier-topic').forEach(function(el){
-    el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
-  });
-}
-function updateCount(){
-  document.getElementById('as-count').textContent=selected.size+' selected';
-}
-try{
-  var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
-  if(saved&&saved.length){show('topic-list');filterTopics(saved);}
-  else{show('as-intro');}
-}catch(e){show('as-intro');}
-window.asOpen=function(){
-  try{selected=new Set(JSON.parse(localStorage.getItem(PREF_KEY)||'[]'));}
-  catch(e){selected=new Set();}
-  document.querySelectorAll('.as-toggle-card').forEach(function(el){
-    el.classList.toggle('selected',selected.has(el.dataset.name));
-  });
-  updateCount();show('as-cards');
-};
-window.asToggle=function(el){
-  var name=el.dataset.name;
-  if(selected.has(name)){selected.delete(name);el.classList.remove('selected');}
-  else{selected.add(name);el.classList.add('selected');}
-  updateCount();
-};
-window.asConfirm=function(){
-  localStorage.setItem(PREF_KEY,JSON.stringify(Array.from(selected)));
-  show('topic-list');filterTopics(Array.from(selected));
-};
-window.asReset=function(){window.asOpen();};
-})();
-</script>
+<header class="lagebild-header"><p class="kicker">Tuesday, July 28, 2026 · Afternoon Update</p><h1>A moment to catch up.</h1><p class="byline">By the New York Times briefing desk · 1 story · ca. 3 min.</p></header><div class="highlights"><p><strong>Today&#x;s headlines:</strong></p>
+  <p>Japan hit by .magnitude earthquake; mall collapse feared in Kumamoto</p>
+  <p>Boeing posts loss as Air Force One delivery delayed four years</p>
+  <p>Semiconductor stocks plunge globally, raising questions about AI durability</p>
+  <p>Apple launches device leasing program to offset rising component costs</p>
+  </div><hr>
+  <h2>6.8 Magnitude Earthquake Strikes Japan&#x27;s Kumamoto Region</h2>
+  <p><strong>What&#x27;s new:</strong> A powerful earthquake struck southwestern Japan&#x27;s Kumamoto prefecture on Tuesday afternoon, with emergency workers racing to rescue people feared trapped in a collapsed shopping mall. The quake damaged Kumamoto Castle, a centuries-old landmark, and triggered fires across the region. Authorities were working to assess the full scope of casualties and structural damage.</p>
+  <p><strong>Why it matters:</strong> Major earthquakes in densely populated areas create immediate risks to life and infrastructure, and can disrupt supply chains and economic activity. Japan sits on one of the world&#x27;s most seismically active zones; how quickly rescue and recovery operations proceed will affect regional stability and insurance markets.</p>
+  <p class="reifegrad"><span class="rg rg-gilt">Effective 07/28</span></p>
+  <p><a class="source-link" href="https://www.nytimes.com/live/2026/07/28/world/japan-earthquake-kumamoto-tsunami">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-07-28|nachmittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="6.8 Magnitude Earthquake Strikes Japan&amp;#x27;s Kumamoto Region" data-karte="2026-07-28-nachmittag-karte.png">↗ Share</button></div><hr>
+  <h2>Boeing Reports Loss as Air Force One Program Hits $280 Million Setback</h2>
+  <p><strong>What&#x27;s new:</strong> Boeing posted a larger-than-expected loss in the second quarter, driven by a $280 million charge related to delays in its Air Force One contract. The company has pushed back delivery of the two presidential aircraft by four years, a significant setback to a marquee defense program.</p>
+  <p><strong>Why it matters:</strong> Boeing&#x27;s execution troubles on major government contracts reflect deeper manufacturing challenges and management strain. Delays to presidential aircraft signal vulnerability in the defense sector and raise questions about whether Boeing can recover from its recent crises—critical for investors and defense policy.</p>
+  <p class="reifegrad"><span class="rg rg-beschlossen">Decided 07/28</span></p>
+  <p><a class="source-link" href="https://www.nytimes.com/2026/07/28/business/boeing-earnings-air-force-one.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-07-28|nachmittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Boeing Reports Loss as Air Force One Program Hits $280 Million Setback">↗ Share</button></div><hr>
+  <h2>Semiconductor Stocks Plunge Globally on AI Trade Doubts</h2>
+  <p><strong>What&#x27;s new:</strong> Shares in semiconductor companies fell sharply across South Korea and Europe on Tuesday, extending recent losses and casting fresh doubt on whether the artificial intelligence investment boom will sustain itself. The rout follows weeks of volatility as markets reassess the timeline and profitability of AI-driven spending.</p>
+  <p><strong>Why it matters:</strong> The semiconductor sector is a bellwether for tech and AI investment confidence. A sustained retreat signals that markets are pricing in slower-than-expected returns on massive AI infrastructure spending—potentially reshaping capital allocation across tech, cloud services, and enterprise software.</p>
+  <p class="reifegrad"><span class="rg rg-gilt">Effective 07/28</span></p>
+  <p><a class="source-link" href="https://www.nytimes.com/2026/07/28/business/dealbook/chips-market-rout-ai.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-07-28|nachmittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Semiconductor Stocks Plunge Globally on AI Trade Doubts">↗ Share</button></div><hr>
+  <h2>Apple Launches Device Leasing to Counter Rising Component Costs</h2>
+  <p>Apple announced a leasing program for iPhones and other devices, offering customers an alternative to outright purchase as rising component prices—partly driven by AI-related demand—squeeze margins and affordability. (Technology)</p>
+  <p><a class="source-link" href="https://www.nytimes.com/2026/07/28/technology/apple-leasing-program.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-07-28|nachmittag|3"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Apple Launches Device Leasing to Counter Rising Component Costs">↗ Share</button></div><hr>
+  <p class="geprueft">🔍 <em>24 stories checked</em> · 4 included.</p><h2 class="pruef-head">🔍 Checked, not included</h2>
+  <p>- Iran and U.S. pause strikes in standoff — diplomatic developments, no material change yet.</p>
+  <p>- Ukraine strikes Iranian ship in Caspian Sea — escalation reported, but no new policy decision.</p>
+  <p>- Massive wildfires near Bordeaux — environmental crisis, but no regulatory or material economic change.</p>
+  <p>- AFSCME leader Lee Saunders to retire — personnel transition, not a material shift in union strategy or labor policy.</p>
+  <hr>
+  
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 31 in a row — reading time ca. 180 seconds. Next briefing: today at 20:00.</div>
+  <hr>
 </div>
 </div>
 <nav class="tabbar">
-  <a href="index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Briefing</span></a>
-  <a href="dossier.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Topics</span></a>
-  <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archive</span></a>
+  <a href="../index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Briefing</span></a>
+  <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Topics</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archive</span></a>
   <a href="https://www.nytimes.com/section/todayspaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>Today's Paper</span></a>
-  <a href="../" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h5M8 15h3"/></svg><span>Presse</span></a>
+  <a href="../../" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h5M8 15h3"/></svg><span>Presse</span></a>
 </nav>
 </div>
 <script>
@@ -789,7 +743,7 @@ window.asReset=function(){window.asOpen();};
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
 })();
