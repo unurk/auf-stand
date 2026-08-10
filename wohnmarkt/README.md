@@ -53,6 +53,24 @@ dabei: Aus dem Ordner `wohnmarkt/` deployen, nicht aus dem Repository-Wurzel-
 verzeichnis — die dortige `vercel.json` gehört zum Lagebild und würde statt des
 Prototypen den Ordner `site/` ausliefern.
 
+### Deploy über die Vercel-Weboberfläche
+
+Alternativ ohne Terminal: Repo auf [vercel.com/new](https://vercel.com/new)
+importieren und **Root Directory auf `wohnmarkt`** setzen. Das ist der
+entscheidende Schritt — ohne ihn greift die `vercel.json` im
+Wurzelverzeichnis, die zum Lagebild gehört und `site/` als Ausgabeverzeichnis
+erwartet. Der Build scheitert dann mit:
+
+```
+No Output Directory named "site" found after the Build completed.
+```
+
+Die `vercel.json` in diesem Ordner setzt Next.js explizit und lässt Build-,
+Install- und Ausgabeverzeichnis auf den Vorgaben des Frameworks. Sie hat
+Vorrang vor den Einstellungen im Vercel-Dashboard — sobald Root Directory
+korrekt auf `wohnmarkt` zeigt, kann die Konfiguration des Lagebilds nicht mehr
+hineinwirken.
+
 Vor dem Weitergeben eines Links bedenken: Die Seite trägt Presse-Branding und
 zeigt Zahlen, die wie Marktdaten aussehen. Der Demo-Hinweis steht deshalb
 dauerhaft im Seitenkopf, an jedem Kennzahlenblock und in der Fußzeile, und die
