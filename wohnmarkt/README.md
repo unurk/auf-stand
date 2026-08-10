@@ -35,8 +35,28 @@ Weitere Skripte:
 | `npm test` | Vitest: Berechnungs- und Formatierungslogik |
 | `npm run generate:data` | Beispieldaten neu erzeugen (deterministisch) |
 
-Der Prototyp läuft nur lokal. Er ist bewusst **nicht** an den bestehenden
-Pages-/Vercel-Deploy des Repositories angeschlossen.
+Der Prototyp läuft standardmäßig nur lokal. Er ist bewusst **nicht** an den
+bestehenden Pages-/Vercel-Deploy des Repositories angeschlossen — dort liegt das
+Lagebild-Produkt, das davon unberührt bleibt.
+
+## Teilbaren Link erzeugen
+
+Für ein Review mit anderen reicht ein Vorschau-Deployment aus diesem Ordner:
+
+```bash
+cd wohnmarkt
+npx vercel          # beim ersten Mal: Login im Browser, dann Fragen mit Enter bestätigen
+```
+
+Die CLI erkennt Next.js selbst und gibt am Ende eine Preview-URL aus. Wichtig
+dabei: Aus dem Ordner `wohnmarkt/` deployen, nicht aus dem Repository-Wurzel-
+verzeichnis — die dortige `vercel.json` gehört zum Lagebild und würde statt des
+Prototypen den Ordner `site/` ausliefern.
+
+Vor dem Weitergeben eines Links bedenken: Die Seite trägt Presse-Branding und
+zeigt Zahlen, die wie Marktdaten aussehen. Der Demo-Hinweis steht deshalb
+dauerhaft im Seitenkopf, an jedem Kennzahlenblock und in der Fußzeile, und die
+Seite ist auf `noindex` gesetzt. Diese Hinweise bitte nicht entfernen.
 
 ## Technik
 
