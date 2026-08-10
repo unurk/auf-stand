@@ -178,3 +178,18 @@ die Roadmap vor. Sinnvolle erste Aufträge:
    Verbesserungen am Auswahlprinzip in prompts/lagebild.md vor."
 3. „Baue die 17-Uhr-Ausgabe als Audio: TTS-Anbindung, mp3 nach out/."
 4. „Baue einen Telegram-Bot als Zustellkanal (Bot-Token über .env)."
+
+## Nebenprojekt: Prototyp „Presse Wohnmarkt-Update"
+
+Im Ordner `wohnmarkt/` liegt ein eigenständiger, klickbarer Prototyp für ein anderes
+Produkt: ein wiederkehrendes Abo-Nutzwertprodukt zum österreichischen Wohnungsmarkt
+(Next.js/TypeScript). Er teilt weder Code noch Daten noch Deploy mit der
+Lagebild-Pipeline und läuft ausschließlich lokal:
+
+```
+cd wohnmarkt && npm install && npm run dev
+```
+
+Der Prototyp arbeitet mit **synthetischen Beispieldaten**; es gibt keine bestätigte
+Datenquelle und keine Datenpartnerschaft. Details, Datenmodell und die vorbereiteten
+Integrationspunkte stehen in `wohnmarkt/README.md`.
