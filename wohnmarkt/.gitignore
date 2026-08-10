@@ -1,6 +1,8 @@
 node_modules/
 .next/
 out/
+# Ziel des statischen Exports (siehe next.config.ts) — Build-Ergebnis, kein Quellcode.
+site/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store

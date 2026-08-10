@@ -10,8 +10,9 @@ const compat = new FlatCompat({ baseDirectory: __dirname });
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    // next-env.d.ts wird von Next.js generiert und ist nicht eingecheckt.
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts"],
+    // Generiertes, nicht eingechecktes Zeug: Next-Typen, Build-Ordner und
+    // das Ziel des statischen Exports (site/, siehe next.config.ts).
+    ignores: [".next/**", "site/**", "node_modules/**", "next-env.d.ts"],
   },
 ];
 
