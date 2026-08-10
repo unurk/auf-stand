@@ -7,3 +7,8 @@ data/state.nyt.json
 out/
 manual_input/*.txt
 manual_input/*.md
+
+# Prototyp „Presse Wohnmarkt-Update" (eigenes npm-Projekt in wohnmarkt/)
+wohnmarkt/node_modules/
+wohnmarkt/.next/
+wohnmarkt/next-env.d.ts

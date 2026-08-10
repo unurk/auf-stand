@@ -1,0 +1,1529 @@
+{
+  "_hinweis": "Synthetische Beispieldaten. Keine echten Marktdaten, keine bestätigte Datenquelle. Erzeugt von scripts/generate-demo-data.mjs.",
+  "generator": "scripts/generate-demo-data.mjs",
+  "seed": 20260610,
+  "periods": [
+    "2024-07",
+    "2024-08",
+    "2024-09",
+    "2024-10",
+    "2024-11",
+    "2024-12",
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06"
+  ],
+  "observations": [
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-07",
+      "salePricePerSqm": 7119,
+      "rentPricePerSqm": 17.4,
+      "listingsCount": 325,
+      "averageSizeSqm": 69.7
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-08",
+      "salePricePerSqm": 7186,
+      "rentPricePerSqm": 17.5,
+      "listingsCount": 325,
+      "averageSizeSqm": 67.9
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-09",
+      "salePricePerSqm": 7131,
+      "rentPricePerSqm": 17.5,
+      "listingsCount": 299,
+      "averageSizeSqm": 68.4
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-10",
+      "salePricePerSqm": 7149,
+      "rentPricePerSqm": 17.6,
+      "listingsCount": 297,
+      "averageSizeSqm": 69.1
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-11",
+      "salePricePerSqm": 7161,
+      "rentPricePerSqm": 17.6,
+      "listingsCount": 274,
+      "averageSizeSqm": 66.4
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2024-12",
+      "salePricePerSqm": 7176,
+      "rentPricePerSqm": 17.7,
+      "listingsCount": 269,
+      "averageSizeSqm": 69.4
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-01",
+      "salePricePerSqm": 7166,
+      "rentPricePerSqm": 17.9,
+      "listingsCount": 273,
+      "averageSizeSqm": 66.8
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-02",
+      "salePricePerSqm": 7192,
+      "rentPricePerSqm": 17.9,
+      "listingsCount": 282,
+      "averageSizeSqm": 67
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-03",
+      "salePricePerSqm": 7223,
+      "rentPricePerSqm": 17.9,
+      "listingsCount": 296,
+      "averageSizeSqm": 68.5
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-04",
+      "salePricePerSqm": 7266,
+      "rentPricePerSqm": 17.9,
+      "listingsCount": 302,
+      "averageSizeSqm": 66.7
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-05",
+      "salePricePerSqm": 7242,
+      "rentPricePerSqm": 18.1,
+      "listingsCount": 333,
+      "averageSizeSqm": 69.1
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-06",
+      "salePricePerSqm": 7283,
+      "rentPricePerSqm": 18.1,
+      "listingsCount": 325,
+      "averageSizeSqm": 68.7
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-07",
+      "salePricePerSqm": 7257,
+      "rentPricePerSqm": 18.2,
+      "listingsCount": 302,
+      "averageSizeSqm": 69.3
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-08",
+      "salePricePerSqm": 7254,
+      "rentPricePerSqm": 18.2,
+      "listingsCount": 299,
+      "averageSizeSqm": 69.3
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-09",
+      "salePricePerSqm": 7261,
+      "rentPricePerSqm": 18.3,
+      "listingsCount": 288,
+      "averageSizeSqm": 67.6
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-10",
+      "salePricePerSqm": 7311,
+      "rentPricePerSqm": 18.5,
+      "listingsCount": 265,
+      "averageSizeSqm": 69
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-11",
+      "salePricePerSqm": 7315,
+      "rentPricePerSqm": 18.5,
+      "listingsCount": 263,
+      "averageSizeSqm": 67.9
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2025-12",
+      "salePricePerSqm": 7329,
+      "rentPricePerSqm": 18.5,
+      "listingsCount": 244,
+      "averageSizeSqm": 69.6
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-01",
+      "salePricePerSqm": 7271,
+      "rentPricePerSqm": 18.6,
+      "listingsCount": 262,
+      "averageSizeSqm": 68.1
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-02",
+      "salePricePerSqm": 7323,
+      "rentPricePerSqm": 18.7,
+      "listingsCount": 254,
+      "averageSizeSqm": 67.3
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-03",
+      "salePricePerSqm": 7308,
+      "rentPricePerSqm": 18.8,
+      "listingsCount": 262,
+      "averageSizeSqm": 69.6
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-04",
+      "salePricePerSqm": 7332,
+      "rentPricePerSqm": 18.8,
+      "listingsCount": 276,
+      "averageSizeSqm": 67.1
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-05",
+      "salePricePerSqm": 7373,
+      "rentPricePerSqm": 18.9,
+      "listingsCount": 297,
+      "averageSizeSqm": 68.9
+    },
+    {
+      "regionId": "wien-neubau",
+      "period": "2026-06",
+      "salePricePerSqm": 7344,
+      "rentPricePerSqm": 18.9,
+      "listingsCount": 312,
+      "averageSizeSqm": 68.8
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-07",
+      "salePricePerSqm": 5229,
+      "rentPricePerSqm": 14.2,
+      "listingsCount": 785,
+      "averageSizeSqm": 74.1
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-08",
+      "salePricePerSqm": 5227,
+      "rentPricePerSqm": 14.2,
+      "listingsCount": 698,
+      "averageSizeSqm": 73.8
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-09",
+      "salePricePerSqm": 5249,
+      "rentPricePerSqm": 14.3,
+      "listingsCount": 673,
+      "averageSizeSqm": 75.2
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-10",
+      "salePricePerSqm": 5238,
+      "rentPricePerSqm": 14.3,
+      "listingsCount": 646,
+      "averageSizeSqm": 75.4
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-11",
+      "salePricePerSqm": 5217,
+      "rentPricePerSqm": 14.3,
+      "listingsCount": 623,
+      "averageSizeSqm": 75.5
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2024-12",
+      "salePricePerSqm": 5255,
+      "rentPricePerSqm": 14.3,
+      "listingsCount": 599,
+      "averageSizeSqm": 74.7
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-01",
+      "salePricePerSqm": 5225,
+      "rentPricePerSqm": 14.4,
+      "listingsCount": 643,
+      "averageSizeSqm": 73.5
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-02",
+      "salePricePerSqm": 5256,
+      "rentPricePerSqm": 14.5,
+      "listingsCount": 649,
+      "averageSizeSqm": 74.6
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-03",
+      "salePricePerSqm": 5273,
+      "rentPricePerSqm": 14.5,
+      "listingsCount": 719,
+      "averageSizeSqm": 73.5
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-04",
+      "salePricePerSqm": 5279,
+      "rentPricePerSqm": 14.5,
+      "listingsCount": 732,
+      "averageSizeSqm": 73.3
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-05",
+      "salePricePerSqm": 5261,
+      "rentPricePerSqm": 14.5,
+      "listingsCount": 763,
+      "averageSizeSqm": 73.1
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-06",
+      "salePricePerSqm": 5285,
+      "rentPricePerSqm": 14.7,
+      "listingsCount": 773,
+      "averageSizeSqm": 75.2
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-07",
+      "salePricePerSqm": 5272,
+      "rentPricePerSqm": 14.7,
+      "listingsCount": 815,
+      "averageSizeSqm": 74.3
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-08",
+      "salePricePerSqm": 5274,
+      "rentPricePerSqm": 14.7,
+      "listingsCount": 763,
+      "averageSizeSqm": 73.1
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-09",
+      "salePricePerSqm": 5290,
+      "rentPricePerSqm": 14.8,
+      "listingsCount": 746,
+      "averageSizeSqm": 73.1
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-10",
+      "salePricePerSqm": 5246,
+      "rentPricePerSqm": 14.8,
+      "listingsCount": 708,
+      "averageSizeSqm": 75
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-11",
+      "salePricePerSqm": 5275,
+      "rentPricePerSqm": 14.8,
+      "listingsCount": 647,
+      "averageSizeSqm": 72.9
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2025-12",
+      "salePricePerSqm": 5239,
+      "rentPricePerSqm": 14.9,
+      "listingsCount": 667,
+      "averageSizeSqm": 73.1
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-01",
+      "salePricePerSqm": 5267,
+      "rentPricePerSqm": 15,
+      "listingsCount": 680,
+      "averageSizeSqm": 73.2
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-02",
+      "salePricePerSqm": 5259,
+      "rentPricePerSqm": 15,
+      "listingsCount": 721,
+      "averageSizeSqm": 73.2
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-03",
+      "salePricePerSqm": 5287,
+      "rentPricePerSqm": 15,
+      "listingsCount": 765,
+      "averageSizeSqm": 72.7
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-04",
+      "salePricePerSqm": 5248,
+      "rentPricePerSqm": 15,
+      "listingsCount": 798,
+      "averageSizeSqm": 74
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-05",
+      "salePricePerSqm": 5287,
+      "rentPricePerSqm": 15.1,
+      "listingsCount": 838,
+      "averageSizeSqm": 75.7
+    },
+    {
+      "regionId": "wien-donaustadt",
+      "period": "2026-06",
+      "salePricePerSqm": 5304,
+      "rentPricePerSqm": 15.1,
+      "listingsCount": 854,
+      "averageSizeSqm": 72.8
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-07",
+      "salePricePerSqm": 4585,
+      "rentPricePerSqm": 12.6,
+      "listingsCount": 546,
+      "averageSizeSqm": 64.9
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-08",
+      "salePricePerSqm": 4570,
+      "rentPricePerSqm": 12.7,
+      "listingsCount": 524,
+      "averageSizeSqm": 65.6
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-09",
+      "salePricePerSqm": 4589,
+      "rentPricePerSqm": 12.7,
+      "listingsCount": 517,
+      "averageSizeSqm": 67.4
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-10",
+      "salePricePerSqm": 4578,
+      "rentPricePerSqm": 12.7,
+      "listingsCount": 480,
+      "averageSizeSqm": 65.7
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-11",
+      "salePricePerSqm": 4586,
+      "rentPricePerSqm": 12.8,
+      "listingsCount": 451,
+      "averageSizeSqm": 65.3
+    },
+    {
+      "regionId": "graz",
+      "period": "2024-12",
+      "salePricePerSqm": 4589,
+      "rentPricePerSqm": 12.8,
+      "listingsCount": 465,
+      "averageSizeSqm": 67.2
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-01",
+      "salePricePerSqm": 4576,
+      "rentPricePerSqm": 12.8,
+      "listingsCount": 447,
+      "averageSizeSqm": 65.4
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-02",
+      "salePricePerSqm": 4589,
+      "rentPricePerSqm": 12.8,
+      "listingsCount": 505,
+      "averageSizeSqm": 67.3
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-03",
+      "salePricePerSqm": 4604,
+      "rentPricePerSqm": 12.9,
+      "listingsCount": 494,
+      "averageSizeSqm": 64.5
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-04",
+      "salePricePerSqm": 4593,
+      "rentPricePerSqm": 13,
+      "listingsCount": 536,
+      "averageSizeSqm": 66.8
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-05",
+      "salePricePerSqm": 4603,
+      "rentPricePerSqm": 13.1,
+      "listingsCount": 566,
+      "averageSizeSqm": 65.2
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-06",
+      "salePricePerSqm": 4590,
+      "rentPricePerSqm": 13,
+      "listingsCount": 589,
+      "averageSizeSqm": 65.8
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-07",
+      "salePricePerSqm": 4587,
+      "rentPricePerSqm": 13.1,
+      "listingsCount": 583,
+      "averageSizeSqm": 65.4
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-08",
+      "salePricePerSqm": 4635,
+      "rentPricePerSqm": 13.1,
+      "listingsCount": 548,
+      "averageSizeSqm": 65.1
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-09",
+      "salePricePerSqm": 4618,
+      "rentPricePerSqm": 13.2,
+      "listingsCount": 492,
+      "averageSizeSqm": 67
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-10",
+      "salePricePerSqm": 4642,
+      "rentPricePerSqm": 13.3,
+      "listingsCount": 495,
+      "averageSizeSqm": 65.3
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-11",
+      "salePricePerSqm": 4652,
+      "rentPricePerSqm": 13.3,
+      "listingsCount": 470,
+      "averageSizeSqm": 64.4
+    },
+    {
+      "regionId": "graz",
+      "period": "2025-12",
+      "salePricePerSqm": 4639,
+      "rentPricePerSqm": 13.3,
+      "listingsCount": 458,
+      "averageSizeSqm": 67.6
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-01",
+      "salePricePerSqm": 4625,
+      "rentPricePerSqm": 13.4,
+      "listingsCount": 454,
+      "averageSizeSqm": 66.7
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-02",
+      "salePricePerSqm": 4623,
+      "rentPricePerSqm": 13.5,
+      "listingsCount": 470,
+      "averageSizeSqm": 64.6
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-03",
+      "salePricePerSqm": 4660,
+      "rentPricePerSqm": 13.5,
+      "listingsCount": 511,
+      "averageSizeSqm": 64.7
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-04",
+      "salePricePerSqm": 4652,
+      "rentPricePerSqm": 13.6,
+      "listingsCount": 509,
+      "averageSizeSqm": 66.7
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-05",
+      "salePricePerSqm": 4675,
+      "rentPricePerSqm": 13.5,
+      "listingsCount": 531,
+      "averageSizeSqm": 67.2
+    },
+    {
+      "regionId": "graz",
+      "period": "2026-06",
+      "salePricePerSqm": 4675,
+      "rentPricePerSqm": 13.6,
+      "listingsCount": 567,
+      "averageSizeSqm": 65.1
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-07",
+      "salePricePerSqm": 6856,
+      "rentPricePerSqm": 16.3,
+      "listingsCount": 257,
+      "averageSizeSqm": 70
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-08",
+      "salePricePerSqm": 6868,
+      "rentPricePerSqm": 16.3,
+      "listingsCount": 251,
+      "averageSizeSqm": 71.5
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-09",
+      "salePricePerSqm": 6941,
+      "rentPricePerSqm": 16.4,
+      "listingsCount": 236,
+      "averageSizeSqm": 70.8
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-10",
+      "salePricePerSqm": 6924,
+      "rentPricePerSqm": 16.5,
+      "listingsCount": 227,
+      "averageSizeSqm": 70.9
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-11",
+      "salePricePerSqm": 6902,
+      "rentPricePerSqm": 16.5,
+      "listingsCount": 213,
+      "averageSizeSqm": 71.2
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2024-12",
+      "salePricePerSqm": 6945,
+      "rentPricePerSqm": 16.5,
+      "listingsCount": 196,
+      "averageSizeSqm": 70.2
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-01",
+      "salePricePerSqm": 6982,
+      "rentPricePerSqm": 16.6,
+      "listingsCount": 216,
+      "averageSizeSqm": 72.7
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-02",
+      "salePricePerSqm": 7015,
+      "rentPricePerSqm": 16.6,
+      "listingsCount": 223,
+      "averageSizeSqm": 70.5
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-03",
+      "salePricePerSqm": 6998,
+      "rentPricePerSqm": 16.7,
+      "listingsCount": 233,
+      "averageSizeSqm": 69.9
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-04",
+      "salePricePerSqm": 6985,
+      "rentPricePerSqm": 16.8,
+      "listingsCount": 241,
+      "averageSizeSqm": 70.5
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-05",
+      "salePricePerSqm": 7028,
+      "rentPricePerSqm": 16.9,
+      "listingsCount": 254,
+      "averageSizeSqm": 71.4
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-06",
+      "salePricePerSqm": 7017,
+      "rentPricePerSqm": 17,
+      "listingsCount": 240,
+      "averageSizeSqm": 70.1
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-07",
+      "salePricePerSqm": 7058,
+      "rentPricePerSqm": 17,
+      "listingsCount": 242,
+      "averageSizeSqm": 69.5
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-08",
+      "salePricePerSqm": 7019,
+      "rentPricePerSqm": 17,
+      "listingsCount": 230,
+      "averageSizeSqm": 69.3
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-09",
+      "salePricePerSqm": 7079,
+      "rentPricePerSqm": 17.1,
+      "listingsCount": 215,
+      "averageSizeSqm": 71.1
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-10",
+      "salePricePerSqm": 7051,
+      "rentPricePerSqm": 17.1,
+      "listingsCount": 198,
+      "averageSizeSqm": 70.2
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-11",
+      "salePricePerSqm": 7094,
+      "rentPricePerSqm": 17.2,
+      "listingsCount": 196,
+      "averageSizeSqm": 71.7
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2025-12",
+      "salePricePerSqm": 7100,
+      "rentPricePerSqm": 17.4,
+      "listingsCount": 184,
+      "averageSizeSqm": 69.4
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-01",
+      "salePricePerSqm": 7135,
+      "rentPricePerSqm": 17.4,
+      "listingsCount": 193,
+      "averageSizeSqm": 72
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-02",
+      "salePricePerSqm": 7171,
+      "rentPricePerSqm": 17.5,
+      "listingsCount": 198,
+      "averageSizeSqm": 71.5
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-03",
+      "salePricePerSqm": 7148,
+      "rentPricePerSqm": 17.5,
+      "listingsCount": 206,
+      "averageSizeSqm": 72.6
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-04",
+      "salePricePerSqm": 7191,
+      "rentPricePerSqm": 17.6,
+      "listingsCount": 219,
+      "averageSizeSqm": 70
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-05",
+      "salePricePerSqm": 7189,
+      "rentPricePerSqm": 17.7,
+      "listingsCount": 219,
+      "averageSizeSqm": 71
+    },
+    {
+      "regionId": "salzburg-stadt",
+      "period": "2026-06",
+      "salePricePerSqm": 7226,
+      "rentPricePerSqm": 17.9,
+      "listingsCount": 228,
+      "averageSizeSqm": 69.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-07",
+      "salePricePerSqm": 4155,
+      "rentPricePerSqm": 11.4,
+      "listingsCount": 455,
+      "averageSizeSqm": 74.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-08",
+      "salePricePerSqm": 4171,
+      "rentPricePerSqm": 11.4,
+      "listingsCount": 446,
+      "averageSizeSqm": 74.4
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-09",
+      "salePricePerSqm": 4198,
+      "rentPricePerSqm": 11.4,
+      "listingsCount": 438,
+      "averageSizeSqm": 71.4
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-10",
+      "salePricePerSqm": 4171,
+      "rentPricePerSqm": 11.5,
+      "listingsCount": 410,
+      "averageSizeSqm": 72.1
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-11",
+      "salePricePerSqm": 4179,
+      "rentPricePerSqm": 11.5,
+      "listingsCount": 392,
+      "averageSizeSqm": 72.2
+    },
+    {
+      "regionId": "linz",
+      "period": "2024-12",
+      "salePricePerSqm": 4188,
+      "rentPricePerSqm": 11.5,
+      "listingsCount": 373,
+      "averageSizeSqm": 72.7
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-01",
+      "salePricePerSqm": 4187,
+      "rentPricePerSqm": 11.5,
+      "listingsCount": 401,
+      "averageSizeSqm": 74.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-02",
+      "salePricePerSqm": 4186,
+      "rentPricePerSqm": 11.6,
+      "listingsCount": 417,
+      "averageSizeSqm": 73.9
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-03",
+      "salePricePerSqm": 4195,
+      "rentPricePerSqm": 11.6,
+      "listingsCount": 443,
+      "averageSizeSqm": 73.9
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-04",
+      "salePricePerSqm": 4170,
+      "rentPricePerSqm": 11.6,
+      "listingsCount": 452,
+      "averageSizeSqm": 73.8
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-05",
+      "salePricePerSqm": 4173,
+      "rentPricePerSqm": 11.7,
+      "listingsCount": 469,
+      "averageSizeSqm": 73.2
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-06",
+      "salePricePerSqm": 4185,
+      "rentPricePerSqm": 11.8,
+      "listingsCount": 470,
+      "averageSizeSqm": 73.6
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-07",
+      "salePricePerSqm": 4182,
+      "rentPricePerSqm": 11.8,
+      "listingsCount": 497,
+      "averageSizeSqm": 72
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-08",
+      "salePricePerSqm": 4182,
+      "rentPricePerSqm": 11.8,
+      "listingsCount": 469,
+      "averageSizeSqm": 72.4
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-09",
+      "salePricePerSqm": 4169,
+      "rentPricePerSqm": 11.9,
+      "listingsCount": 453,
+      "averageSizeSqm": 74.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-10",
+      "salePricePerSqm": 4195,
+      "rentPricePerSqm": 11.8,
+      "listingsCount": 427,
+      "averageSizeSqm": 73.8
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-11",
+      "salePricePerSqm": 4214,
+      "rentPricePerSqm": 11.8,
+      "listingsCount": 399,
+      "averageSizeSqm": 74.6
+    },
+    {
+      "regionId": "linz",
+      "period": "2025-12",
+      "salePricePerSqm": 4206,
+      "rentPricePerSqm": 12,
+      "listingsCount": 392,
+      "averageSizeSqm": 74.6
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-01",
+      "salePricePerSqm": 4188,
+      "rentPricePerSqm": 11.9,
+      "listingsCount": 389,
+      "averageSizeSqm": 73.4
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-02",
+      "salePricePerSqm": 4214,
+      "rentPricePerSqm": 12,
+      "listingsCount": 398,
+      "averageSizeSqm": 71.6
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-03",
+      "salePricePerSqm": 4207,
+      "rentPricePerSqm": 12,
+      "listingsCount": 432,
+      "averageSizeSqm": 74.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-04",
+      "salePricePerSqm": 4213,
+      "rentPricePerSqm": 12.1,
+      "listingsCount": 472,
+      "averageSizeSqm": 73.3
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-05",
+      "salePricePerSqm": 4219,
+      "rentPricePerSqm": 12,
+      "listingsCount": 469,
+      "averageSizeSqm": 72.5
+    },
+    {
+      "regionId": "linz",
+      "period": "2026-06",
+      "salePricePerSqm": 4221,
+      "rentPricePerSqm": 12.1,
+      "listingsCount": 467,
+      "averageSizeSqm": 72.9
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-07",
+      "salePricePerSqm": 6441,
+      "rentPricePerSqm": 15.6,
+      "listingsCount": 224,
+      "averageSizeSqm": 64.1
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-08",
+      "salePricePerSqm": 6408,
+      "rentPricePerSqm": 15.5,
+      "listingsCount": 208,
+      "averageSizeSqm": 64.7
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-09",
+      "salePricePerSqm": 6464,
+      "rentPricePerSqm": 15.6,
+      "listingsCount": 202,
+      "averageSizeSqm": 64.1
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-10",
+      "salePricePerSqm": 6437,
+      "rentPricePerSqm": 15.6,
+      "listingsCount": 189,
+      "averageSizeSqm": 65.2
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-11",
+      "salePricePerSqm": 6472,
+      "rentPricePerSqm": 15.7,
+      "listingsCount": 173,
+      "averageSizeSqm": 64.8
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2024-12",
+      "salePricePerSqm": 6446,
+      "rentPricePerSqm": 15.8,
+      "listingsCount": 172,
+      "averageSizeSqm": 62.4
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-01",
+      "salePricePerSqm": 6443,
+      "rentPricePerSqm": 15.8,
+      "listingsCount": 178,
+      "averageSizeSqm": 64.4
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-02",
+      "salePricePerSqm": 6522,
+      "rentPricePerSqm": 15.9,
+      "listingsCount": 184,
+      "averageSizeSqm": 64.9
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-03",
+      "salePricePerSqm": 6488,
+      "rentPricePerSqm": 16,
+      "listingsCount": 196,
+      "averageSizeSqm": 63.6
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-04",
+      "salePricePerSqm": 6481,
+      "rentPricePerSqm": 16.1,
+      "listingsCount": 193,
+      "averageSizeSqm": 64.1
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-05",
+      "salePricePerSqm": 6515,
+      "rentPricePerSqm": 16.2,
+      "listingsCount": 204,
+      "averageSizeSqm": 63.8
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-06",
+      "salePricePerSqm": 6504,
+      "rentPricePerSqm": 16.2,
+      "listingsCount": 207,
+      "averageSizeSqm": 64.9
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-07",
+      "salePricePerSqm": 6525,
+      "rentPricePerSqm": 16.3,
+      "listingsCount": 208,
+      "averageSizeSqm": 63.2
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-08",
+      "salePricePerSqm": 6573,
+      "rentPricePerSqm": 16.3,
+      "listingsCount": 192,
+      "averageSizeSqm": 62.8
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-09",
+      "salePricePerSqm": 6585,
+      "rentPricePerSqm": 16.3,
+      "listingsCount": 188,
+      "averageSizeSqm": 64.2
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-10",
+      "salePricePerSqm": 6535,
+      "rentPricePerSqm": 16.5,
+      "listingsCount": 170,
+      "averageSizeSqm": 63.8
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-11",
+      "salePricePerSqm": 6567,
+      "rentPricePerSqm": 16.4,
+      "listingsCount": 171,
+      "averageSizeSqm": 64
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2025-12",
+      "salePricePerSqm": 6618,
+      "rentPricePerSqm": 16.5,
+      "listingsCount": 160,
+      "averageSizeSqm": 64.3
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-01",
+      "salePricePerSqm": 6596,
+      "rentPricePerSqm": 16.6,
+      "listingsCount": 159,
+      "averageSizeSqm": 65.6
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-02",
+      "salePricePerSqm": 6575,
+      "rentPricePerSqm": 16.7,
+      "listingsCount": 167,
+      "averageSizeSqm": 62.5
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-03",
+      "salePricePerSqm": 6619,
+      "rentPricePerSqm": 16.8,
+      "listingsCount": 188,
+      "averageSizeSqm": 62.4
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-04",
+      "salePricePerSqm": 6612,
+      "rentPricePerSqm": 16.7,
+      "listingsCount": 185,
+      "averageSizeSqm": 65.4
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-05",
+      "salePricePerSqm": 6630,
+      "rentPricePerSqm": 16.9,
+      "listingsCount": 193,
+      "averageSizeSqm": 64.7
+    },
+    {
+      "regionId": "innsbruck",
+      "period": "2026-06",
+      "salePricePerSqm": 6622,
+      "rentPricePerSqm": 17,
+      "listingsCount": 197,
+      "averageSizeSqm": 64.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2024-12",
+      "salePricePerSqm": 3291,
+      "rentPricePerSqm": 10,
+      "listingsCount": 170,
+      "averageSizeSqm": 77.9
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-01",
+      "salePricePerSqm": 3295,
+      "rentPricePerSqm": 10,
+      "listingsCount": 166,
+      "averageSizeSqm": 79
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-02",
+      "salePricePerSqm": 3311,
+      "rentPricePerSqm": 10.1,
+      "listingsCount": 183,
+      "averageSizeSqm": 77.4
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-03",
+      "salePricePerSqm": 3300,
+      "rentPricePerSqm": 10.1,
+      "listingsCount": 200,
+      "averageSizeSqm": 78.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-04",
+      "salePricePerSqm": 3293,
+      "rentPricePerSqm": 10.2,
+      "listingsCount": 208,
+      "averageSizeSqm": 78.3
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-05",
+      "salePricePerSqm": 3313,
+      "rentPricePerSqm": 10.2,
+      "listingsCount": 218,
+      "averageSizeSqm": 77.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-06",
+      "salePricePerSqm": 3312,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 218,
+      "averageSizeSqm": 77.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-07",
+      "salePricePerSqm": 3340,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 222,
+      "averageSizeSqm": 78.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-08",
+      "salePricePerSqm": 3357,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 215,
+      "averageSizeSqm": 78.2
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-09",
+      "salePricePerSqm": 3333,
+      "rentPricePerSqm": 10.5,
+      "listingsCount": 198,
+      "averageSizeSqm": 79.2
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-10",
+      "salePricePerSqm": 3351,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 201,
+      "averageSizeSqm": 77.7
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-11",
+      "salePricePerSqm": 3341,
+      "rentPricePerSqm": 10.5,
+      "listingsCount": 190,
+      "averageSizeSqm": 76.6
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2025-12",
+      "salePricePerSqm": 3354,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 187,
+      "averageSizeSqm": 77.2
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-01",
+      "salePricePerSqm": 3374,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 187,
+      "averageSizeSqm": 78.9
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-02",
+      "salePricePerSqm": 3366,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 207,
+      "averageSizeSqm": 78.5
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-03",
+      "salePricePerSqm": 3413,
+      "rentPricePerSqm": 10.7,
+      "listingsCount": 210,
+      "averageSizeSqm": 76.4
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-04",
+      "salePricePerSqm": 3408,
+      "rentPricePerSqm": 10.8,
+      "listingsCount": 232,
+      "averageSizeSqm": 76.6
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-05",
+      "salePricePerSqm": 3428,
+      "rentPricePerSqm": 10.8,
+      "listingsCount": 242,
+      "averageSizeSqm": 78.8
+    },
+    {
+      "regionId": "st-poelten",
+      "period": "2026-06",
+      "salePricePerSqm": 3413,
+      "rentPricePerSqm": 10.9,
+      "listingsCount": 234,
+      "averageSizeSqm": 78.5
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-07",
+      "salePricePerSqm": 3465,
+      "rentPricePerSqm": 10.2,
+      "listingsCount": 178,
+      "averageSizeSqm": 75.8
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-08",
+      "salePricePerSqm": 3485,
+      "rentPricePerSqm": 10.2,
+      "listingsCount": 168,
+      "averageSizeSqm": 76.8
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-09",
+      "salePricePerSqm": 3483,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 163,
+      "averageSizeSqm": 74.4
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-10",
+      "salePricePerSqm": 3480,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 150,
+      "averageSizeSqm": 77
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-11",
+      "salePricePerSqm": 3484,
+      "rentPricePerSqm": 10.2,
+      "listingsCount": 141,
+      "averageSizeSqm": 74.7
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2024-12",
+      "salePricePerSqm": 3465,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 139,
+      "averageSizeSqm": 77
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-01",
+      "salePricePerSqm": 3458,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 144,
+      "averageSizeSqm": 76.7
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-02",
+      "salePricePerSqm": 3481,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 154,
+      "averageSizeSqm": 76.9
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-03",
+      "salePricePerSqm": 3484,
+      "rentPricePerSqm": 10.3,
+      "listingsCount": 151,
+      "averageSizeSqm": 77.3
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-04",
+      "salePricePerSqm": 3447,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 161,
+      "averageSizeSqm": 74.9
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-05",
+      "salePricePerSqm": 3449,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 167,
+      "averageSizeSqm": 75.5
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-06",
+      "salePricePerSqm": 3479,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 172,
+      "averageSizeSqm": 76.6
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-07",
+      "salePricePerSqm": 3462,
+      "rentPricePerSqm": 10.4,
+      "listingsCount": 164,
+      "averageSizeSqm": 75.1
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-08",
+      "salePricePerSqm": 3473,
+      "rentPricePerSqm": 10.5,
+      "listingsCount": 167,
+      "averageSizeSqm": 74.4
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-09",
+      "salePricePerSqm": 3475,
+      "rentPricePerSqm": 10.5,
+      "listingsCount": 160,
+      "averageSizeSqm": 75.4
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-10",
+      "salePricePerSqm": 3470,
+      "rentPricePerSqm": 10.5,
+      "listingsCount": 148,
+      "averageSizeSqm": 75.5
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-11",
+      "salePricePerSqm": 3444,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 144,
+      "averageSizeSqm": 75.2
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2025-12",
+      "salePricePerSqm": 3432,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 137,
+      "averageSizeSqm": 75.8
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-01",
+      "salePricePerSqm": 3468,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 141,
+      "averageSizeSqm": 74.7
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-02",
+      "salePricePerSqm": 3454,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 149,
+      "averageSizeSqm": 77.1
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-03",
+      "salePricePerSqm": 3440,
+      "rentPricePerSqm": 10.6,
+      "listingsCount": 155,
+      "averageSizeSqm": 75.6
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-04",
+      "salePricePerSqm": 3453,
+      "rentPricePerSqm": 10.7,
+      "listingsCount": 157,
+      "averageSizeSqm": 74.8
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-05",
+      "salePricePerSqm": 3435,
+      "rentPricePerSqm": null,
+      "listingsCount": 172,
+      "averageSizeSqm": 76.3
+    },
+    {
+      "regionId": "klagenfurt",
+      "period": "2026-06",
+      "salePricePerSqm": 3458,
+      "rentPricePerSqm": null,
+      "listingsCount": 163,
+      "averageSizeSqm": 75.9
+    }
+  ]
+}
