@@ -28,8 +28,7 @@ Weitere Skripte:
 
 | Befehl | Zweck |
 | --- | --- |
-| `npm run build` | Produktionsbuild (prüft zugleich Typen und Lint) |
-| `npm run start` | Produktionsbuild lokal ausliefern |
+| `npm run build` | Statischer Export nach `site/` (prüft zugleich Typen und Lint) |
 | `npm run typecheck` | TypeScript ohne Emit |
 | `npm run lint` | ESLint (next/core-web-vitals) |
 | `npm test` | Vitest: Berechnungs- und Formatierungslogik |
@@ -87,6 +86,21 @@ Seite ist auf `noindex` gesetzt. Diese Hinweise bitte nicht entfernen.
 
 Serverkomponenten sind der Standard; `"use client"` steht nur dort, wo
 Interaktion nötig ist (Charts, Auswahl, Beobachtungsliste, Abo-Schalter).
+
+### Statischer Export
+
+`npm run build` erzeugt einen vollständig statischen Export (`output: "export"`)
+im Ordner `site/`. Der Prototyp braucht keinen Server: Alle Seiten sind
+vorgerendert, sämtliche Interaktion läuft im Browser. Das Ergebnis lässt sich
+mit jedem Static-Hosting ausliefern, lokal etwa mit
+`npx http-server site`.
+
+Der Ordnername `site` ist bewusst gewählt und sollte nicht geändert werden: Die
+`vercel.json` im Wurzelverzeichnis des Repositories gehört zum Lagebild und
+schreibt `outputDirectory: "site"` fest. Vercel wendet sie auch auf ein Projekt
+an, dessen Root Directory auf `wohnmarkt` zeigt. Mit demselben Ordnernamen
+funktioniert der Deploy unter beiden Konfigurationen — der des Lagebilds wie
+der eigenen in `wohnmarkt/vercel.json`.
 
 ## Seiten
 
