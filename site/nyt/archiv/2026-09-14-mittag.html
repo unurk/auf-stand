@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#ffffff">
-  <link rel="manifest" href="manifest.webmanifest">
-  <script src="push-config.js"></script>
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../push-config.js"></script>
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Copilot">
@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <title>My Topics · NYT Briefing</title>
+  <title>Monday, September 14 · Midday Update · NYT Briefing</title>
   <style>
     /* Copilot · Die Presse — Richtung C „Briefing-Timeline" (Light, Presse-Stil)
        Schriften: Newsreader (editoriale Serif für Schlagzeilen), Archivo (UI + Text).
@@ -485,101 +485,45 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<h1>My Topics</h1>
-<div id="as-intro">
-  <p class="as-intro-text">Select the topics you want to follow. The questions help you gauge what's relevant to you.</p>
-  <button class="as-btn-primary" onclick="asOpen()">Select topics →</button>
-</div>
-<div id="as-cards" style="display:none">
-  <p style="font-size:13px;color:var(--muted);font-family:var(--sans);margin:0 0 16px">Tap a topic to select or deselect it.</p>
-  <div class="as-toggle-card" data-name="US politics, Congress and the White House" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US politics, Congress and the White House</div><div class="as-card-q">Do you follow US federal politics and decisions out of Washington?</div></div></div>
-<div class="as-toggle-card" data-name="Federal Reserve: interest rates and monetary policy" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Federal Reserve: interest rates and monetary policy</div><div class="as-card-q">Does the Fed&#x27;s rate path affect you — via a mortgage, savings or loans?</div></div></div>
-<div class="as-toggle-card" data-name="Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers</div><div class="as-card-q">Do you hold stocks, ETFs or a brokerage account, or follow the markets?</div></div></div>
-<div class="as-toggle-card" data-name="US economy, jobs and inflation" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US economy, jobs and inflation</div><div class="as-card-q">Do you notice the economy in daily life — prices, your job, the job market?</div></div></div>
-<div class="as-toggle-card" data-name="US foreign policy and national security" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">US foreign policy and national security</div><div class="as-card-q">Do you follow US foreign policy and its global consequences?</div></div></div>
-<div class="as-toggle-card" data-name="Middle East" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Middle East</div><div class="as-card-q">Do you follow developments in the Middle East?</div></div></div>
-<div class="as-toggle-card" data-name="Russia&#x27;s war in Ukraine" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Russia&#x27;s war in Ukraine</div><div class="as-card-q">Do you follow the war in Ukraine and its consequences?</div></div></div>
-<div class="as-toggle-card" data-name="Artificial intelligence and Big Tech" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Artificial intelligence and Big Tech</div><div class="as-card-q">Does AI affect you — as a user, at work, or because you follow the field?</div></div></div>
-<div class="as-toggle-card" data-name="Supreme Court and the law" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Supreme Court and the law</div><div class="as-card-q">Do you follow Supreme Court rulings and major legal decisions?</div></div></div>
-<div class="as-toggle-card" data-name="Immigration and the border" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Immigration and the border</div><div class="as-card-q">Is immigration policy relevant to you professionally or socially?</div></div></div>
-<div class="as-toggle-card" data-name="Climate and the environment" onclick="asToggle(this)"><div class="as-card-check">✓</div><div><div class="as-card-name">Climate and the environment</div><div class="as-card-q">Do you care about climate policy and the environment — personally or at work?</div></div></div>
-  <div class="as-confirm-row">
-    <span id="as-count" style="font-size:13px;color:var(--muted);font-family:var(--sans)">0 selected</span>
-    <button class="as-btn-primary" onclick="asConfirm()">Save</button>
-  </div>
-</div>
-<div id="topic-list" style="display:none">
-<div class="dossier-topic" data-topic-name="US politics, Congress and the White House"><h2>US politics, Congress and the White House<span class="schlagwort-badge">#Politics</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/us/university-core-curriculum-texas-politics.html" target="_blank" rel="noopener"><span class="topic-article-title">How University Core Curriculums Are Getting Political</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/12/world/europe/trump-irish-open-ireland-doonbeg.html" target="_blank" rel="noopener"><span class="topic-article-title">In Doonbeg, Trump’s Irish Open Visit Prompts Protests and Praise</span><span class="topic-article-date">13.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Federal Reserve: interest rates and monetary policy"><h2>Federal Reserve: interest rates and monetary policy<span class="schlagwort-badge">#Fed</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/us/politics/democrat-senate-menopause-gillibrand.html" target="_blank" rel="noopener"><span class="topic-article-title">As Midterms Rage, Gillibrand Wants Congress to Talk Menopause</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/arts/design/trump-kennedy-center-bankruptcy-closure.html" target="_blank" rel="noopener"><span class="topic-article-title">Kennedy Center Warns of Bankruptcy Unless Trump’s Name Is Added</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/us/democrats-populists.html" target="_blank" rel="noopener"><span class="topic-article-title">For Populist Democrats, a Movement Fueled by Anger at Both Parties</span><span class="topic-article-date">13.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers"><h2>Wall Street: S&amp;P 500, Nasdaq, Dow — direction and drivers<span class="schlagwort-badge">#Markets</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="US economy, jobs and inflation"><h2>US economy, jobs and inflation<span class="schlagwort-badge">#Economy</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/world/asia/japapn-okinawa-election-governor-conservative-china-economy.html" target="_blank" rel="noopener"><span class="topic-article-title">Okinawa Elects a Conservative Amid Fears About China and the Economy</span><span class="topic-article-date">14.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="US foreign policy and national security"><h2>US foreign policy and national security<span class="schlagwort-badge">#Foreign</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Middle East"><h2>Middle East<span class="schlagwort-badge">#MiddleEast</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Russia&#x27;s war in Ukraine"><h2>Russia&#x27;s war in Ukraine<span class="schlagwort-badge">#Ukraine</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/world/europe/ukraine-petraeus-russian-strike.html" target="_blank" rel="noopener"><span class="topic-article-title">Russian Strikes on Ukraine Hits Near David Petraeus, ex-C.I.A. Chief</span><span class="topic-article-date">13.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/business/trump-ukraine-diesel.html" target="_blank" rel="noopener"><span class="topic-article-title">Trump Blames Ukraine for Global Diesel Shortage</span><span class="topic-article-date">13.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Artificial intelligence and Big Tech"><h2>Artificial intelligence and Big Tech<span class="schlagwort-badge">#AI</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/science/ai-bioweapons.html" target="_blank" rel="noopener"><span class="topic-article-title">Is A.I. Raising the Chances of Biological Warfare?</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/business/defense-hiring-european-car-industry.html" target="_blank" rel="noopener"><span class="topic-article-title">Defense Hiring Will Ease, Not End, Pain in European Car Industry</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/world/americas/trinidad-assassination-plot-arrests.html" target="_blank" rel="noopener"><span class="topic-article-title">She Bashed the Government on a Private Call. Then She Was Detained for Months</span><span class="topic-article-date">14.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Supreme Court and the law"><h2>Supreme Court and the law<span class="schlagwort-badge">#Court</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/us/politics/utah-mormon-women-abortion-redistricting.html" target="_blank" rel="noopener"><span class="topic-article-title">A Gender War Explodes in Utah Over the Courts, Abortion and Representation</span><span class="topic-article-date">13.09</span></a></li></ul></div>
-<div class="dossier-topic" data-topic-name="Immigration and the border"><h2>Immigration and the border<span class="schlagwort-badge">#Immigration</span></h2><p class="dossier-empty">No recent articles on this topic.</p></div>
-<div class="dossier-topic" data-topic-name="Climate and the environment"><h2>Climate and the environment<span class="schlagwort-badge">#Climate</span></h2><ul class="topic-articles"><li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/us/politics/hegseth-pentagon-turmoil.html" target="_blank" rel="noopener"><span class="topic-article-title">Trying to Rid the Pentagon of Culture Wars, Hegseth Has Created His Own</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/14/us/university-core-curriculum-texas-politics.html" target="_blank" rel="noopener"><span class="topic-article-title">How University Core Curriculums Are Getting Political</span><span class="topic-article-date">14.09</span></a></li>
-<li class="topic-article"><a href="https://www.nytimes.com/2026/09/13/climate/epa-power-plant-climate-rules.html" target="_blank" rel="noopener"><span class="topic-article-title">E.P.A. Will Erase Limits on Climate Pollution From Power Plants</span><span class="topic-article-date">14.09</span></a></li></ul></div>
-  <button class="reset-link" onclick="asReset()">Edit topic selection</button>
-</div>
-<script>
-(function(){
-var TOPICS=[{"name": "US politics, Congress and the White House", "kw": "Politics", "q": "Do you follow US federal politics and decisions out of Washington?"}, {"name": "Federal Reserve: interest rates and monetary policy", "kw": "Fed", "q": "Does the Fed's rate path affect you — via a mortgage, savings or loans?"}, {"name": "Wall Street: S&P 500, Nasdaq, Dow — direction and drivers", "kw": "Markets", "q": "Do you hold stocks, ETFs or a brokerage account, or follow the markets?"}, {"name": "US economy, jobs and inflation", "kw": "Economy", "q": "Do you notice the economy in daily life — prices, your job, the job market?"}, {"name": "US foreign policy and national security", "kw": "Foreign", "q": "Do you follow US foreign policy and its global consequences?"}, {"name": "Middle East", "kw": "MiddleEast", "q": "Do you follow developments in the Middle East?"}, {"name": "Russia's war in Ukraine", "kw": "Ukraine", "q": "Do you follow the war in Ukraine and its consequences?"}, {"name": "Artificial intelligence and Big Tech", "kw": "AI", "q": "Does AI affect you — as a user, at work, or because you follow the field?"}, {"name": "Supreme Court and the law", "kw": "Court", "q": "Do you follow Supreme Court rulings and major legal decisions?"}, {"name": "Immigration and the border", "kw": "Immigration", "q": "Is immigration policy relevant to you professionally or socially?"}, {"name": "Climate and the environment", "kw": "Climate", "q": "Do you care about climate policy and the environment — personally or at work?"}];
-var PREF_KEY='nyt_prefs';
-var selected=new Set();
-function show(id){['as-intro','as-cards','topic-list'].forEach(function(i){
-  document.getElementById(i).style.display=i===id?'':'none';
-});}
-function filterTopics(prefs){
-  document.getElementById('topic-list').querySelectorAll('.dossier-topic').forEach(function(el){
-    el.style.display=(!prefs||prefs.indexOf(el.dataset.topicName)>=0)?'':'none';
-  });
-}
-function updateCount(){
-  document.getElementById('as-count').textContent=selected.size+' selected';
-}
-try{
-  var saved=JSON.parse(localStorage.getItem(PREF_KEY)||'null');
-  if(saved&&saved.length){show('topic-list');filterTopics(saved);}
-  else{show('as-intro');}
-}catch(e){show('as-intro');}
-window.asOpen=function(){
-  try{selected=new Set(JSON.parse(localStorage.getItem(PREF_KEY)||'[]'));}
-  catch(e){selected=new Set();}
-  document.querySelectorAll('.as-toggle-card').forEach(function(el){
-    el.classList.toggle('selected',selected.has(el.dataset.name));
-  });
-  updateCount();show('as-cards');
-};
-window.asToggle=function(el){
-  var name=el.dataset.name;
-  if(selected.has(name)){selected.delete(name);el.classList.remove('selected');}
-  else{selected.add(name);el.classList.add('selected');}
-  updateCount();
-};
-window.asConfirm=function(){
-  localStorage.setItem(PREF_KEY,JSON.stringify(Array.from(selected)));
-  show('topic-list');filterTopics(Array.from(selected));
-};
-window.asReset=function(){window.asOpen();};
-})();
-</script>
+<header class="lagebild-header"><p class="kicker">Monday, September 14, 2026 · Midday Update</p><h1>A quick pause.</h1><p class="byline">By the New York Times briefing desk · ca. 2 min.</p></header><div class="highlights"><p><strong>Today&#x;s headlines:</strong></p>
+  <p>Oil prices surge on Saudi pipeline attack</p>
+  <p>Pentagon turmoil over Defense Secretary&#x;s management</p>
+  <p>New synthetic drug cychlorphine arrives in San Francisco</p>
+  </div><hr>
+  <h2>Oil prices jump on Saudi pipeline damage</h2>
+  <p><strong>What&#x27;s new:</strong> Crude futures rose sharply today after a drone attack damaged a critical pipeline in Saudi Arabia, raising concerns that energy supplies from the Persian Gulf could tighten further. Traders are pricing in the risk of sustained supply constraints in a region already strained by geopolitical tensions.</p>
+  <p><strong>Why it matters:</strong> Higher oil prices ripple directly into gas at the pump and heating costs this winter. For the broader economy, a sustained spike could add pressure on inflation and complicate the Federal Reserve&#x27;s efforts to keep rate cuts on track.</p>
+  <p class="reifegrad"><span class="rg rg-gilt">Effective today</span></p>
+  <p><span class="ressort" style="--h:175">Business</span> <a class="source-link" href="https://www.nytimes.com/2026/09/13/business/oil-prices-iran-war.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-09-14|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Oil prices jump on Saudi pipeline damage" data-karte="2026-09-14-mittag-karte.png">↗ Share</button></div><hr>
+  <h2>Hegseth&#x27;s Pentagon leadership creating mistrust amid wartime gaps</h2>
+  <p><strong>What&#x27;s new:</strong> Defense Secretary Pete Hegseth&#x27;s management approach has bred internal friction and distraction at the Pentagon while the military faces concrete operational shortfalls—including a critical deficit in missile interceptors. The culture-war tensions are compounding readiness challenges at a moment when the U.S. needs operational focus.</p>
+  <p><strong>Why it matters:</strong> A fractured Pentagon leadership undermines military effectiveness and sends mixed signals to allies and adversaries alike. Missile interceptor shortfalls have direct bearing on national defense posture.</p>
+  <p class="reifegrad"><span class="rg rg-beschlossen">Decided</span></p>
+  <p><span class="ressort" style="--h:25">US</span> <a class="source-link" href="https://www.nytimes.com/2026/09/14/us/politics/hegseth-pentagon-turmoil.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-09-14|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Hegseth&amp;#x27;s Pentagon leadership creating mistrust amid wartime gaps">↗ Share</button></div><hr>
+  <h2>Potent synthetic drug cychlorphine documented in San Francisco</h2>
+  <p><strong>What&#x27;s new:</strong> An autopsy in San Francisco has confirmed the presence of cychlorphine, a drug far more potent than fentanyl, marking its documented arrival in the city. City officials and community advocates are mobilizing to contain its spread before it becomes endemic.</p>
+  <p><strong>Why it matters:</strong> A new synthetic opioid of this potency could accelerate overdose deaths in a city already struggling with the fentanyl crisis. Early intervention now is critical to preventing another wave of the overdose epidemic.</p>
+  <p class="reifegrad"><span class="rg rg-gilt">Effective today</span></p>
+  <p><span class="ressort" style="--h:25">US</span> <a class="source-link" href="https://www.nytimes.com/2026/09/14/us/san-francisco-autopsy-cychlorphine.html">Read in the NYT →</a></p>
+<div class="article-fb" data-key="2026-09-14|mittag|2"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Less</button><button class="share-btn" data-title="Potent synthetic drug cychlorphine documented in San Francisco">↗ Share</button></div><hr>
+  <p class="geprueft">🔍 <em>15 stories checked</em> · 3 included.</p><h2 class="pruef-head">🔍 Checked, not included</h2>
+  <p>- AI and biological warfare — experts assess emerging risks, but no regulatory change today</p>
+  <p>- Volkswagen factory conversion to defense manufacturing — signals hope but remains logistically uncertain</p>
+  <p>- Poll accuracy after primary misses — analytical piece, no shift in methodology or confidence</p>
+  <hr>
+  
+  <div class="done"><span class="done-check">✓</span> You&#x27;re informed — day 10 in a row — reading time ca. 135 seconds. Next briefing: today at 16:00.</div>
+  <hr>
 </div>
 </div>
 <nav class="tabbar">
-  <a href="index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Briefing</span></a>
-  <a href="dossier.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Topics</span></a>
-  <a href="archiv/index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archive</span></a>
+  <a href="../index.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Briefing</span></a>
+  <a href="../dossier.html" class="tab "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>Topics</span></a>
+  <a href="../archiv/index.html" class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3 8l9 4 9-4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg><span>Archive</span></a>
   <a href="https://www.nytimes.com/section/todayspaper" class="tab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2V5z"/><path d="M16 8h4v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 11h6M7 14h4"/></svg><span>Today's Paper</span></a>
-  <a href="../" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h5M8 15h3"/></svg><span>Presse</span></a>
+  <a href="../../" class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h5M8 15h3"/></svg><span>Presse</span></a>
 </nav>
 </div>
 <script>
@@ -793,7 +737,7 @@ window.asReset=function(){window.asOpen();};
   // PWA: Service Worker registrieren
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      navigator.serviceWorker.register('../sw.js').catch(function(){});
     });
   }
 })();
