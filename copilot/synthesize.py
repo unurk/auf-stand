@@ -62,6 +62,42 @@ def _format_verlauf(entries: list[dict]) -> str:
     return " ".join(parts)
 
 
+def ausgabe_zweck(
+    edition: str,
+    lang: str = "de",
+    termine: list[dict] | None = None,
+    bisher_heute: list[str] | None = None,
+) -> str:
+    """Block „Zweck dieser Ausgabe" für den Prompt — oder '' (z. B. catchup).
+
+    Jede der vier Ausgaben hat einen eigenen Job: 06 Überblick, 11 nur Neues,
+    16 Update, 20 Einordnung + Ausblick. Dazu bekommen die späteren Ausgaben die
+    heute schon gebrachten Punkt-Titel (gegen Wiederholung bzw. für die
+    Einordnung am Abend) und die Abend-Ausgabe die Termine von morgen.
+    """
+    from .vorausschau import get_upcoming
+
+    zwecke = i18n.t(lang, "zweck")
+    text = zwecke.get(edition) if isinstance(zwecke, dict) else None
+    if not text:
+        return ""
+    teile = [i18n.t(lang, "zweck_heading"), text]
+    if bisher_heute and edition != "morgen":
+        teile.append("")
+        teile.append(i18n.t(lang, "bisher_heute_heading"))
+        teile.extend(f"- {h}" for h in bisher_heute)
+    if edition == "abend":
+        morgen = [
+            t.get("name", "") for t in get_upcoming(termine or [], days_ahead=1)
+            if t["delta_days"] == 1 and t.get("name")
+        ]
+        if morgen:
+            teile.append("")
+            teile.append(i18n.t(lang, "termine_morgen_heading"))
+            teile.extend(f"- {n}" for n in morgen)
+    return "\n".join(teile)
+
+
 def build_prompt(
     articles: list,
     topics: list,
@@ -78,6 +114,8 @@ def build_prompt(
     profil: dict | None = None,
     missing_hint: str = "",
     budget_hint: str = "",
+    edition: str = "",
+    bisher_heute: list[str] | None = None,
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -90,6 +128,7 @@ def build_prompt(
         .replace("{TRACKER_SECTION_HINT}", tracker_hint)
         .replace("{VORAUSSCHAU_SECTION}", vorausschau)
         .replace("{NICHT_AUFGENOMMEN_SECTION}", i18n.t(lang, "nicht_aufgenommen_hint"))
+        .replace("{AUSGABE_ZWECK}", ausgabe_zweck(edition, lang, termine, bisher_heute))
         .replace("{LESEZEIT}", "90")
         .replace("{NAECHSTE_AUSGABE}", next_edition)
     )

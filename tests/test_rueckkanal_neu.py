@@ -3,6 +3,10 @@ import pytest
 
 from copilot import rueckkanal
 
+from datetime import date as _date, timedelta as _td
+
+_TAG = (_date.today() - _td(days=1)).isoformat()  # relativ: Retention-Fenster
+
 
 class FakeTelegram:
     """Minimaler Ersatz für das telegram-Modul — merkt sich, was rausgegangen wäre."""
@@ -54,34 +58,34 @@ def test_profil_tap_mit_unbekanntem_wert_wird_verworfen(tg):
 
 def test_lese_tap_wird_notiert(tg):
     st: dict = {}
-    assert rueckkanal._handle_callback(_cq("read|2026-07-24|abend"), {"42"}, st, tg) == 1
+    assert rueckkanal._handle_callback(_cq(f"read|{_TAG}|abend"), {"42"}, st, tg) == 1
     assert st["read_events"][0]["quelle"] == "telegram_tap"
     assert "Tag in Folge" in tg.callbacks[0]
 
 
 def test_fehlt_tap_erklaert_den_befehl(tg):
     st: dict = {}
-    assert rueckkanal._handle_callback(_cq("fehlt|2026-07-24|abend"), {"42"}, st, tg) == 0
+    assert rueckkanal._handle_callback(_cq(f"fehlt|{_TAG}|abend"), {"42"}, st, tg) == 0
     assert any("/fehlt" in a for a in tg.alerts)
 
 
 def test_artikel_feedback_zaehlt_als_lese_signal(tg):
-    st = {"edition_points": {"2026-07-24|abend": ["Ein Punkt"]}}
-    rueckkanal._handle_callback(_cq("artfb|2026-07-24|abend|0|up"), {"42"}, st, tg)
+    st = {"edition_points": {f"{_TAG}|abend": ["Ein Punkt"]}}
+    rueckkanal._handle_callback(_cq(f"artfb|{_TAG}|abend|0|up"), {"42"}, st, tg)
     assert st["article_feedback"][0]["rating"] == "up"
     assert st["read_events"][0]["quelle"] == "artfb"
 
 
 def test_ausgaben_feedback_zaehlt_als_lese_signal(tg):
     st: dict = {}
-    rueckkanal._handle_callback(_cq("fb|2026-07-24|abend|up"), {"42"}, st, tg)
+    rueckkanal._handle_callback(_cq(f"fb|{_TAG}|abend|up"), {"42"}, st, tg)
     assert st["feedback"][0]["rating"] == "up"
     assert st["read_events"][0]["quelle"] == "fb"
 
 
 def test_fremde_chat_id_wird_ignoriert(tg):
     st: dict = {}
-    assert rueckkanal._handle_callback(_cq("read|2026-07-24|abend", "999"), {"42"}, st, tg) == 0
+    assert rueckkanal._handle_callback(_cq(f"read|{_TAG}|abend", "999"), {"42"}, st, tg) == 0
     assert "read_events" not in st
 
 

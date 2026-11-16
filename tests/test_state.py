@@ -4,6 +4,13 @@ from datetime import datetime, timedelta, timezone
 from copilot import state
 from copilot.fetch import Article
 
+from datetime import date as _date, timedelta as _td
+
+# Relativ zu heute: Der State räumt alte Einträge weg (Retention), feste
+# Daten fielen sonst mit der Zeit aus dem Fenster und die Tests kippten.
+_TAG = (_date.today() - _td(days=2)).isoformat()
+_VORHER = (_date.today() - _td(days=5)).isoformat()
+
 
 def _art(article_id: str) -> Article:
     return Article(article_id, f"Titel {article_id}", "Teaser", "https://x/{article_id}", "Politik", None)
@@ -33,10 +40,10 @@ def test_update_dossier_ordnet_zeile_dem_tracker_zu():
     )
     topics = [{"name": "EZB-Zinsentscheidungen", "schlagwort": "EZB"}]
     s: dict = {}
-    state.update_dossier(s, lagebild, topics, "2026-07-04")
+    state.update_dossier(s, lagebild, topics, _TAG)
     entries = s["dossier"]["EZB-Zinsentscheidungen"]
     assert len(entries) == 1
-    assert entries[0]["date"] == "2026-07-04"
+    assert entries[0]["date"] == _TAG
     # Markdown, Link und Label-Präfixe sind entfernt
     summary = entries[0]["summary"]
     assert "**" not in summary and "https" not in summary
@@ -45,7 +52,7 @@ def test_update_dossier_ordnet_zeile_dem_tracker_zu():
 
 def test_update_dossier_ohne_themen_abschnitt():
     s: dict = {}
-    state.update_dossier(s, "# Lagebild\n## 1️⃣ Punkt\nText", [{"name": "EZB", "schlagwort": "EZB"}], "2026-07-04")
+    state.update_dossier(s, "# Lagebild\n## 1️⃣ Punkt\nText", [{"name": "EZB", "schlagwort": "EZB"}], _TAG)
     assert "dossier" not in s
 
 
@@ -56,10 +63,10 @@ def test_strip_markdown():
 
 def test_feedback_summary_letzte_bewertung_zaehlt():
     s: dict = {}
-    state.record_feedback(s, "2026-07-04", "morgen", "down", "1")
-    state.record_feedback(s, "2026-07-04", "morgen", "up", "1")  # überschreibt
-    state.record_feedback(s, "2026-07-04", "abend", "down", "1")
-    summary = state.feedback_summary(s, "2026-07-01")
+    state.record_feedback(s, _TAG, "morgen", "down", "1")
+    state.record_feedback(s, _TAG, "morgen", "up", "1")  # überschreibt
+    state.record_feedback(s, _TAG, "abend", "down", "1")
+    summary = state.feedback_summary(s, _VORHER)
     assert summary == {"up": 1, "down": 1, "total": 2}
 
 

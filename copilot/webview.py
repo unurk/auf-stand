@@ -12,6 +12,7 @@ import yaml
 
 from . import i18n as _i18n
 from . import podcast as _podcast
+from . import qualitaet as _qualitaet
 from . import render as _render
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -1200,7 +1201,15 @@ def _add_article_feedback(content: str, datum: str, edition: str, lang: str = "d
         )
         return m.group(0).rstrip() + bar
 
-    return re.sub(r"<h2>(?!Deine Themen|Your Topics).*?(?=<h2>|<hr>)", _insert, content, flags=re.DOTALL)
+    # Ende eines Artikels: die nächste Überschrift — auch mit Attributen wie
+    # <h2 class="pruef-head"> oder <h2 class="topic-summary-head"> —, die Prüf-
+    # Zählzeile (steht vor dem eingeklappten Block), ein <hr> oder das Ende.
+    # Vorher galt nur ein nacktes <h2> als Ende: Die Knöpfe des letzten Artikels
+    # landeten dadurch im zugeklappten Block „Geprüft, nicht aufgenommen".
+    return re.sub(
+        r'<h2>(?!Deine Themen|Your Topics).*?(?=<h2[\s>]|<hr>|<p class="geprueft">|\Z)',
+        _insert, content, flags=re.DOTALL,
+    )
 
 
 _REIFEGRAD_KLASSEN = [
@@ -1236,6 +1245,28 @@ def _enhance_neu(content: str, lang: str = "de") -> str:
             f"{wert}</span></p>"
         )
 
+    # Reifegrad nur bei Politik/Recht/Regelungen. Gleiches Gate wie nach der
+    # Synthese (qualitaet.reifegrad_passt) — hier zusätzlich, damit auch bereits
+    # archivierte Ausgaben beim Site-Build kein „Gilt ab …" an einem Unfall tragen.
+    rg_re = re.compile(
+        rf"(?:<p><strong>{label_reifegrad}:</strong>|<p class=\"reifegrad\">)\s*(.*?)</p>\s*",
+        re.DOTALL,
+    )
+
+    def _punkt(m: re.Match) -> str:
+        block = m.group(0)
+        rg = rg_re.search(block)
+        if not rg:
+            return block
+        kopf = re.search(r"<h2[^>]*>(.*?)</h2>", block, re.DOTALL)
+        text = re.sub(r"<[^>]+>", " ", block[: rg.start()] + block[rg.end():])
+        if _qualitaet.reifegrad_passt(
+            re.sub(r"<[^>]+>", "", rg.group(1)), text, kopf.group(1) if kopf else ""
+        ):
+            return block
+        return block[: rg.start()] + block[rg.end():]
+
+    content = re.sub(r"<h2>.*?(?=<h2[\s>]|<hr>|\Z)", _punkt, content, flags=re.DOTALL)
     content = re.sub(
         rf"<p><strong>{label_reifegrad}:</strong>\s*(.*?)</p>", _rg, content, flags=re.DOTALL
     )
@@ -1267,6 +1298,9 @@ def _enhance_neu(content: str, lang: str = "de") -> str:
 
 def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str = "de") -> str:
     """Verleiht dem Roh-Inhalt Die-Presse-/NYT-Charakter (Pills, Kicker, Highlight-Box)."""
+    # Fremdzeichen vom Modell (z. B. „⣣" in „Heute wichtig") — auch für bereits
+    # archivierte Ausgaben, die der Site-Build erneut durchläuft.
+    content = _qualitaet.bereinige_zeichen(content)
     content = re.sub(
         r'<div class="audio-player">.*?</div>\s*', "", content, flags=re.DOTALL
     )

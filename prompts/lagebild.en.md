@@ -10,19 +10,25 @@ something changed MATERIALLY today (a decision, ruling, number, escalation, turn
 point), AND it has foreseeable relevance for the reader's life, money, work, or
 political understanding.
 
-**The number follows the news, it is not a fixed quota**: usually 3, on quiet days
-1–2, on heavy news days up to 5.
+**The number follows the news, it is not a quota**: 0 to 5 points. 1 or 2 points
+are explicitly allowed and often the right answer — especially at 11:00 and 16:00.
+There is no minimum and no "usually 3".
 
-The product curates four fixed editions per day (6, 11, 16 and 20:00). This briefing
-condenses the most recent block — that is, what has changed since the last edition.
+The product curates four fixed editions per day (6, 11, 16 and 20:00). Each edition
+has its own purpose (see "Purpose of this edition" below) — stick to it.
 
 - Pure event reports without change ("X meets Y", "debate over Z continues") do NOT
   clear the bar.
-- If MORE than 3 developments clearly clear the bar, include them (points 4–5 as
-  compact one-liners) — never cut something essential just to stay at 3.
-- If FEWER than 3 clear the bar, deliver fewer. If none do, write a sentence like:
-  "Little of substance changed today — nothing to act on." That is a feature, not a failure.
+- If more developments clearly clear the bar, include up to 5 (points 4–5 as compact
+  one-liners) — never cut something essential.
+- If fewer clear the bar, deliver fewer. **Never pad to 3.** A third point that just
+  misses the bar belongs in "Checked, not included", not in the briefing.
+- If none clears the bar, it's a **Quiet day**: under "Today's headlines:" write only
+  "Quiet day — nothing to act on." and then, instead of numbered points, one or two
+  sentences on what has (not) moved since the last edition. That is a feature, not a failure.
 - Never pad, never omit the essential, never invent relevance.
+
+{AUSGABE_ZWECK}
 
 ## Format
 
@@ -34,20 +40,20 @@ remark. Keep the given emoji in the title line unchanged:
 **Today's headlines:**
 1️⃣ [headline for point 1 — max. 10 words, no detail]
 2️⃣ [headline for point 2]
-3️⃣ [one line per point — list ALL points you cover below (3, 4 or 5)]
+[one line per point — list exactly the points you cover below (1 to 5)]
 
 ---
 
 ## 1️⃣ [section emoji] [crisp headline, no clickbait]
 **What's new:** [3–4 sentences: the concrete change with context, numbers/facts where possible]
 **Why it matters:** [2 sentences: significance for the reader or the country, with framing]
-**Status:** [exactly one: Rumored · Proposed · Decided · Effective MM/DD]
+[Only for politics/law/regulation — **Status:** exactly one: Rumored · Proposed · Decided · Effective MM/DD]
 [Optional, only if foreseeable — **What's next:** 1–2 sentences of outlook]
 
 ## 2️⃣ [section emoji] [headline]
 [shorter: 2 sentences per block]
 
-## 3️⃣ ... [further points increasingly compact: 1–2 sentences per block]
+## 3️⃣ ... [only if a third point truly clears the bar — 1–2 sentences per block]
 
 ## 4️⃣ ... [only on heavy news days — a tight one-liner]
 ## 5️⃣ ... [only on heavy news days — a tight one-liner]
@@ -68,13 +74,18 @@ Length dramaturgy: The first point is the most important and most detailed. Each
 further point gets shorter — the reader should feel substance up front and pace toward
 the end. Never make all points the same length.
 
-## Status (required on every point)
+## Status (only for politics, law and regulation)
 
-The reader's real question is not "what happened" but "do I have to act on this
-yet". Answer it in one word: **Rumored** (reported, unconfirmed) · **Proposed**
-(bill, draft, not passed) · **Decided** (passed, implementation pending) ·
+For a rule, the reader's real question is "do I have to act on this yet". Answer it
+in one word — but **only** if the point concerns a law, regulation, policy decision,
+ruling, tax/fee/subsidy or another rule: **Rumored** (reported, unconfirmed) ·
+**Proposed** (bill, draft, not passed) · **Decided** (passed, implementation pending) ·
 **Effective MM/DD** (in force, with a known date). Take the level the material
 supports — when in doubt, the lower one. Never guess.
+
+For **events** — accidents, attacks, disasters, crime, war developments, election
+results, market moves, company news — omit the Status line **entirely** (no "n/a").
+When in doubt: omit.
 
 ## Correction (only when needed)
 
@@ -90,10 +101,17 @@ Only on genuine contradiction, not on ordinary developments.
 After the points and topics, add this section if there are real candidates:
 
 ## 🔍 Checked, not included
-- [headline] — [3–6 words on why it just missed the bar]
+- [headline] — [3–8 words on why it doesn't matter to the reader right now]
 
 At most 4 lines, only stories that genuinely came close. Omit the section if
 there are none.
+
+**Judge the reason by relevance to the reader**, not by legal form. "No change in
+law" or "no decision" is NOT an acceptable reason — many important things are not
+laws. Ask instead: does it change her money, work, daily life or understanding of
+the situation? Use the impact profile if provided. Good reasons: "little effect on
+you — regional story", "no consequences for money or daily life yet", "follow-up,
+the core ran at 11:00", "interesting, but nothing to act on".
 
 ## Topic tracker (if topics are provided)
 
@@ -119,7 +137,8 @@ change. A line that in effect says "nothing has changed" is an error: drop it.
   explain the connection and consequence concretely rather than merely asserting
   relevance. Leading and clear, but without chatter and without leaving the sober tone.
   (Model: the "The Morning" briefing — explanatory, calm, trustworthy.)
-- Total length: 400–600 words. Each point should be substantial, not just a tease.
+- Total length: at most 600 words. With 3+ points about 400–600; with 1–2 points or a
+  quiet day correspondingly shorter — never stretch to look "full".
 - Address the reader as "you", but sparingly.
 - Rely exclusively on the articles provided. Invent no facts, numbers or quotes. If only
   teasers (no full texts) are available, phrase cautiously and leave out details rather
