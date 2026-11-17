@@ -254,3 +254,58 @@ def entferne_reifegrad_bei_ereignissen(markdown: str) -> tuple[str, int]:
             entfernt += 1
         neu.append(teil)
     return "".join(neu), entfernt
+
+
+# ── „Gilt ab" nur mit echtem Datum ───────────────────────────────────────────
+# Im Prompt steht als Format „Gilt ab TT.MM." — das Modell hat das am 17.11.
+# wörtlich übernommen („Gilt ab TT.MM" als Badge). Ein „Gilt ab" ohne Datum
+# sagt der Leserin nichts und sieht kaputt aus: Es fällt auf „Beschlossen"
+# zurück (der Beschluss ist ja offenbar gefallen, nur das Datum fehlt).
+_GILT_AB_RE = re.compile(r"^\s*(?:gilt ab|effective)\b", re.IGNORECASE)
+_MONATE = (
+    r"j[äa]n(?:ner|uar)?|feb(?:ruar)?|märz|maerz|mär|apr(?:il)?|mai|jun[i]?|jul[i]?|"
+    r"aug(?:ust)?|sep(?:t(?:ember)?)?|okt(?:ober)?|nov(?:ember)?|dez(?:ember)?|"
+    r"january|february|march|mar|april|may|june|july|august|september|"
+    r"oct(?:ober)?|november|dec(?:ember)?"
+)
+_DATUM_RE = re.compile(
+    r"\b\d{1,2}\.\s?\d{1,2}\.(?:\s?\d{2,4}\b)?"            # 17.11.  1.1.2027
+    r"|\b(?:0?[1-9]|[12]\d|3[01])\.\s?(?:0?[1-9]|1[0-2])\b"  # 17.11 (Badge ohne Punkt)
+    r"|\b\d{1,2}/\d{1,2}(?:/\d{2,4})?\b"                   # 11/17  1/1/2027
+    r"|\b\d{4}-\d{2}-\d{2}\b"                              # 2027-01-01
+    rf"|\b\d{{1,2}}\.?\s+(?:{_MONATE})\b\.?"                # 1. Jänner 2027, 17 Nov
+    rf"|\b(?:{_MONATE})\.?\s+\d{{1,2}}\b"                   # November 17, Jan. 1
+    rf"|\b(?:{_MONATE})\.?\s+\d{{4}}\b",                     # Jänner 2027
+    re.IGNORECASE,
+)
+
+
+def hat_echtes_datum(text: str) -> bool:
+    """True, wenn der Text ein konkretes Datum enthält (nicht „TT.MM"/„MM/DD")."""
+    return bool(_DATUM_RE.search(text or ""))
+
+
+def normalisiere_reifegrad(wert: str, lang: str = "de") -> str:
+    """„Gilt ab"/„Effective" ohne echtes Datum → „Beschlossen"/„Decided".
+
+    Alle anderen Werte (auch „Gilt ab 17.11.") bleiben unverändert.
+    """
+    if _GILT_AB_RE.match(wert or "") and not hat_echtes_datum(wert):
+        return "Decided" if lang == "en" else "Beschlossen"
+    return wert
+
+
+def korrigiere_reifegrad_platzhalter(markdown: str, lang: str = "de") -> tuple[str, int]:
+    """Wendet normalisiere_reifegrad auf alle Reifegrad-/Status-Zeilen an. → (md, anzahl)"""
+    anzahl = 0
+
+    def _ersetze(m: re.Match) -> str:
+        nonlocal anzahl
+        wert = m.group("wert").strip()
+        neu = normalisiere_reifegrad(wert, lang)
+        if neu == wert:
+            return m.group(0)
+        anzahl += 1
+        return m.group(0).replace(m.group("wert"), neu, 1)
+
+    return _REIFEGRAD_ZEILE_RE.sub(_ersetze, markdown), anzahl
