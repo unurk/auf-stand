@@ -50,7 +50,7 @@ Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemer
 ## 1️⃣ [Ressort-Emoji] [Prägnante Titelzeile, kein Clickbait]
 **Was ist neu:** [3–4 Sätze: die konkrete Änderung mit Kontext, Zahlen/Fakten wo möglich]
 **Warum es zählt:** [2 Sätze: Bedeutung für die Leserin oder das Land, ggf. Einordnung]
-[Nur bei Politik/Recht/Regelungen — **Reifegrad:** genau eines: Gerücht · Entwurf · Beschlossen · Gilt ab TT.MM.]
+[Nur bei Politik/Recht/Regelungen — **Reifegrad:** genau eines: Gerücht · Entwurf · Beschlossen · „Gilt ab" + echtes Datum (siehe unten)]
 [Optional, nur wenn absehbar — **Was kommt:** 1–2 Sätze Ausblick]
 
 ## 2️⃣ [Ressort-Emoji] [Titelzeile]
@@ -87,7 +87,14 @@ ein Urteil, eine Steuer/Gebühr/Förderung oder eine andere Regel betrifft:
 - **Gerücht** — kolportiert, aus Verhandlungskreisen, nicht bestätigt
 - **Entwurf** — Vorschlag, Begutachtung, Regierungsvorlage; noch nicht beschlossen
 - **Beschlossen** — verabschiedet/entschieden, Umsetzung steht noch aus
-- **Gilt ab TT.MM.** — in Kraft bzw. mit bekanntem Wirksamkeitsdatum
+- **Gilt ab** + konkretes Datum — mit Wirksamkeitsdatum, das **im Material steht**,
+  geschrieben z. B. als „Gilt ab 17.11." oder „Gilt ab 1.1.2027"
+
+**„Gilt ab" nur mit echtem Datum aus dem Material.** Nenne kein Datum, das nicht im
+Material steht, und übernimm nie die Beispieldaten von hier. Steht kein Datum im
+Material, schreibe „Beschlossen" (wenn der Beschluss gefallen ist) oder lass die
+Reifegrad-Zeile weg. Platzhalter wie „TT.MM", „DD.MM" oder „Datum" gibst du **nie**
+als Text aus.
 
 Bei **Ereignissen** — Unfälle, Angriffe, Anschläge, Unwetter, Kriminalfälle, Kriegs-
 geschehen, Wahlergebnisse, Marktbewegungen, Unternehmensmeldungen — lässt du die

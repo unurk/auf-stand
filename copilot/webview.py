@@ -1239,7 +1239,7 @@ def _enhance_neu(content: str, lang: str = "de") -> str:
     label_fuerdich = "What it means for you" if lang == "en" else "Für dich konkret"
 
     def _rg(m: re.Match) -> str:
-        wert = m.group(1).strip().rstrip(".")
+        wert = _qualitaet.normalisiere_reifegrad(m.group(1).strip(), lang).rstrip(".")
         return (
             f'<p class="reifegrad"><span class="rg {_reifegrad_klasse(wert)}">'
             f"{wert}</span></p>"
@@ -1267,6 +1267,21 @@ def _enhance_neu(content: str, lang: str = "de") -> str:
         return block[: rg.start()] + block[rg.end():]
 
     content = re.sub(r"<h2>.*?(?=<h2[\s>]|<hr>|\Z)", _punkt, content, flags=re.DOTALL)
+    # Bereits gerenderte Badges (Archiv, Site-Build): Platzhalter wie
+    # „Gilt ab TT.MM" ohne echtes Datum fallen auf „Beschlossen" zurück.
+    def _rg_archiv(m: re.Match) -> str:
+        wert = _qualitaet.normalisiere_reifegrad(m.group(1).strip(), lang)
+        if wert == m.group(1).strip():
+            return m.group(0)
+        return (
+            f'<p class="reifegrad"><span class="rg {_reifegrad_klasse(wert)}">'
+            f"{wert}</span></p>"
+        )
+
+    content = re.sub(
+        r'<p class="reifegrad"><span class="rg [^"]*">(.*?)</span></p>', _rg_archiv, content,
+        flags=re.DOTALL,
+    )
     content = re.sub(
         rf"<p><strong>{label_reifegrad}:</strong>\s*(.*?)</p>", _rg, content, flags=re.DOTALL
     )

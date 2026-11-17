@@ -47,7 +47,7 @@ remark. Keep the given emoji in the title line unchanged:
 ## 1️⃣ [section emoji] [crisp headline, no clickbait]
 **What's new:** [3–4 sentences: the concrete change with context, numbers/facts where possible]
 **Why it matters:** [2 sentences: significance for the reader or the country, with framing]
-[Only for politics/law/regulation — **Status:** exactly one: Rumored · Proposed · Decided · Effective MM/DD]
+[Only for politics/law/regulation — **Status:** exactly one: Rumored · Proposed · Decided · "Effective" + real date (see below)]
 [Optional, only if foreseeable — **What's next:** 1–2 sentences of outlook]
 
 ## 2️⃣ [section emoji] [headline]
@@ -80,8 +80,14 @@ For a rule, the reader's real question is "do I have to act on this yet". Answer
 in one word — but **only** if the point concerns a law, regulation, policy decision,
 ruling, tax/fee/subsidy or another rule: **Rumored** (reported, unconfirmed) ·
 **Proposed** (bill, draft, not passed) · **Decided** (passed, implementation pending) ·
-**Effective MM/DD** (in force, with a known date). Take the level the material
+**Effective** + a concrete date that **appears in the material** (written e.g. as
+"Effective Nov. 17" or "Effective Jan. 1, 2027"). Take the level the material
 supports — when in doubt, the lower one. Never guess.
+
+**"Effective" only with a real date from the material.** Never state a date that
+isn't in the material and never copy the example dates from here. If there is no
+date, write "Decided" (if the decision has been taken) or omit the Status line.
+**Never** output placeholders like "MM/DD", "DD.MM" or "date" as text.
 
 For **events** — accidents, attacks, disasters, crime, war developments, election
 results, market moves, company news — omit the Status line **entirely** (no "n/a").
