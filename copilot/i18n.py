@@ -43,8 +43,47 @@ STRINGS: dict[str, dict] = {
         # Vollständigkeits-Beweis (synthesize.build_prompt / webview-Rendering)
         "nicht_aufgenommen_hint": (
             "## 🔍 Geprüft, nicht aufgenommen\n[Nur wenn es ernsthafte Kandidaten "
-            "gibt — max. 4 Zeilen, sonst Abschnitt weglassen]"
+            "gibt — max. 4 Zeilen, Begründung nach Relevanz für die Leserin (nicht "
+            "„keine Gesetzesänderung“), sonst Abschnitt weglassen]"
         ),
+        # Zweck je Ausgabe (synthesize.build_prompt → {AUSGABE_ZWECK})
+        "zweck_heading": "## Zweck dieser Ausgabe",
+        "zweck": {
+            "morgen": (
+                "**06:00 — Überblick.** Die Leserin startet in den Tag und hat seit dem "
+                "Vorabend nichts gelesen. Gib den Überblick: Was hat sich über Nacht und "
+                "seit gestern Abend materiell geändert, was bestimmt den heutigen Tag? "
+                "Hier dürfen auch Entwicklungen von gestern Abend stehen, sofern sie "
+                "noch nicht im Lagebild waren. Das ist die einzige Ausgabe, in der bis "
+                "zu 5 Punkte normal sind."
+            ),
+            "mittag": (
+                "**11:00 — nur Neues seit dem Morgen.** Die Leserin kennt die "
+                "06-Uhr-Ausgabe. Bring ausschließlich, was seit dem Morgen neu ist oder "
+                "sich gegenüber dem Morgenstand materiell bewegt hat. Wiederhole nichts "
+                "aus „Heute bereits berichtet“ — außer mit echtem neuen Stand, dann "
+                "beginne den Punkt mit „Update:“. 1–2 Punkte sind hier der Normalfall; "
+                "ist nichts Wesentliches dazugekommen, ist das eine Ruhige Lage."
+            ),
+            "nachmittag": (
+                "**16:00 — Update.** Was hat sich seit Mittag bewegt: neue "
+                "Entscheidungen, Zahlen, Reaktionen mit Folgen? Setze auf Bekanntem auf, "
+                "statt es zu wiederholen („Update:“ am Punktanfang, wenn ein Thema aus "
+                "„Heute bereits berichtet“ weitergeht). 1–2 Punkte sind normal; Ruhige "
+                "Lage ist erlaubt."
+            ),
+            "abend": (
+                "**20:00 — Einordnung und Ausblick auf morgen.** Die Leserin will den "
+                "Tag abschließen. Nimm die wichtigste(n) Entwicklung(en) des Tages — "
+                "auch aus „Heute bereits berichtet“ — und ordne sie ein: Was bedeutet "
+                "das unterm Strich, was ist offen? Neue Meldungen seit 16 Uhr haben "
+                "Vorrang, wenn sie die Schwelle erreichen. Schließe jeden Punkt, wo "
+                "möglich, mit **Was kommt:** — mit Blick auf morgen. Keine Nacherzählung "
+                "des ganzen Tages: höchstens 3 Punkte."
+            ),
+        },
+        "bisher_heute_heading": "## Heute bereits berichtet (nicht wiederholen)",
+        "termine_morgen_heading": "## Termine morgen (für den Ausblick)",
         "nicht_aufgenommen_marker": "Geprüft, nicht aufgenommen",
         "tracker_heading": "Deine Themen",
         "geprueft_fmt": "🔍 *{n} Meldungen geprüft* · {p} aufgenommen.",
@@ -131,6 +170,38 @@ STRINGS: dict[str, dict] = {
             "max. 4 lines, otherwise omit the section]"
         ),
         "nicht_aufgenommen_marker": "Checked, not included",
+        "zweck_heading": "## Purpose of this edition",
+        "zweck": {
+            "morgen": (
+                "**06:00 — Overview.** The reader is starting her day and has read "
+                "nothing since last evening. Give the overview: what changed materially "
+                "overnight and since last evening, what will shape today? Up to 5 points "
+                "are normal only in this edition."
+            ),
+            "mittag": (
+                "**11:00 — only what's new since the morning.** The reader knows the "
+                "06:00 edition. Cover only what is new since then or has materially "
+                "moved. Repeat nothing from \"Already covered today\" unless there is a "
+                "genuinely new state — then start the point with \"Update:\". 1–2 points "
+                "are normal; if nothing substantial came in, it's a quiet day."
+            ),
+            "nachmittag": (
+                "**16:00 — Update.** What moved since midday: new decisions, numbers, "
+                "reactions with consequences? Build on what's known instead of repeating "
+                "it (\"Update:\" at the start when a topic from \"Already covered "
+                "today\" continues). 1–2 points are normal; a quiet day is allowed."
+            ),
+            "abend": (
+                "**20:00 — Context and a look ahead to tomorrow.** The reader wants to "
+                "close the day. Take the day's most important development(s) — also from "
+                "\"Already covered today\" — and put them in context: what does it mean "
+                "on balance, what is still open? News since 16:00 takes priority if it "
+                "clears the bar. End each point, where possible, with **What's next:** — "
+                "looking to tomorrow. No retelling of the whole day: at most 3 points."
+            ),
+        },
+        "bisher_heute_heading": "## Already covered today (do not repeat)",
+        "termine_morgen_heading": "## Scheduled tomorrow (for the look ahead)",
         "tracker_heading": "Your Topics",
         "geprueft_fmt": "🔍 *{n} stories checked* · {p} included.",
         "ruhe_headline": "A quiet stretch",

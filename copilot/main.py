@@ -60,6 +60,34 @@ def cmd_feeds(config: dict) -> int:
     return 0
 
 
+def _bisher_heute(current_state: dict, edition: str, order: list[str]) -> list[str]:
+    """Punkt-Titel der heute schon erschienenen, früheren Ausgaben (in Reihenfolge)."""
+    if edition not in order:
+        return []
+    heute = f"{datetime.now():%Y-%m-%d}"
+    punkte = current_state.get("edition_points", {}) or {}
+    titel: list[str] = []
+    for frueher in order[: order.index(edition)]:
+        for h in punkte.get(f"{heute}|{frueher}", []):
+            if h not in titel:
+                titel.append(h)
+    return titel
+
+
+def _bereinige_modell_output(lagebild: str) -> str:
+    """Deterministische Nachbearbeitung direkt nach der Synthese.
+
+    - Fremdzeichen (Braille-Glyphen wie „⣣", CJK, Private Use) raus, bevor sie
+      in Telegram, E-Mail, Audio und Web landen.
+    - Reifegrad nur bei Politik/Recht/Regelungen — nicht bei Unfällen/Angriffen.
+    """
+    lagebild = qualitaet.bereinige_zeichen(lagebild)
+    lagebild, rg_entfernt = qualitaet.entferne_reifegrad_bei_ereignissen(lagebild)
+    if rg_entfernt:
+        print(f"Qualitäts-Gate: {rg_entfernt} Reifegrad-Zeile(n) bei Ereignis-Meldungen entfernt.")
+    return lagebild
+
+
 def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> int:
     editions = config.get("editions", {})
     if edition not in editions:
@@ -150,6 +178,8 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         profil=profil.get_profil(current_state),
         missing_hint=missing_hint,
         budget_hint=budget_hint,
+        edition=edition,
+        bisher_heute=_bisher_heute(current_state, edition, order),
     )
 
     if dry_run:
@@ -161,6 +191,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
 
     lagebild = synthesize.synthesize(prompt, config)
+    lagebild = _bereinige_modell_output(lagebild)
     # Qualitäts-Gate VOR der Lesezeit-Rechnung: leere Themen-Deltas („hat sich
     # nichts geändert") raus, Abschnitt auf 3 Zeilen kappen. Der Prompt verbietet
     # das zwar, hielt es im Archiv aber nachweislich nicht ein.
@@ -402,6 +433,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
         print(f"Dry-Run: Prompt gespeichert unter {path}")
         return 0
     lagebild = synthesize.synthesize(prompt, config)
+    lagebild = _bereinige_modell_output(lagebild)
     md_path, html_path = render.write_output(lagebild, "catchup", lang)
     print(f"Catch-up erzeugt:\n  {md_path}\n  {html_path}")
     return 0
