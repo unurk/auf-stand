@@ -309,3 +309,169 @@ def korrigiere_reifegrad_platzhalter(markdown: str, lang: str = "de") -> tuple[s
         return m.group(0).replace(m.group("wert"), neu, 1)
 
     return _REIFEGRAD_ZEILE_RE.sub(_ersetze, markdown), anzahl
+
+
+# ── „Heute wichtig" spiegelt die Punkte ──────────────────────────────────────
+# Liste und Punkte entstehen im selben Modell-Aufruf, aber nichts zwingt das
+# Modell, beide konsistent zu halten. Darum wird die Liste nach der Synthese
+# deterministisch aus den Punkt-Überschriften neu gebaut: gleiche Anzahl,
+# gleiche Reihenfolge, gleiches Thema.
+_HEUTE_LABELS = ("**Heute wichtig:**", "**Today's headlines:**")
+_KEYCAP_PREFIX_RE = re.compile(r"^\d️?⃣\s*")
+
+
+def punkt_titel(markdown: str) -> list[str]:
+    """Überschriften der nummerierten Punkte (ohne Nummer-Keycap und Ressort-Emoji)."""
+    titel = []
+    for zeile in markdown.splitlines():
+        if not re.match(r"## \d", zeile):
+            continue
+        t = _KEYCAP_PREFIX_RE.sub("", zeile[3:].strip())
+        t = re.sub(r"^[^\w„\"'(«»]+", "", t).strip()  # Ressort-Emoji(s) am Anfang
+        if t:
+            titel.append(t)
+    return titel
+
+
+def synchronisiere_heute_wichtig(markdown: str) -> tuple[str, bool]:
+    """Baut „Heute wichtig" aus den Punkt-Überschriften neu. → (md, geändert)
+
+    Ohne nummerierte Punkte (Ruhige Lage) bleibt der Block unangetastet.
+    """
+    titel = punkt_titel(markdown)
+    if not titel:
+        return markdown, False
+    lines = markdown.splitlines()
+    start = next((i for i, l in enumerate(lines) if l.strip() in _HEUTE_LABELS), None)
+    if start is None:
+        return markdown, False
+    ende = start + 1
+    while ende < len(lines) and not (
+        lines[ende].startswith("---") or lines[ende].startswith("## ")
+    ):
+        ende += 1
+    # Leerzeilen vor dem Trenner erhalten
+    inhalt_ende = ende
+    while inhalt_ende > start + 1 and not lines[inhalt_ende - 1].strip():
+        inhalt_ende -= 1
+    neu_block = [f"{i}️⃣ {t}" for i, t in enumerate(titel, 1)]
+    if lines[start + 1 : inhalt_ende] == neu_block:
+        return markdown, False
+    if inhalt_ende == ende:  # kein Abstand zum Trenner vorhanden → einen setzen
+        neu_block.append("")
+    neu = lines[: start + 1] + neu_block + lines[inhalt_ende:]
+    return "\n".join(neu) + ("\n" if markdown.endswith("\n") else ""), True
+
+
+# ── Sprache: durchgehend Deutsch ─────────────────────────────────────────────
+# Beobachtet am 18.11.: „drohen store closures". Englische Einsprengsel werden
+# erkannt (Wortliste + Endungs-Heuristik), bekannte Fälle direkt ersetzt; was
+# übrig bleibt, lässt main.py einmal vom Modell korrigieren.
+#
+# Bewusst nur kleingeschriebene Treffer: Deutsche Nomen sind großgeschrieben,
+# etablierte Lehnwörter („Deal", „Job") ebenso. Ein kleingeschriebenes
+# „closures" oder „the" ist dagegen sicher Englisch. Wörter, die es auch im
+# Deutschen gibt („will", „was", „die", „also"), stehen nicht auf der Liste.
+_ENGLISCHE_WOERTER = frozenset("""
+the and of with for which would could should been their they this that these those
+from into about between however although because whereas despite amid without within
+through against among its are were has have had not but is it be by or on at
+store stores closure closures shutdown shutdowns layoff layoffs earnings outlook growth
+rates tariff tariffs revenue revenues sales shares stake profit profits deficit inflation
+spending workers worker strike strikes talks deadline lockdown headwinds
+tailwinds update breaking market markets company companies government
+""".split())
+# Typisch englische Endungen bei kleingeschriebenen Wörtern (deutsche
+# Kleinwörter enden so praktisch nie — Ausnahmen unten).
+_ENGLISCHE_ENDUNG_RE = re.compile(r"\b[a-z]{3,}(?:ures|ings|tions|ments|ness|ships)\b")
+_DEUTSCHE_AUSNAHMEN = frozenset({"allerdings", "neuerdings", "schlechterdings", "platterdings"})
+# Bekannte Fälle mit eindeutiger Übersetzung: direkt ersetzen, kein Modell-Aufruf.
+ANGLIZISMEN = {
+    "store closures": "Geschäftsschließungen",
+    "closures": "Schließungen",
+    "layoffs": "Kündigungen",
+    "earnings": "Quartalszahlen",
+    "tariffs": "Zölle",
+    "shutdown": "Stillstand",
+    "deadline": "Frist",
+    "headwinds": "Gegenwind",
+}
+
+
+def _pruefbarer_text(markdown: str) -> str:
+    """Text ohne Links, URLs, Zitate und Quellenklammern — dort ist Englisch legitim."""
+    t = re.sub(r"\[([^\]]*)\]\([^)]*\)", " ", markdown)          # Markdown-Links
+    t = re.sub(r"https?://\S+", " ", t)
+    t = re.sub(r"„[^“”\"]*[“”\"]|\"[^\"]*\"|“[^”]*”|»[^«]*«", " ", t)  # Zitate/Titel
+    t = re.sub(r"\([^)]*·[^)]*\)", " ", t)                       # (Ressort · Bericht: …)
+    return t
+
+
+def finde_englisch(markdown: str) -> list[str]:
+    """Englische Wörter im deutschen Fließtext (eindeutig, in Fundreihenfolge)."""
+    text = _pruefbarer_text(markdown)
+    treffer: list[str] = []
+    for wort in re.findall(r"(?<![\w-])[a-z][a-z']*(?![\w-])", text):
+        if wort in _ENGLISCHE_WOERTER and wort not in treffer:
+            treffer.append(wort)
+    for wort in _ENGLISCHE_ENDUNG_RE.findall(text):
+        if wort not in _DEUTSCHE_AUSNAHMEN and wort not in treffer:
+            treffer.append(wort)
+    return treffer
+
+
+def ersetze_anglizismen(markdown: str) -> tuple[str, int]:
+    """Ersetzt bekannte englische Ausdrücke (nur kleingeschrieben, ganze Wörter)."""
+    anzahl = 0
+    for en, de in sorted(ANGLIZISMEN.items(), key=lambda kv: -len(kv[0])):
+        markdown, n = re.subn(rf"(?<![\w-]){re.escape(en)}(?![\w-])", de, markdown)
+        anzahl += n
+    return markdown, anzahl
+
+
+# ── Anrede: keine weiblichen Rollenbezeichnungen für den Leser ───────────────
+# Beobachtet am 18.11.: „Für dich als Konsumentin". Der Leser ist ein Mann.
+_ROLLE_WEIBLICH_RE = re.compile(
+    r"\b(?P<vor>(?:dich|dir|du|Du|Dich|Dir)\s+als\s+)"
+    r"(?P<stamm>[A-ZÄÖÜ][a-zäöüß]+?(?:er|ent|ant|ist|eur|är|ör|tor|ar))"
+    r"(?P<suffix>in|:in|\*in|_in|In)\b"
+)
+_ROLLE_SONDERFAELLE = {"Kundin": "Kunde", "Beamtin": "Beamter", "Expertin": "Experte"}
+
+
+def neutralisiere_anrede(markdown: str) -> tuple[str, int]:
+    """„dich als Konsumentin/Konsument:in" → „dich als Konsument". → (md, anzahl)"""
+    anzahl = 0
+
+    def _sonder(m: re.Match) -> str:
+        nonlocal anzahl
+        anzahl += 1
+        return m.group(1) + _ROLLE_SONDERFAELLE[m.group(2)]
+
+    markdown = re.sub(
+        r"\b((?:dich|dir|du|Du|Dich|Dir)\s+als\s+)(" + "|".join(_ROLLE_SONDERFAELLE) + r")\b",
+        _sonder, markdown,
+    )
+
+    def _ersetze(m: re.Match) -> str:
+        nonlocal anzahl
+        anzahl += 1
+        return m.group("vor") + m.group("stamm")
+
+    return _ROLLE_WEIBLICH_RE.sub(_ersetze, markdown), anzahl
+
+
+# ── Meta-Floskeln in „Warum es zählt" ────────────────────────────────────────
+_META_FLOSKEL_RE = re.compile(
+    r"\s*\b(?:Für dein(?:\s+\w+)?\s+Verständnis|For your(?:\s+\w+)?\s+understanding)\s*:\s*",
+    re.IGNORECASE,
+)
+
+
+def entferne_meta_floskeln(markdown: str) -> tuple[str, int]:
+    """Entfernt „Für dein politisches Verständnis:"-Einleitungen. → (md, anzahl)"""
+    def _ersetze(m: re.Match) -> str:
+        return " " if m.start() > 0 else ""
+
+    neu, n = _META_FLOSKEL_RE.subn(_ersetze, markdown)
+    return neu, n

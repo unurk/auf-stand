@@ -43,14 +43,14 @@ STRINGS: dict[str, dict] = {
         # Vollständigkeits-Beweis (synthesize.build_prompt / webview-Rendering)
         "nicht_aufgenommen_hint": (
             "## 🔍 Geprüft, nicht aufgenommen\n[Nur wenn es ernsthafte Kandidaten "
-            "gibt — max. 4 Zeilen, Begründung nach Relevanz für die Leserin (nicht "
+            "gibt — max. 4 Zeilen, Begründung nach Relevanz für den Leser (nicht "
             "„keine Gesetzesänderung“), sonst Abschnitt weglassen]"
         ),
         # Zweck je Ausgabe (synthesize.build_prompt → {AUSGABE_ZWECK})
         "zweck_heading": "## Zweck dieser Ausgabe",
         "zweck": {
             "morgen": (
-                "**06:00 — Überblick.** Die Leserin startet in den Tag und hat seit dem "
+                "**06:00 — Überblick.** Der Leser startet in den Tag und hat seit dem "
                 "Vorabend nichts gelesen. Gib den Überblick: Was hat sich über Nacht und "
                 "seit gestern Abend materiell geändert, was bestimmt den heutigen Tag? "
                 "Hier dürfen auch Entwicklungen von gestern Abend stehen, sofern sie "
@@ -58,7 +58,7 @@ STRINGS: dict[str, dict] = {
                 "zu 5 Punkte normal sind."
             ),
             "mittag": (
-                "**11:00 — nur Neues seit dem Morgen.** Die Leserin kennt die "
+                "**11:00 — nur Neues seit dem Morgen.** Der Leser kennt die "
                 "06-Uhr-Ausgabe. Bring ausschließlich, was seit dem Morgen neu ist oder "
                 "sich gegenüber dem Morgenstand materiell bewegt hat. Wiederhole nichts "
                 "aus „Heute bereits berichtet“ — außer mit echtem neuen Stand, dann "
@@ -73,7 +73,7 @@ STRINGS: dict[str, dict] = {
                 "Lage ist erlaubt."
             ),
             "abend": (
-                "**20:00 — Einordnung und Ausblick auf morgen.** Die Leserin will den "
+                "**20:00 — Einordnung und Ausblick auf morgen.** Der Leser will den "
                 "Tag abschließen. Nimm die wichtigste(n) Entwicklung(en) des Tages — "
                 "auch aus „Heute bereits berichtet“ — und ordne sie ein: Was bedeutet "
                 "das unterm Strich, was ist offen? Neue Meldungen seit 16 Uhr haben "
@@ -173,7 +173,7 @@ STRINGS: dict[str, dict] = {
         "zweck_heading": "## Purpose of this edition",
         "zweck": {
             "morgen": (
-                "**06:00 — Overview.** The reader is starting her day and has read "
+                "**06:00 — Overview.** The reader is starting his day and has read "
                 "nothing since last evening. Give the overview: what changed materially "
                 "overnight and since last evening, what will shape today? Up to 5 points "
                 "are normal only in this edition."

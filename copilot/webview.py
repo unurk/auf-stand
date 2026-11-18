@@ -1437,7 +1437,12 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
     # erzeugte Ausgaben behielten die Keycaps sonst bis zum nächsten Site-Build.
     content = re.sub(
         r'(<div class="highlights">)(.*?)(</div>)',
-        lambda m: m.group(1) + re.sub(r'\d️?⃣?\s*', '', m.group(2)) + m.group(3),
+        # Nur die Nummern-Keycap am Zeilenanfang (1️⃣ = Ziffer + U+FE0F + U+20E3).
+        # Früher fiel JEDE Ziffer weg: „Euro auf 19-Monats-Tief" wurde am 18.11.
+        # zu „Euro auf -Monats-Tief".
+        lambda m: m.group(1)
+        + re.sub(r'(^|>|\n)(\s*)\d\ufe0f?\u20e3\s*', r'\1\2', m.group(2))
+        + m.group(3),
         content,
         flags=re.DOTALL,
     )
