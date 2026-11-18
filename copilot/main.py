@@ -74,14 +74,18 @@ def _bisher_heute(current_state: dict, edition: str, order: list[str]) -> list[s
     return titel
 
 
-def _bereinige_modell_output(lagebild: str, lang: str = "de") -> str:
+def _bereinige_modell_output(lagebild: str, lang: str = "de", config: dict | None = None) -> str:
     """Deterministische Nachbearbeitung direkt nach der Synthese.
 
     - Fremdzeichen (Braille-Glyphen wie „⣣", CJK, Private Use) raus, bevor sie
       in Telegram, E-Mail, Audio und Web landen.
-    - Reifegrad nur bei Politik/Recht/Regelungen — nicht bei Unfällen/Angriffen.
     - „Gilt ab" nur mit echtem Datum; der Format-Platzhalter „Gilt ab TT.MM"
       fällt auf „Beschlossen" zurück.
+    - Reifegrad nur bei Politik/Recht/Regelungen — nicht bei Unfällen/Angriffen.
+    - Anrede ohne weibliche Rollenbezeichnung, keine Meta-Floskeln.
+    - Deutsch durchgehend: bekannte Anglizismen ersetzen, Reste einmal vom
+      Modell eindeutschen lassen (nur mit config, nur deutsche Ausgabe).
+    - „Heute wichtig" zuletzt aus den Punkt-Überschriften neu bauen.
     """
     lagebild = qualitaet.bereinige_zeichen(lagebild)
     lagebild, platzhalter = qualitaet.korrigiere_reifegrad_platzhalter(lagebild, lang)
@@ -90,6 +94,26 @@ def _bereinige_modell_output(lagebild: str, lang: str = "de") -> str:
     lagebild, rg_entfernt = qualitaet.entferne_reifegrad_bei_ereignissen(lagebild)
     if rg_entfernt:
         print(f"Qualitäts-Gate: {rg_entfernt} Reifegrad-Zeile(n) bei Ereignis-Meldungen entfernt.")
+    lagebild, n = qualitaet.neutralisiere_anrede(lagebild)
+    if n:
+        print(f"Qualitäts-Gate: {n} weibliche Rollenbezeichnung(en) für den Leser ersetzt.")
+    lagebild, n = qualitaet.entferne_meta_floskeln(lagebild)
+    if n:
+        print(f"Qualitäts-Gate: {n} Meta-Floskel(n) entfernt.")
+    if lang == "de":
+        lagebild, n = qualitaet.ersetze_anglizismen(lagebild)
+        if n:
+            print(f"Qualitäts-Gate: {n} englische(r) Ausdruck/Ausdrücke ersetzt.")
+        rest = qualitaet.finde_englisch(lagebild)
+        if rest and config is not None:
+            print(f"Qualitäts-Gate: Englisch im Text ({', '.join(rest)}) — Korrektur-Durchlauf.")
+            lagebild = synthesize.korrigiere_sprache(lagebild, rest, config)
+            rest = qualitaet.finde_englisch(lagebild)
+        if rest:
+            print(f"⚠️ Qualitäts-Gate: Englisch bleibt im Text: {', '.join(rest)}")
+    lagebild, geaendert = qualitaet.synchronisiere_heute_wichtig(lagebild)
+    if geaendert:
+        print("Qualitäts-Gate: „Heute wichtig“ an die Punkte angeglichen.")
     return lagebild
 
 
@@ -196,7 +220,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         return 0
 
     lagebild = synthesize.synthesize(prompt, config)
-    lagebild = _bereinige_modell_output(lagebild, lang)
+    lagebild = _bereinige_modell_output(lagebild, lang, config)
     # Qualitäts-Gate VOR der Lesezeit-Rechnung: leere Themen-Deltas („hat sich
     # nichts geändert") raus, Abschnitt auf 3 Zeilen kappen. Der Prompt verbietet
     # das zwar, hielt es im Archiv aber nachweislich nicht ein.
@@ -438,7 +462,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
         print(f"Dry-Run: Prompt gespeichert unter {path}")
         return 0
     lagebild = synthesize.synthesize(prompt, config)
-    lagebild = _bereinige_modell_output(lagebild, lang)
+    lagebild = _bereinige_modell_output(lagebild, lang, config)
     md_path, html_path = render.write_output(lagebild, "catchup", lang)
     print(f"Catch-up erzeugt:\n  {md_path}\n  {html_path}")
     return 0

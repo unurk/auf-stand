@@ -306,6 +306,37 @@ def synthesize(prompt: str, config: dict) -> str:
     return _complete(prompt, config, max_tokens=int(config.get("max_tokens", 1500)))
 
 
+def korrigiere_sprache(lagebild: str, woerter: list[str], config: dict) -> str:
+    """Lässt englische Einsprengsel einmal vom Modell eindeutschen.
+
+    Nur ein gezielter Schlussredaktions-Aufruf (kein neues Lagebild): Das
+    Ergebnis wird nur übernommen, wenn Struktur und Links erhalten bleiben —
+    sonst bleibt der Originaltext stehen. Ohne konfigurierten Provider: no-op.
+    """
+    if not woerter or not _provider_configured(config):
+        return lagebild
+    prompt = (
+        "Du bist Schlussredakteur:in der „Presse“. Im folgenden Lagebild stehen "
+        f"englische Wörter: {', '.join(woerter)}.\n"
+        "Ersetze jedes davon durch einen passenden deutschen Ausdruck. Ändere sonst "
+        "NICHTS: gleiche Struktur, gleiche Überschriften, gleiche Emojis, Zahlen, "
+        "Links und Zeilenumbrüche. Eigennamen und Zitate bleiben, wie sie sind. "
+        "Gib ausschließlich das korrigierte Lagebild aus, ohne Kommentar.\n\n"
+        f"{lagebild}"
+    )
+    try:
+        neu = _complete(prompt, config, max_tokens=int(config.get("max_tokens", 1500)))
+    except Exception as exc:  # best-effort: Lagebild nie an der Korrektur scheitern lassen
+        print(f"Sprach-Korrektur fehlgeschlagen ({exc}) — Original bleibt.")
+        return lagebild
+    links = lambda t: re.findall(r"\]\(([^)]+)\)", t)  # noqa: E731
+    punkte = lambda t: len(re.findall(r"(?m)^## ", t))  # noqa: E731
+    if not neu.strip() or punkte(neu) != punkte(lagebild) or links(neu) != links(lagebild):
+        print("Sprach-Korrektur verworfen: Struktur oder Links verändert — Original bleibt.")
+        return lagebild
+    return neu.strip() + ("\n" if lagebild.endswith("\n") else "")
+
+
 # ---------------------------------------------------------------------------
 # Provider-Abstraktion: anthropic (Claude, Default) oder glm (OpenRouter,
 # OpenAI-kompatibel via httpx — kein zusätzliches SDK, CLAUDE.md-Konvention).

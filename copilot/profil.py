@@ -246,9 +246,9 @@ def prompt_block(antworten: dict, lang: str = "de") -> str:
             "the material provides one].\n"
             "Never invent numbers, and skip the line when the profile adds nothing.\n"
         )
-    lines = "\n".join(f"- Die Leserin {s}" for s in saetze)
+    lines = "\n".join(f"- Der Leser {s}" for s in saetze)
     return (
-        "\n\n---\n\n# Wirkungs-Profil der Leserin (Betroffenheit, nicht Interesse)\n"
+        "\n\n---\n\n# Wirkungs-Profil des Lesers (Betroffenheit, nicht Interesse)\n"
         f"{lines}\n\n"
         "Nutze das AUSSCHLIESSLICH, um Folgen konkret zu machen — niemals zur Auswahl "
         "der Themen. Wo das Material es hergibt, hänge an einen Punkt eine Zeile:\n"
