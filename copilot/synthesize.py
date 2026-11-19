@@ -324,16 +324,54 @@ def korrigiere_sprache(lagebild: str, woerter: list[str], config: dict) -> str:
         "Gib ausschließlich das korrigierte Lagebild aus, ohne Kommentar.\n\n"
         f"{lagebild}"
     )
+    kandidat = _nachbessern(lagebild, prompt, config)
+    return lagebild if kandidat is None else kandidat
+
+
+def repariere_struktur(lagebild: str, punkte: list[int], config: dict, lang: str = "de") -> str:
+    """Neuversuch per Schlussredaktion: fehlende „Was ist neu"/„Warum es zählt" ergänzen.
+
+    Das Modell gliedert nur den vorhandenen Text der betroffenen Punkte in beide
+    Teile (keine neuen Fakten). Übernommen wird das Ergebnis nur, wenn danach
+    weniger Punkte unvollständig sind und Überschriften wie Links gleich bleiben.
+    Ohne konfigurierten Provider: no-op.
+    """
+    from . import qualitaet
+
+    if not punkte or not _provider_configured(config):
+        return lagebild
+    neu, warum = ("What's new:", "Why it matters:") if lang == "en" else ("Was ist neu:", "Warum es zählt:")
+    nummern = ", ".join(str(n) for n in punkte)
+    prompt = (
+        "Du bist Schlussredakteur:in der „Presse“. Im folgenden Lagebild fehlt bei "
+        f"Punkt {nummern} die Gliederung in **{neu}** und **{warum}**.\n"
+        f"Gliedere genau diese Punkte in beide Teile: **{neu}** = die Änderung, "
+        f"**{warum}** = die konkrete Folge. Verwende ausschließlich Inhalt, der im "
+        "Punkt schon steht — keine neuen Fakten, Zahlen oder Namen. Quelle und Link "
+        "bleiben am Ende. Ändere sonst NICHTS am Lagebild. Gib ausschließlich das "
+        f"vollständige Lagebild aus, ohne Kommentar.\n\n{lagebild}"
+    )
+    kandidat = _nachbessern(lagebild, prompt, config)
+    if kandidat is None:
+        return lagebild
+    if len(qualitaet.fehlende_struktur(kandidat, lang)) >= len(punkte):
+        print("Struktur-Reparatur verworfen: keine Verbesserung — Original bleibt.")
+        return lagebild
+    return kandidat
+
+
+def _nachbessern(lagebild: str, prompt: str, config: dict) -> str | None:
+    """Ein Schlussredaktions-Aufruf; None, wenn er scheitert oder Struktur/Links bricht."""
     try:
         neu = _complete(prompt, config, max_tokens=int(config.get("max_tokens", 1500)))
-    except Exception as exc:  # best-effort: Lagebild nie an der Korrektur scheitern lassen
-        print(f"Sprach-Korrektur fehlgeschlagen ({exc}) — Original bleibt.")
-        return lagebild
+    except Exception as exc:  # best-effort: Lagebild nie an der Nachbesserung scheitern lassen
+        print(f"Nachbesserung fehlgeschlagen ({exc}) — Original bleibt.")
+        return None
     links = lambda t: re.findall(r"\]\(([^)]+)\)", t)  # noqa: E731
-    punkte = lambda t: len(re.findall(r"(?m)^## ", t))  # noqa: E731
-    if not neu.strip() or punkte(neu) != punkte(lagebild) or links(neu) != links(lagebild):
-        print("Sprach-Korrektur verworfen: Struktur oder Links verändert — Original bleibt.")
-        return lagebild
+    koepfe = lambda t: len(re.findall(r"(?m)^## ", t))  # noqa: E731
+    if not neu.strip() or koepfe(neu) != koepfe(lagebild) or links(neu) != links(lagebild):
+        print("Nachbesserung verworfen: Überschriften oder Links verändert — Original bleibt.")
+        return None
     return neu.strip() + ("\n" if lagebild.endswith("\n") else "")
 
 

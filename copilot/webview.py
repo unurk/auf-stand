@@ -956,111 +956,27 @@ def _meta_tag_en(m: re.Match) -> str:
     return out + " "
 
 
-_GREETING_POOL: dict[str, list[str]] = {
-    "morgen": [
-        "Guten Morgen.",
-        "Schön, dass du da bist.",
-        "Ein neuer Tag.",
-        "Guten Morgen. Los geht's.",
-        "Bereit?",
-        "Guten Morgen. Hier ist er.",
-        "Frisch informiert starten.",
-    ],
-    "mittag": [
-        "Guten Tag.",
-        "Kurze Pause.",
-        "Halbzeit.",
-        "Schön, dass du schaust.",
-        "Mitten im Tag.",
-        "Guten Tag. Kurz.",
-        "Der Überblick zur Mittagszeit.",
-    ],
-    "nachmittag": [
-        "Guten Nachmittag.",
-        "Fast geschafft.",
-        "Kurz innehalten.",
-        "Schön, dass du da bist.",
-        "Der Nachmittag, kompakt.",
-        "Noch ein Blick.",
-        "Guten Nachmittag. Da sind wir.",
-    ],
-    "abend": [
-        "Guten Abend.",
-        "Feierabend — fast.",
-        "Der Tag, kompakt.",
-        "Schön, dass du da bist.",
-        "Was bleibt vom Tag.",
-        "Guten Abend. Kurz noch.",
-        "Der Abend gehört dir.",
-    ],
-    "catchup": [
-        "Willkommen zurück.",
-        "Schön, dass du wieder da bist.",
-        "Was sich getan hat.",
-        "Willkommen. Kurz nachgeholt.",
-        "Die letzten Tage, kompakt.",
-    ],
-}
+def _schlagzeile_aus_inhalt(content: str, lang: str = "de") -> str:
+    """H1 der Seite: eine echte Schlagzeile, nie eine Meta-Floskel.
 
-_GREETING_POOL_EN: dict[str, list[str]] = {
-    "morgen": [
-        "Good morning.",
-        "Here's what happened.",
-        "A new day.",
-        "Good morning. Let's go.",
-        "Ready?",
-        "Good morning. Here it is.",
-        "Start informed.",
-    ],
-    "mittag": [
-        "Good afternoon.",
-        "A quick pause.",
-        "Midday check-in.",
-        "Here's the latest.",
-        "Halfway through the day.",
-        "Good afternoon. Briefly.",
-        "The midday picture.",
-    ],
-    "nachmittag": [
-        "Good afternoon.",
-        "Almost there.",
-        "A moment to catch up.",
-        "Here's what's new.",
-        "The afternoon, compact.",
-        "One more look.",
-        "Good afternoon. Here we are.",
-    ],
-    "abend": [
-        "Good evening.",
-        "The day, in brief.",
-        "What the day leaves behind.",
-        "Good evening. Quick.",
-        "The evening is yours.",
-        "End of day briefing.",
-        "What mattered today.",
-    ],
-    "catchup": [
-        "Welcome back.",
-        "Good to have you here.",
-        "What you missed.",
-        "Welcome. Caught up quickly.",
-        "The last few days, compact.",
-    ],
-}
+    Früher kam die H1 aus einem festen Begrüßungs-Pool („Bereit?", „Guten
+    Morgen." …) — am 19.11. stand so „Bereit?" über der Ausgabe. Jetzt: die H1
+    der Synthese, sofern sie Inhalt trägt, sonst die Überschrift des Aufmachers
+    (erster Punkt), ohne Punkte „Ruhige Lage".
+    """
+    def _clean(fragment: str) -> str:
+        text = _html.unescape(re.sub(r"<[^>]+>", "", fragment)).strip()
+        return re.sub(r"^[^\wÄÖÜäöüß„\"']+", "", text).strip()
 
-
-def _pick_greeting(edition: str, datum_iso: str, lang: str = "de") -> str:
-    if lang == "en":
-        pool = _GREETING_POOL_EN.get(edition, ["Your Briefing."])
-    else:
-        if datum_iso == "2026-06-15" and edition == "morgen":
-            return "Guten Morgen, Andreas Rast."
-        pool = _GREETING_POOL.get(edition, ["Dein Lagebild."])
-    try:
-        idx = date.fromisoformat(datum_iso).toordinal() % len(pool)
-    except (ValueError, TypeError):
-        idx = 0
-    return pool[idx]
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", content, re.DOTALL)
+    if h1 and _clean(h1.group(1)) and not _qualitaet.ist_meta_ueberschrift(_clean(h1.group(1))):
+        return _clean(h1.group(1))
+    ausnahmen = ("Deine Themen", "Your Topics", "Geprüft", "Checked", "Diese Woche", "This week")
+    for h2 in re.findall(r"<h2>(.*?)</h2>", content, re.DOTALL):
+        titel = _clean(h2)
+        if titel and not any(a in titel for a in ausnahmen):
+            return titel
+    return _i18n.t(lang, "ruhe_headline")
 
 
 def _next_edition_hint(edition: str, lang: str = "de") -> str:
@@ -1124,7 +1040,8 @@ def _timeline_panel(edition: str, lang: str = "de") -> str:
 
 
 def _lagebild_header(
-    datum_iso: str, edition: str, points: int, lesezeit: int | None, lang: str = "de"
+    datum_iso: str, edition: str, points: int, lesezeit: int | None, lang: str = "de",
+    schlagzeile: str = "",
 ) -> str:
     """Baut den Seitenkopf: Kicker (Datum · Ausgabe), Begrüßung, Meta-Byline."""
     weekdays = _i18n.t(lang, "weekdays")
@@ -1137,7 +1054,7 @@ def _lagebild_header(
             kicker = f"{weekdays[d.weekday()]}, {d.day}. {months[d.month - 1]} · {_EDITION_LABEL.get(edition, edition)}"
     except (ValueError, TypeError):
         kicker = (_EDITION_LABEL_EN if lang == "en" else _EDITION_LABEL).get(edition, edition)
-    greeting = _pick_greeting(edition, datum_iso, lang)
+    greeting = _html.escape(schlagzeile or _i18n.t(lang, "ruhe_headline"), quote=False)
     byline = _NYT_BYLINE if lang == "en" else _BYLINE
     if lang == "en":
         meta = [byline]
@@ -1386,7 +1303,9 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
         else:
             m = re.search(r"Lesezeit ca\.\s*(\d+)\s*Sekunden", content)
         lesezeit = int(m.group(1)) if m else None
-        header = _lagebild_header(datum, edition, points, lesezeit, lang)
+        header = _lagebild_header(
+            datum, edition, points, lesezeit, lang, _schlagzeile_aus_inhalt(content, lang)
+        )
         if '<header class="lagebild-header">' in content:
             content = re.sub(
                 r'<header class="lagebild-header">.*?</header>',
@@ -1394,7 +1313,10 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
             )
         else:
             content = re.sub(
-                r'<h1>.*?</h1>\s*(?:<p class="byline">.*?</p>\s*)?',
+                # Datumszeile der Synthese („*Donnerstag, 19. November …*") direkt
+                # unter der H1 fällt weg — das Datum steht im Kicker.
+                r'<h1>.*?</h1>\s*(?:(?:<p class="byline">.*?</p>'
+                r'|<p><em>[^<]*(?:Ausgabe|Edition|Briefing|Catch-up)[^<]*</em></p>)\s*){0,2}',
                 header, content, count=1, flags=re.DOTALL,
             )
     else:

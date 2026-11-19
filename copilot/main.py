@@ -111,9 +111,24 @@ def _bereinige_modell_output(lagebild: str, lang: str = "de", config: dict | Non
             rest = qualitaet.finde_englisch(lagebild)
         if rest:
             print(f"⚠️ Qualitäts-Gate: Englisch bleibt im Text: {', '.join(rest)}")
+    # Struktur: jeder Punkt braucht „Was ist neu" UND „Warum es zählt" —
+    # erst Neuversuch per Schlussredaktion, dann deterministische Gliederung.
+    fehlend = qualitaet.fehlende_struktur(lagebild, lang)
+    if fehlend:
+        print(f"Qualitäts-Gate: Punkt(e) {fehlend} ohne „Was ist neu“/„Warum es zählt“.")
+        if config is not None:
+            lagebild = synthesize.repariere_struktur(lagebild, fehlend, config, lang)
+        lagebild, _ = qualitaet.repariere_struktur(lagebild, lang)
+        rest = qualitaet.fehlende_struktur(lagebild, lang)
+        if rest:
+            print(f"⚠️ Qualitäts-Gate: Punkt(e) {rest} weiterhin unvollständig.")
     lagebild, geaendert = qualitaet.synchronisiere_heute_wichtig(lagebild)
     if geaendert:
         print("Qualitäts-Gate: „Heute wichtig“ an die Punkte angeglichen.")
+    # Überschrift zuletzt: braucht die endgültigen Punkt-Titel.
+    lagebild, geaendert = qualitaet.korrigiere_h1(lagebild, i18n.t(lang, "ruhe_headline"))
+    if geaendert:
+        print("Qualitäts-Gate: Meta-Überschrift durch Schlagzeile des Aufmachers ersetzt.")
     return lagebild
 
 
@@ -232,6 +247,14 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
             f"Qualitäts-Gate: {tracker_report['entfernt']} Themen-Zeile(n) entfernt, "
             f"{tracker_report['gekappt']} gekürzt, {tracker_report['behalten']} behalten."
         )
+    # Keine Doppelungen: Themen-Zeilen, die schon als Punkt oben stehen, fallen
+    # aus der Ausgabe. Das Dossier bekommt sie trotzdem (Verlauf je Tracker).
+    lagebild_fuer_dossier = lagebild
+    lagebild, doppelt = qualitaet.entferne_themen_doppelungen(
+        lagebild, heading=i18n.t(lang, "tracker_heading")
+    )
+    if doppelt:
+        print(f"Qualitäts-Gate: {doppelt} Themen-Zeile(n) doppelt zu Punkten — entfernt.")
     # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
     words = len(re.findall(r"\w+", lagebild))
     wps = float(i18n.t(lang, "words_per_sec"))
@@ -342,7 +365,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
             secs=secs, geprueft=len(selection),
         )
         state.update_dossier(
-            current_state, lagebild, all_topics, f"{datetime.now():%Y-%m-%d}"
+            current_state, lagebild_fuer_dossier, all_topics, f"{datetime.now():%Y-%m-%d}"
         )
         questions = synthesize.generate_assessment_questions(result.articles, all_topics, config)
         if questions:

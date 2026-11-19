@@ -21,7 +21,7 @@ hat einen eigenen Zweck (siehe „Zweck dieser Ausgabe" unten) — halte dich da
 - Reine Ereignis-Meldungen ohne Änderung („X trifft Y", „Debatte über Z geht weiter")
   erreichen die Schwelle NICHT.
 - Erreichen mehr Entwicklungen die Schwelle klar, nimm bis zu 5 auf (Punkte 4–5 als
-  kompakte Ein-Zeiler) — kappe nichts Wesentliches.
+  kompakt, aber mit beiden Teilen) — kappe nichts Wesentliches.
 - Erreichen weniger die Schwelle, liefere weniger. **Fülle niemals auf 3 auf.**
   Ein dritter Punkt, der die Schwelle nur knapp verfehlt, gehört in „Geprüft, nicht
   aufgenommen", nicht ins Lagebild.
@@ -38,7 +38,8 @@ hat einen eigenen Zweck (siehe „Zweck dieser Ausgabe" unten) — halte dich da
 Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemerkung.
 Übernimm das vorgegebene Emoji in der Titelzeile unverändert:
 
-# {EDITION_EMOJI} Dein Lagebild — {DATUM_LABEL}
+# {EDITION_EMOJI} [Schlagzeile des Tages: der Kern des Aufmachers (Punkt 1), max. 10 Wörter]
+*{DATUM_LABEL}*
 
 **Heute wichtig:**
 1️⃣ [Schlagzeile zu Punkt 1 — max. 10 Wörter, keine Details]
@@ -54,12 +55,22 @@ Gib das Lagebild exakt in dieser Markdown-Struktur aus, ohne Vor- oder Nachbemer
 [Optional, nur wenn absehbar — **Was kommt:** 1–2 Sätze Ausblick]
 
 ## 2️⃣ [Ressort-Emoji] [Titelzeile]
-[kürzer: 2 Sätze pro Block]
+**Was ist neu:** [kürzer: 1–2 Sätze]
+**Warum es zählt:** [1–2 Sätze]
 
-## 3️⃣ ... [nur wenn ein dritter Punkt die Schwelle wirklich erreicht — 1–2 Sätze pro Block]
+## 3️⃣ ... [nur wenn ein dritter Punkt die Schwelle wirklich erreicht — gleiche Struktur, je 1 Satz]
 
-## 4️⃣ ... [nur an nachrichtenreichen Tagen — ein knapper Ein-Zeiler]
-## 5️⃣ ... [nur an nachrichtenreichen Tagen — ein knapper Ein-Zeiler]
+## 4️⃣ ... [nur an nachrichtenreichen Tagen — gleiche Struktur, je 1 knapper Satz]
+## 5️⃣ ... [nur an nachrichtenreichen Tagen — gleiche Struktur, je 1 knapper Satz]
+
+**Jeder Punkt hat beide Teile — „Was ist neu:" UND „Warum es zählt:"**, auch die
+kompakten Punkte 3–5. Kürzer heißt: je ein Satz, nicht: ein Fließtextabsatz ohne
+Labels.
+
+**Die Titelzeile (H1) ist eine echte Schlagzeile**, abgeleitet aus dem Aufmacher —
+keine Begrüßung und keine Meta-Überschrift. Verboten: „Bereit?", „Guten Morgen",
+„Dein Lagebild", „Los geht's", „Das Wichtigste heute", „Update". Gut: „Eisenbahner
+bekommen 38,5-Stunden-Woche". Bei Ruhiger Lage lautet die Titelzeile „Ruhige Lage".
 
 {TRACKER_SECTION_HINT}
 
@@ -143,6 +154,10 @@ der Lage? Nutze dazu die Angaben zu ihrer Lebenslage, falls geliefert. Gute Begr
 Falls unten verfolgte Themen angegeben sind: Prüfe für jedes Thema, ob es in den
 Artikeln eine materielle Änderung gibt. Nur dann erscheint es im Abschnitt
 „## Deine Themen" mit einer Delta-Formulierung: „Seit deinem letzten Stand: …".
+**Keine Doppelungen:** Was schon als nummerierter Punkt oben steht, kommt nicht noch
+einmal in „Deine Themen" — auch nicht umformuliert oder als Nebenbezug (z. B. ein
+Konkurrent, der im Punkt erwähnt ist). Bleibt dadurch nichts übrig, entfällt der
+Abschnitt.
 Gibt es zu einem Thema nichts Neues, lasse es komplett weg — kein „keine Neuigkeiten".
 Gibt es zu keinem Thema etwas, entfällt der Abschnitt ganz.
 
