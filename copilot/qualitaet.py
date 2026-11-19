@@ -475,3 +475,217 @@ def entferne_meta_floskeln(markdown: str) -> tuple[str, int]:
 
     neu, n = _META_FLOSKEL_RE.subn(_ersetze, markdown)
     return neu, n
+
+
+# ── Überschrift: echte Schlagzeile statt Meta-Floskel ────────────────────────
+# Beobachtet am 19.11.: H1 „Bereit?". Generische Titel (Begrüßungen, „Dein
+# Lagebild", reine Datumszeilen) werden durch die Schlagzeile des Aufmachers
+# ersetzt.
+_META_PHRASEN_RE = re.compile(
+    r"\b(?:bereit|ready|guten (?:morgen|tag|abend|nachmittag)|"
+    r"good (?:morning|afternoon|evening)|dein(?:e)? lagebild|your briefing|the briefing|"
+    r"lagebild|briefing|los geht'?s|here we go|hallo|hi|hello|"
+    r"willkommen(?: zurück)?|welcome(?: back)?|ein neuer tag|a new day|"
+    r"schön,? dass du (?:da bist|schaust|wieder da bist)|kurze pause|halbzeit|"
+    r"fast geschafft|kurz innehalten|noch ein blick|mitten im tag|feierabend|"
+    r"der tag,? kompakt|der abend gehört dir|was bleibt vom tag|was sich getan hat|"
+    r"frisch informiert starten|hier ist er|kurz nachgeholt|kurz(?: noch)?|"
+    r"das wichtigste(?: heute| des tages)?|today'?s update|update|überblick|"
+    r"der überblick(?: zur mittagszeit)?|der nachmittag,? kompakt|da sind wir)\b",
+    re.IGNORECASE,
+)
+_DATUMSZEILE_RE = re.compile(
+    r"\b(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|monday|tuesday|"
+    r"wednesday|thursday|friday|saturday|sunday|"
+    rf"{_MONATE}|"
+    r"(?:morgen|mittags|nachmittags|abend)-ausgabe|ausgabe|edition|catch-up|"
+    r"morning|midday|afternoon|evening|uhr)\b",
+    re.IGNORECASE,
+)
+
+
+def ist_meta_ueberschrift(text: str) -> bool:
+    """True, wenn die Überschrift keinen Inhalt trägt (Begrüßung, Datum, „Lagebild")."""
+    rest = _META_PHRASEN_RE.sub(" ", text or "")
+    rest = _DATUMSZEILE_RE.sub(" ", rest)
+    return not re.search(r"[A-Za-zÄÖÜäöüß]{3,}", rest)
+
+
+def korrigiere_h1(markdown: str, ersatz_ohne_punkte: str = "Ruhige Lage") -> tuple[str, bool]:
+    """Ersetzt eine Meta-H1 durch die Schlagzeile des ersten Punktes. → (md, geändert)"""
+    lines = markdown.splitlines()
+    idx = next((i for i, l in enumerate(lines) if l.startswith("# ")), None)
+    if idx is None:
+        return markdown, False
+    h1 = lines[idx][2:]
+    prefix = re.match(r"^[^\wÄÖÜäöüß„\"']*", h1).group(0)  # Ausgaben-Emoji behalten
+    if not ist_meta_ueberschrift(h1[len(prefix):]):
+        return markdown, False
+    titel = punkt_titel(markdown)
+    lines[idx] = f"# {prefix}{titel[0] if titel else ersatz_ohne_punkte}"
+    return "\n".join(lines) + ("\n" if markdown.endswith("\n") else ""), True
+
+
+# ── Einheitliche Struktur: jeder Punkt hat „Was ist neu" und „Warum es zählt" ─
+# Beobachtet am 19.11.: Punkt 4 („Medienförderung") war nur ein Fließtextsatz —
+# der Prompt hatte für Punkte 4–5 „knappe Ein-Zeiler" verlangt.
+_LABELS = {
+    "de": ("**Was ist neu:**", "**Warum es zählt:**"),
+    "en": ("**What's new:**", "**Why it matters:**"),
+}
+_LABEL_ZEILE_RE = re.compile(r"^\*\*[^*]{2,40}:\*\*")
+_QUELLE_ENDE_RE = re.compile(
+    r"\s*(?P<tail>(?:\([^()]*\)\s*)?(?:\[→[^\]]*\]\([^)]*\)\s*)?)$"
+)
+
+
+def _punkt_teile(markdown: str) -> list[str]:
+    return re.split(r"(?m)^(?=## |---)", markdown)
+
+
+def fehlende_struktur(markdown: str, lang: str = "de") -> list[int]:
+    """1-basierte Nummern der Punkte, denen „Was ist neu" oder „Warum es zählt" fehlt."""
+    neu, warum = _LABELS.get(lang, _LABELS["de"])
+    fehlend, nr = [], 0
+    for teil in _punkt_teile(markdown):
+        if re.match(r"## \d", teil):
+            nr += 1
+            if neu not in teil or warum not in teil:
+                fehlend.append(nr)
+    return fehlend
+
+
+def _teile_satz(satz: str, lang: str) -> tuple[str, str] | None:
+    """Teilt einen einzelnen Satz in Änderung + Folge (an „und"/„;"/„—"), sonst None."""
+    satz = satz.strip()
+    ende = satz[-1] if satz[-1:] in ".!?" else "."
+    kern = satz.rstrip(".!?")
+    for trenner, anschluss in (("; ", ""), (" — ", ""), (" – ", ""),
+                               (" und ", "Das " if lang == "de" else "This "),
+                               (" and ", "This ")):
+        pos = kern.rfind(trenner)
+        if pos == -1:
+            continue
+        links, rechts = kern[:pos].strip(), kern[pos + len(trenner):].strip()
+        if len(links.split()) >= 4 and len(rechts.split()) >= 3:
+            rechts = anschluss + rechts if anschluss else rechts[:1].upper() + rechts[1:]
+            return links + ".", rechts + ende
+    return None
+
+
+def repariere_struktur(markdown: str, lang: str = "de") -> tuple[str, int]:
+    """Gliedert Fließtext-Punkte deterministisch in beide Teile. → (md, repariert)
+
+    Nur der Fall „Punkt ohne beide Labels": mehrere Sätze → erster Satz ist die
+    Änderung, der Rest die Folge; ein einzelner Satz wird an „und"/„;"/„—"
+    geteilt. Quelle/Link am Ende bleiben am Ende. Nicht teilbares bleibt stehen
+    (main.py versucht vorher eine Modell-Reparatur und warnt sonst).
+    """
+    neu_l, warum_l = _LABELS.get(lang, _LABELS["de"])
+    repariert = 0
+    teile = _punkt_teile(markdown)
+    for i, teil in enumerate(teile):
+        if not re.match(r"## \d", teil) or neu_l in teil or warum_l in teil:
+            continue
+        zeilen = teil.split("\n")
+        kopf, rumpf = zeilen[0], zeilen[1:]
+        fliess = [z for z in rumpf if z.strip() and not _LABEL_ZEILE_RE.match(z.strip())]
+        if not fliess:
+            continue
+        text = " ".join(z.strip() for z in fliess)
+        m = _QUELLE_ENDE_RE.search(text)
+        tail = m.group("tail").strip() if m else ""
+        text = text[: m.start()].strip() if m and tail else text
+        saetze = re.split(r"(?<=[.!?])\s+(?=[A-ZÄÖÜ„\"])", text)
+        if len(saetze) >= 2:
+            was, warum = saetze[0], " ".join(saetze[1:])
+        else:
+            geteilt = _teile_satz(text, lang)
+            if not geteilt:
+                continue
+            was, warum = geteilt
+        neu_rumpf, gesetzt = [], False
+        for z in rumpf:
+            if z.strip() and not _LABEL_ZEILE_RE.match(z.strip()):
+                if not gesetzt:
+                    neu_rumpf += [f"{neu_l} {was}", f"{warum_l} {warum}" + (f" {tail}" if tail else "")]
+                    gesetzt = True
+                continue
+            neu_rumpf.append(z)
+        teile[i] = "\n".join([kopf] + neu_rumpf)
+        repariert += 1
+    return "".join(teile), repariert
+
+
+# ── „Deine Themen" ohne Doppelungen zu den Punkten ───────────────────────────
+# Beobachtet am 19.11.: Die Airbnb-/Kurzzeitvermietungs-Meldung stand als Punkt 2
+# UND als Themen-Zeile; die Nvidia-Zeile wiederholte den Anthropic-Punkt.
+_STOPPWOERTER = frozenset("""
+der die das den dem des ein eine einer eines einem einen und oder mit für von vom bei
+auf aus nach seit über unter zum zur im in am an als auch nicht noch nur mehr wie was
+wer wird werden wurde wurden hat haben hatte ist sind war sein seine seiner ihre ihr
+dein deine deinem deinen deiner letzten letzter stand weiter neue neuen neuem neues
+dass sich sie er es man vor bis durch gegen ohne um soll sollen will kann können
+heute jetzt dabei damit davon dazu diese dieser dieses jedoch aber sowie bereits
+since your last update the and of with for from that this into
+""".split())
+
+
+def _schluesselwoerter(text: str) -> set[str]:
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", " ", text)
+    text = re.sub(r"\([^)]*\)", " ", text)
+    woerter = set()
+    for wort in re.findall(r"[A-Za-zÄÖÜäöüß0-9][\wÄÖÜäöüß]*", text):
+        w = wort.lower()
+        if w in _STOPPWOERTER or len(w) < 4:
+            continue
+        if w.endswith("ungen"):
+            w = w[:-2]
+        else:
+            for suf in ("en", "er", "es", "em", "e", "n", "s"):
+                if w.endswith(suf) and len(w) - len(suf) >= 4:
+                    w = w[: -len(suf)]
+                    break
+        woerter.add(w)
+    return woerter
+
+
+def ist_doppelung(zeile: str, punkt_texte: list[str]) -> bool:
+    """True, wenn eine Themen-Zeile inhaltlich einen der Punkte wiederholt."""
+    rumpf = re.sub(r"^\s*[-*•]\s*(?:\*\*[^*]+\*\*:?\s*)?", "", zeile)
+    rumpf = re.sub(r"^(?:Seit deinem letzten Stand|Since your last update)\s*:?\s*", "",
+                   rumpf, flags=re.IGNORECASE)
+    z = _schluesselwoerter(rumpf)
+    if not z:
+        return False
+    for text in punkt_texte:
+        gemeinsam = z & _schluesselwoerter(text)
+        if len(gemeinsam) >= 3 or (len(gemeinsam) >= 2 and len(gemeinsam) / len(z) >= 0.3):
+            return True
+    return False
+
+
+def entferne_themen_doppelungen(markdown: str, heading: str = "Deine Themen") -> tuple[str, int]:
+    """Streicht Themen-Zeilen, die schon als Punkt vorkommen; leerer Abschnitt fällt weg."""
+    punkte = [t for t in _punkt_teile(markdown) if re.match(r"## \d", t)]
+    if not punkte:
+        return markdown, 0
+    lines = markdown.splitlines()
+    start = next((i for i, l in enumerate(lines) if l.startswith("## ") and heading in l), None)
+    if start is None:
+        return markdown, 0
+    ende = next((i for i in range(start + 1, len(lines))
+                 if lines[i].startswith("## ") or lines[i].startswith("---")), len(lines))
+    behalten, entfernt = [], 0
+    for z in lines[start + 1 : ende]:
+        if z.lstrip().startswith(("-", "*", "•")) and ist_doppelung(z, punkte):
+            entfernt += 1
+            continue
+        behalten.append(z)
+    if not entfernt:
+        return markdown, 0
+    if any(z.lstrip().startswith(("-", "*", "•")) for z in behalten):
+        neu = lines[: start + 1] + behalten + lines[ende:]
+    else:
+        neu = lines[:start] + lines[ende:]
+    return "\n".join(neu) + ("\n" if markdown.endswith("\n") else ""), entfernt

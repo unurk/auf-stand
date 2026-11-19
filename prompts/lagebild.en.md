@@ -19,8 +19,8 @@ has its own purpose (see "Purpose of this edition" below) — stick to it.
 
 - Pure event reports without change ("X meets Y", "debate over Z continues") do NOT
   clear the bar.
-- If more developments clearly clear the bar, include up to 5 (points 4–5 as compact
-  one-liners) — never cut something essential.
+- If more developments clearly clear the bar, include up to 5 (points 4–5 compact,
+  but with both parts) — never cut something essential.
 - If fewer clear the bar, deliver fewer. **Never pad to 3.** A third point that just
   misses the bar belongs in "Checked, not included", not in the briefing.
 - If none clears the bar, it's a **Quiet day**: under "Today's headlines:" write only
@@ -35,7 +35,8 @@ has its own purpose (see "Purpose of this edition" below) — stick to it.
 Output the briefing exactly in this Markdown structure, with no preamble or closing
 remark. Keep the given emoji in the title line unchanged:
 
-# {EDITION_EMOJI} Your Briefing — {DATUM_LABEL}
+# {EDITION_EMOJI} [Headline of the day: the core of the lead story (point 1), max. 10 words]
+*{DATUM_LABEL}*
 
 **Today's headlines:**
 1️⃣ [headline for point 1 — max. 10 words, no detail]
@@ -51,12 +52,20 @@ remark. Keep the given emoji in the title line unchanged:
 [Optional, only if foreseeable — **What's next:** 1–2 sentences of outlook]
 
 ## 2️⃣ [section emoji] [headline]
-[shorter: 2 sentences per block]
+**What's new:** [shorter: 1–2 sentences]
+**Why it matters:** [1–2 sentences]
 
-## 3️⃣ ... [only if a third point truly clears the bar — 1–2 sentences per block]
+## 3️⃣ ... [only if a third point truly clears the bar — same structure, 1 sentence each]
 
-## 4️⃣ ... [only on heavy news days — a tight one-liner]
-## 5️⃣ ... [only on heavy news days — a tight one-liner]
+## 4️⃣ ... [only on heavy news days — same structure, 1 tight sentence each]
+## 5️⃣ ... [only on heavy news days — same structure, 1 tight sentence each]
+
+**Every point has both parts — "What's new:" AND "Why it matters:"**, including the
+compact points 3–5.
+
+**The title line (H1) is a real headline** derived from the lead story — no greeting,
+no meta title. Forbidden: "Ready?", "Good morning", "Your Briefing", "Here we go",
+"Today's update". On a quiet day the title is "Quiet day".
 
 {TRACKER_SECTION_HINT}
 
@@ -123,7 +132,9 @@ the core ran at 11:00", "interesting, but nothing to act on".
 
 If tracked topics are listed below: for each topic, check whether the articles show a
 material change. Only then does it appear in the "## Your Topics" section with a delta
-phrasing: "Since your last update: …". If there is nothing new on a topic, omit it
+phrasing: "Since your last update: …". **No duplicates:** anything already covered as a
+numbered point above does not appear again in "Your Topics", not even rephrased or as a
+side reference. If nothing remains, drop the section. If there is nothing new on a topic, omit it
 entirely — no "no news". If there is nothing on any topic, drop the section entirely.
 
 If a topic has a `History:` line (earlier states, with dates), phrase the delta
