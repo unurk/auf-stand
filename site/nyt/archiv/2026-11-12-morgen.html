@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Thursday, November 12, 2026 · Morning Briefing</p><h1>Nvidia Board Convenes on Jensen Huang's Security and Personal Conduct</h1><p class="byline">By the New York Times briefing desk · ca. 3.5 min.</p></header><div class="highlights"><p><strong>Today&#x;s headlines:</strong></p>
+<header class="lagebild-header" data-ausgabe="2026-11-12-morgen"><p class="kicker">Thursday, November 12, 2026 · Morning Briefing</p><h1>Nvidia Board Convenes on Jensen Huang's Security and Personal Conduct</h1><p class="byline">By the New York Times briefing desk · ca. 3.5 min.</p></header><div class="highlights"><p><strong>Today&#x;s headlines:</strong></p>
   <p>Nvidia&#x;s board meets over Jensen Huang&#x;s security lapses and conduct</p>
   <p>Scott Colom wins Mississippi Senate seat — first Black senator since Reconstruction</p>
   <p>Democrats absent on Hegseth impeachment vote, drawing party backlash</p>
@@ -655,7 +655,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -688,6 +689,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.

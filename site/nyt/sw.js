@@ -18,6 +18,10 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   var req = e.request;
   if(req.method !== 'GET') return;
+  // cache:'no-store' heißt: nie aus dem Cache bedienen, nie cachen — u. a. der
+  // Engagement-Zähler. Ohne diese Ausnahme beantwortete der Cache-first-Zweig
+  // für fremde Origins (Fonts) auch Zähler-Requests aus dem Cache.
+  if(req.cache === 'no-store') return;
   var url = new URL(req.url);
   if(url.origin !== self.location.origin){
     e.respondWith(caches.open(CACHE).then(function(c){
