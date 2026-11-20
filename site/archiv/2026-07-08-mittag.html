@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Mittwoch, 8. Juli · Mittags-Ausgabe</p><h1>Regierung stoppt Doppelbezug: Familienbeihilfe nur noch ohne Grundversorgung</h1><p class="byline">Von der „Presse"-Redaktion</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header" data-ausgabe="2026-07-08-mittag"><p class="kicker">Mittwoch, 8. Juli · Mittags-Ausgabe</p><h1>Regierung stoppt Doppelbezug: Familienbeihilfe nur noch ohne Grundversorgung</h1><p class="byline">Von der „Presse"-Redaktion</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Regierung beendet Doppelbezug bei Familienbeihilfe für Ukrainer</p>
   <p>USA greifen Iran an — Trump kündigt Friedensabsichtserklärung an</p>
   <p>Japanischer Konzern übernimmt E-Card-Produzenten Austriacard</p>
@@ -499,6 +499,7 @@
 <div class="article-fb" data-key="2026-07-08|mittag|0"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Regierung stoppt Doppelbezug: Familienbeihilfe nur noch ohne Grundversorgung" data-karte="2026-07-08-mittag-karte.png">↗ Teilen</button></div><h2>Eskalation und Kehrtwende: USA greifen Iran an, Trump will Frieden</h2>
   <p><strong>Was ist neu:</strong> Die US-Armee hat in der Nacht auf heute Dutzende Ziele im Iran angegriffen — als Reaktion auf iranische Attacken auf drei Handelsschiffe in der Straße von Hormuz. Unmittelbar danach kündigte US-Präsident Trump eine „Absichtserklärung für</p>
 <div class="article-fb" data-key="2026-07-08|mittag|1"><button class="fb-btn" data-vote="up">Relevant</button><button class="fb-btn" data-vote="down">Weniger</button><button class="share-btn" data-title="Eskalation und Kehrtwende: USA greifen Iran an, Trump will Frieden">↗ Teilen</button></div><hr>
+<script>window.__ZAEHLER__={"base": "https://abacus.jasoncameron.dev", "ns": "auf-stand-lagebild"};</script>
 </div>
 </div>
 <nav class="tabbar">
@@ -632,7 +633,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -665,6 +667,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.

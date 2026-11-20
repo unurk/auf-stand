@@ -487,6 +487,7 @@
 <div class="wrap">
 <h1>Archiv</h1>
 <div class="archiv-grid">
+<a class="archiv-card" href="2026-11-20-mittag.html"><span class="archiv-date">Freitag 20. November · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
 <a class="archiv-card" href="2026-11-20-morgen.html"><span class="archiv-date">Freitag 20. November · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
 <a class="archiv-card" href="2026-11-19-abend.html"><span class="archiv-date">Donnerstag 19. November · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
 <a class="archiv-card" href="2026-11-19-nachmittag.html"><span class="archiv-date">Donnerstag 19. November · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
@@ -546,7 +547,6 @@
 <a class="archiv-card" href="2026-10-07-mittag.html"><span class="archiv-date">Mittwoch 7. Oktober · Mittags-Ausgabe</span><span class="archiv-label">Mittags-Ausgabe</span></a>
 <a class="archiv-card" href="2026-10-07-morgen.html"><span class="archiv-date">Mittwoch 7. Oktober · Morgen-Ausgabe</span><span class="archiv-label">Morgen-Ausgabe</span></a>
 <a class="archiv-card" href="2026-10-06-abend.html"><span class="archiv-date">Dienstag 6. Oktober · Abend-Ausgabe</span><span class="archiv-label">Abend-Ausgabe</span></a>
-<a class="archiv-card" href="2026-10-06-nachmittag.html"><span class="archiv-date">Dienstag 6. Oktober · Nachmittags-Ausgabe</span><span class="archiv-label">Nachmittags-Ausgabe</span></a>
 </div>
 </div>
 </div>
@@ -681,7 +681,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -714,6 +715,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.

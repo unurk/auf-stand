@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Donnerstag, 25. Juni · Morgen-Ausgabe</p><h1>Schweres Erdbeben in Venezuela — über 1.000 Todesfälle befürchtet</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header" data-ausgabe="2026-06-25-morgen"><p class="kicker">Donnerstag, 25. Juni · Morgen-Ausgabe</p><h1>Schweres Erdbeben in Venezuela — über 1.000 Todesfälle befürchtet</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Schweres Erdbeben in Venezuela — über .Todesfälle befürchtet</p>
   <p>Energiewende-Projekte in Österreich in Gefahr — Batteriespeicher-Boom droht zu kollabieren</p>
   <p>Trump lobt NATO-Chef Rutte — Spannungen vor Juli-Gipfel bleiben</p>
@@ -505,6 +505,7 @@
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand (24.06.) verschärft sich die Unsicherheit: Der geplante Batteriespeicher-Ausbau — zentral für künftige Kostenstabilität — steht vor dem Kollaps. Das verlängert die Phase hoher Volatilität bei den Stromkosten erheblich.</p>
   <div class="done"><span class="done-check">✓</span> Du bist informiert — Lesezeit ca. 120 Sekunden. Nächstes Lagebild: heute 11:00 Uhr.</div>
   <hr>
+<script>window.__ZAEHLER__={"base": "https://abacus.jasoncameron.dev", "ns": "auf-stand-lagebild"};</script>
 </div>
 </div>
 <nav class="tabbar">
@@ -638,7 +639,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -671,6 +673,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.

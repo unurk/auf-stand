@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Mittwoch, 8. Juli · Nachmittags-Ausgabe</p><h1>Trump kündigt Waffenruhe mit Iran auf und droht</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header" data-ausgabe="2026-07-08-nachmittag"><p class="kicker">Mittwoch, 8. Juli · Nachmittags-Ausgabe</p><h1>Trump kündigt Waffenruhe mit Iran auf und droht</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Trump beendet Waffenruhe-Deal mit Iran, droht mit Angriffen</p>
   <p>Trump stimmt NATO-Beistandsverpflichtung zu</p>
   <p>Hitzeschutz: Sport und Prüfungen können ausgesetzt werden</p>
@@ -510,6 +510,7 @@
   <p>- <strong>Energiepreise:</strong> Seit deinem letzten Stand eskaliert die Lage am Golf — iranische Angriffe auf Tanker in der Straße von Hormuz und Trumps Kündigung des Waffenruhe-Deals erhöhen das Risiko für Ölpreisschübe. Konkrete Auswirkungen auf österreichische Energiekosten sind noch nicht messbar, aber der Druck auf die Preise wächst.</p><hr>
   <div class="done"><span class="done-check">✓</span> Du bist informiert — 27. Tag in Folge — Lesezeit ca. 135 Sekunden. Nächstes Lagebild: heute 20:00 Uhr.</div>
   <hr>
+<script>window.__ZAEHLER__={"base": "https://abacus.jasoncameron.dev", "ns": "auf-stand-lagebild"};</script>
 </div>
 </div>
 <nav class="tabbar">
@@ -643,7 +644,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -676,6 +678,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.

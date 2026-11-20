@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-area" id="__sa">
 <div class="wrap">
-<header class="lagebild-header"><p class="kicker">Montag, 5. Oktober · Abend-Ausgabe</p><h1>Feierabend — fast.</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
+<header class="lagebild-header" data-ausgabe="2026-10-05-abend"><p class="kicker">Montag, 5. Oktober · Abend-Ausgabe</p><h1>Feierabend — fast.</h1><p class="byline">Von der „Presse"-Redaktion · ca. 2 Min.</p></header><div class="highlights"><p><strong>Heute wichtig:</strong></p>
   <p>Vida-Chef beendet Lohnzurückhaltung vor den Herbstverhandlungen</p>
   <p>Kroatiens Forderung blockiert EU-Beitritt Montenegros materiell</p>
   <p>KI-Deepfakes bei EU-Abgeordneten: Studie zeigt Ausmaß</p>
@@ -515,6 +515,7 @@
   
   <div class="done"><span class="done-check">✓</span> Du bist informiert — 31. Tag in Folge — Lesezeit ca. 105 Sekunden. Nächstes Lagebild: morgen 06:00 Uhr.</div>
   <hr>
+<script>window.__ZAEHLER__={"base": "https://abacus.jasoncameron.dev", "ns": "auf-stand-lagebild"};</script>
 </div>
 </div>
 <nav class="tabbar">
@@ -648,7 +649,8 @@
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -681,6 +683,27 @@
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.
