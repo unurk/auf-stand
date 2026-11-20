@@ -111,6 +111,23 @@ kaputten Dienst nicht unterscheidbar.
 
 Der Rückkanal läuft nach jeder Ausgabe in der Pipeline (`python -m copilot.main rueckkanal`).
 
+## Engagement-Messung (Öffnungen und Feedback je Ausgabe)
+
+Misst, ob jede Ausgabe (06 · 11 · 16 · 20 Uhr) geöffnet wird und wie oft Feedback
+kommt — ohne neues Secret, ohne kostenpflichtigen Dienst:
+
+- **Telegram:** Taps auf „✓ Gelesen" und 👍/👎 sammelt der Rückkanal-Schritt der
+  Action ohnehin ein (`data/state.json`). Telegram meldet Bots kein „gelesen" —
+  dort zählt nur ein Tap.
+- **Web:** Die Seite meldet je Gerät und Ausgabe einmal „geöffnet" und je
+  bewertetem Artikel einmal „Feedback" an einen freien, cookie-freien Zähler
+  ohne Account/Token ([Abacus](https://abacus.jasoncameron.dev)). Kein Cookie,
+  kein Referrer, keine Kennung. Konfiguration: `config.yaml` → `engagement`
+  (Block löschen = Web-Zählung aus, Telegram läuft weiter).
+- **Auswertung:** samstags automatisch nach `berichte/engagement.md`
+  (Öffnungen je Ausgabe, Feedback-Rate, Tages-Matrix; neueste Woche oben).
+  Manuell: `python -m copilot.main engagement [--dry-run]`.
+
 ## Englische NYT-Edition (`config.nyt.yaml`)
 
 Dieselbe Pipeline kann ein **englisches Briefing aus öffentlichen New-York-Times-

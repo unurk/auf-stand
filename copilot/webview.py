@@ -693,7 +693,8 @@ __CONTENT__
     var vote=btn.dataset.vote;
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
-    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');}
+    if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -726,6 +727,27 @@ __CONTENT__
       } else { textShare(); }
     });
   });
+  // Engagement-Messung (cookie-frei, nur wenn config.yaml → engagement gesetzt
+  // ist): je Gerät und Ausgabe EINE Öffnung, je Artikel EIN Feedback. Kein
+  // Cookie, kein Referrer, keine Kennung — nur ein Zähler je Ausgabe.
+  (function(){
+    var z=window.__ZAEHLER__;
+    var head=document.querySelector('.lagebild-header[data-ausgabe]');
+    if(!z||!z.base||!z.ns||!head) return;
+    var id=head.getAttribute('data-ausgabe').replace(/[^A-Za-z0-9_.-]/g,'_');
+    function hit(art){
+      try{
+        fetch(z.base+'/hit/'+z.ns+'/'+id+'_'+art,{mode:'no-cors',credentials:'omit',
+          referrerPolicy:'no-referrer',cache:'no-store'}).catch(function(){});
+      }catch(e){}
+    }
+    function einmal(flag,art){
+      try{ if(localStorage.getItem(flag)) return; localStorage.setItem(flag,'1'); }catch(e){}
+      hit(art);
+    }
+    einmal('zaehler_offen_'+id,'offen');
+    window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+  })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
   // Streak aus Zustellungen nur uns misst, nicht die Leserin.
@@ -1081,7 +1103,7 @@ def _lagebild_header(
             label = f"{mins:.1f}".rstrip("0").rstrip(".").replace(".", ",")
             meta.append(f"ca. {label} Min.")
     return (
-        '<header class="lagebild-header">'
+        f'<header class="lagebild-header" data-ausgabe="{_html.escape(f"{datum_iso}-{edition}")}">'
         f'<p class="kicker">{kicker}</p>'
         f"<h1>{greeting}</h1>"
         f'<p class="byline">{" · ".join(meta)}</p>'
@@ -1236,6 +1258,9 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
     content = re.sub(
         r'<div class="audio-player">.*?</div>\s*', "", content, flags=re.DOTALL
     )
+    # Zähler-Konfiguration hängt der Site-Build jedes Mal neu an — beim Neubau
+    # aus dem Archiv die alte entfernen, sonst vermehrt sie sich je Build.
+    content = re.sub(r"\s*<script>window\.__ZAEHLER__=.*?</script>", "", content, flags=re.DOTALL)
     content = re.sub(
         r'<(p|div)[^>]*class="brand"[^>]*>.*?</\1>\s*', "", content, flags=re.DOTALL
     )
@@ -1306,9 +1331,9 @@ def _enhance_content(content: str, datum: str = "", edition: str = "", lang: str
         header = _lagebild_header(
             datum, edition, points, lesezeit, lang, _schlagzeile_aus_inhalt(content, lang)
         )
-        if '<header class="lagebild-header">' in content:
+        if '<header class="lagebild-header"' in content:
             content = re.sub(
-                r'<header class="lagebild-header">.*?</header>',
+                r'<header class="lagebild-header"[^>]*>.*?</header>',
                 header, content, count=1, flags=re.DOTALL,
             )
         else:
@@ -2073,6 +2098,10 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   var req = e.request;
   if(req.method !== 'GET') return;
+  // cache:'no-store' heißt: nie aus dem Cache bedienen, nie cachen — u. a. der
+  // Engagement-Zähler. Ohne diese Ausnahme beantwortete der Cache-first-Zweig
+  // für fremde Origins (Fonts) auch Zähler-Requests aus dem Cache.
+  if(req.cache === 'no-store') return;
   var url = new URL(req.url);
   if(url.origin !== self.location.origin){
     e.respondWith(caches.open(CACHE).then(function(c){
@@ -2154,6 +2183,20 @@ def _erster_punkt(html_text: str) -> str:
         if titel:
             return titel[:70]
     return ""
+
+
+def _zaehler_script(config: dict) -> str:
+    """Konfiguration des cookie-freien Öffnungs-Zählers — '' wenn nicht konfiguriert."""
+    from .engagement import zaehler_config
+
+    zc = zaehler_config(config)
+    if zc is None:
+        return ""
+    return (
+        "\n<script>window.__ZAEHLER__="
+        + json.dumps({"base": zc[0], "ns": zc[1]})
+        + ";</script>"
+    )
 
 
 def _ausgaben_script(editions: list, lang: str = "de", root: str = "") -> str:
@@ -2288,7 +2331,9 @@ def _build_presse_site() -> Path:
         mp3_name = f"{d.isoformat()}-{edition}.mp3"
         if (archiv_dir / mp3_name).exists():
             content = _insert_after_header(content, _audio_player(mp3_name))
-        branded = _render_page(_label(d, edition, "de"), content, "archiv", root="../")
+        branded = _render_page(
+            _label(d, edition, "de"), content + _zaehler_script(config), "archiv", root="../"
+        )
         path.write_text(branded, encoding="utf-8")
 
     build_archiv_index(editions)
@@ -2319,6 +2364,7 @@ def _build_presse_site() -> Path:
     # Nachhol-Leiste: Liste der letzten Ausgaben für den Client (statische Site,
     # der Lese-Stand liegt im Browser).
     latest_content += "\n" + _ausgaben_script(editions, "de")
+    latest_content += _zaehler_script(config)
 
     title = _label(latest_d, latest_edition, "de")
     index_html = _render_page(title, latest_content, "lagebild")
