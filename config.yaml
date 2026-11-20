@@ -166,6 +166,15 @@ epaper_url: https://www.diepresse.com/epaper
 # Basis-URL der PWA — für Web-Push und den Podcast-Feed (site/feed.xml).
 site_url: https://unurk.github.io/auf-stand/
 
+# Engagement-Messung (copilot/engagement.py): Web-Öffnungen und -Feedback je
+# Ausgabe über einen freien, cookie-freien Zähler ohne Account/Token (Abacus).
+# Kein Secret — der Namespace steht ohnehin im öffentlichen Seiten-JS.
+# Block löschen oder namespace leeren = Web-Zählung aus (no-op), Telegram-Taps
+# werden weiter ausgewertet. Auswertung: Samstag → berichte/engagement.md.
+engagement:
+  zaehler_url: https://abacus.jasoncameron.dev
+  namespace: auf-stand-lagebild
+
 # Zeitbudget der Ausgabe in Sekunden. Wird nicht erzwungen (Kürzen würde Inhalt
 # zerstören), aber gemessen: Reißen die letzten Ausgaben das Budget im Schnitt,
 # geht ein Kürzungs-Hinweis als Kalibrierung in den nächsten Prompt.

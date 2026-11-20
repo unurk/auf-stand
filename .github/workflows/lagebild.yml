@@ -108,6 +108,27 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python -m copilot.main rueckkanal
 
+      # Engagement-Auswertung: samstags mit der Wochen-Quittung. Läuft NACH dem
+      # Rückkanal (der die Telegram-Taps einsammelt) und braucht kein Secret —
+      # Web-Zähler ist frei lesbar, Telegram-Daten liegen im State.
+      - name: Engagement-Auswertung (wöchentlich)
+        if: >-
+          always() && github.ref == 'refs/heads/master' &&
+          (github.event.inputs.edition == 'woche' || github.event.schedule == '0 7 * * 6')
+        run: |
+          python -m copilot.main engagement
+          if [ -n "$(git status --porcelain berichte)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add berichte
+            git commit -m "berichte: Engagement-Auswertung $(date -u +%F)"
+            for i in 1 2 3 4; do
+              git push origin HEAD:master && break
+              sleep $((2 ** i))
+              git pull --rebase origin master
+            done
+          fi
+
       - name: Web-Ansicht bauen und committen
         id: site
         if: always() && github.ref == 'refs/heads/master'

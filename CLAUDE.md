@@ -36,9 +36,11 @@ copilot/
   rueckkanal.py  Telegram-Rückkanal: Fragen, /themen, /thema-neu, /push, Feedback-Taps
   quittung.py    Wochen-Quittung als Bild-Karte (Samstag)
   epaper.py      E-Paper-Verweis am Ende jeder Ausgabe
+  engagement.py  Wöchentliche Messung: Öffnungen je Ausgabe (Web-Zähler + Telegram-Taps),
+                 Feedback-Rate → berichte/engagement.md
   vorausschau.py Termin-Vorausschau in der Morgen-Ausgabe
   i18n.py        Deutsche/englische Textbausteine (Presse- vs. NYT-Edition)
-  main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte [--dry-run]
+  main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte|engagement [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
 manual_input/    Hier können Volltexte (Premium) als .txt/.md abgelegt werden

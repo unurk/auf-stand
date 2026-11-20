@@ -1,4 +1,4 @@
-"""CLI: python -m copilot.main morgen|mittag|nachmittag|abend|catchup|feeds [--dry-run] [--keep-seen]"""
+"""CLI: python -m copilot.main morgen|mittag|nachmittag|abend|catchup|feeds|engagement [--dry-run] [--keep-seen]"""
 from __future__ import annotations
 
 import argparse
@@ -495,7 +495,7 @@ def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", nargs="?", default="auto",
-                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys"])
+                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys", "engagement"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -533,6 +533,9 @@ def main() -> int:
         if args.command == "woche":
             from . import quittung
             return quittung.cmd_woche(config)
+        if args.command == "engagement":
+            from . import engagement
+            return engagement.cmd_engagement(config, state.load_state(), dry_run=args.dry_run)
         if args.command == "rueckkanal":
             from . import rueckkanal
             return rueckkanal.cmd_rueckkanal(config)
