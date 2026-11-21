@@ -85,12 +85,12 @@ _PAGE_TEMPLATE = """\
   <link rel="apple-touch-icon" href="__ROOT__apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Copilot">
-  <meta name="application-name" content="Copilot">
+  <meta name="apple-mobile-web-app-title" content="auf-stand">
+  <meta name="application-name" content="auf-stand">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <title>__TITLE__ · Die Presse · Copilot</title>
+  <title>__TITLE__ · Die Presse · auf-stand</title>
   <style>
     /* Copilot · Die Presse — Richtung C „Briefing-Timeline" (Light, Presse-Stil)
        Schriften: Newsreader (editoriale Serif für Schlagzeilen), Archivo (UI + Text).
@@ -553,7 +553,7 @@ _PAGE_TEMPLATE = """\
 <div class="topbar">
   <div class="brandrow">
     <div class="wordmark-text">Die Presse</div>
-    <div class="copilot-pill">Copilot</div>
+    <div class="copilot-pill">auf-stand</div>
   </div>
   <div class="progress-track"><div class="progress-bar" id="__pb"></div></div>
 </div>
@@ -694,7 +694,8 @@ __CONTENT__
     var prev=localStorage.getItem(key);
     bar.querySelectorAll('.fb-btn').forEach(function(b){b.classList.remove('active');});
     if(prev!==vote){localStorage.setItem(key,vote);btn.classList.add('active');
-      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);}
+      if(window.__zaehleFeedback) window.__zaehleFeedback(bar.dataset.key);
+      if(window.__zaehleVote) window.__zaehleVote(bar.dataset.key,vote);}
     else{localStorage.removeItem(key);}
   }
   document.querySelectorAll('.article-fb').forEach(function(bar){
@@ -747,6 +748,14 @@ __CONTENT__
     }
     einmal('zaehler_offen_'+id,'offen');
     window.__zaehleFeedback=function(artikel){ einmal('zaehler_fb_'+artikel,'fb'); };
+    // Leserprofil: Richtung je Punkt („fb<idx>_up"/„fb<idx>_down"), je Gerät
+    // höchstens einmal pro Richtung. Der Lagebild-Lauf liest diese Zähler und
+    // macht daraus Gewichte je Thema/Ressort/Stichwort (copilot/leserprofil.py).
+    window.__zaehleVote=function(artikel,vote){
+      var idx=String(artikel).split('|').pop();
+      if(!/^[0-9]+$/.test(idx)||(vote!=='up'&&vote!=='down')) return;
+      einmal('zaehler_v_'+artikel+'_'+vote,'fb'+idx+'_'+vote);
+    };
   })();
   // Lese-Signal: Tap auf „Du bist informiert ✓" merkt sich den Stand lokal.
   // Grundlage der Nachhol-Leiste — und die ehrliche Antwort darauf, dass ein
@@ -822,7 +831,7 @@ _NYT_PAGE_TEMPLATE = (
         "<html lang=\"en\">"
     )
     .replace(
-        "<title>__TITLE__ · Die Presse · Copilot</title>",
+        "<title>__TITLE__ · Die Presse · auf-stand</title>",
         "<title>__TITLE__ · NYT Briefing</title>"
     )
     .replace(
@@ -2037,8 +2046,8 @@ def build_archiv_index(editions: list, lang: str = "de", site_dir: Path | None =
 
 
 _MANIFEST = {
-    "name": "Copilot · Die Presse",
-    "short_name": "Copilot",
+    "name": "auf-stand · Die Presse",
+    "short_name": "auf-stand",
     "description": "Dein tägliches Lagebild der Presse — in rund 90 Sekunden informiert.",
     "lang": "de-AT",
     "dir": "ltr",
@@ -2130,7 +2139,7 @@ self.addEventListener('fetch', function(e){
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}
-  e.waitUntil(self.registration.showNotification(d.title || 'Copilot', {
+  e.waitUntil(self.registration.showNotification(d.title || 'auf-stand', {
     body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
     data: { url: d.url || './index.html' }, tag: 'lagebild'
   }));

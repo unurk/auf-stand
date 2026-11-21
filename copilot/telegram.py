@@ -77,7 +77,10 @@ def _escape_remaining(text: str) -> str:
                 result.append(text[i : end + 1])
                 i = end + 1
                 continue
-        if text[i] in _SPECIAL:
+        # Ein einzelnes „*" ohne Partner (z. B. „Preis * Leistung") ist kein
+        # Token — unescaped lässt Telegram die GANZE Nachricht mit „can't find
+        # end of entity" abweisen. Darum escapen wie jedes andere Sonderzeichen.
+        if text[i] in _SPECIAL or text[i] == "*":
             result.append(f"\\{text[i]}")
         else:
             result.append(text[i])
@@ -303,15 +306,33 @@ def confirm_feedback(chat_id: str, message_id: int, text: str) -> None:
         pass
 
 
+def _sichtbare_laenge(text: str) -> int:
+    """Länge, wie Telegram sie gegen das 4096-Limit zählt (obere Schranke).
+
+    Telegram zählt den Text NACH dem Markdown-Parsing in UTF-16-Einheiten:
+    Escape-Backslashes zählen nicht, Emoji außerhalb der BMP doppelt. Markup-
+    Zeichen und Link-URLs zählen wir trotzdem mit — das überschätzt leicht und
+    bleibt damit sicher unter dem Limit.
+    """
+    ohne_escapes = re.sub(r"\\(.)", r"\1", text)
+    return len(ohne_escapes.encode("utf-16-le")) // 2
+
+
 def _split(text: str, limit: int = 4000) -> list[str]:
-    """Teilt langen Text an Absatzgrenzen auf, max. `limit` Zeichen pro Teil."""
-    if len(text) <= limit:
+    """Teilt langen Text an Absatzgrenzen auf, max. `limit` sichtbare Zeichen pro Teil.
+
+    Früher zählte hier der escapte Text — jeder „\\." und „\\-" ging mit ins
+    Limit, und eine Ausgabe, die als eine Nachricht gepasst hätte, kam in zwei
+    Teilen an (Punkte vorne, der Rest samt Bewertungs-Knöpfen in einer zweiten
+    Nachricht).
+    """
+    if _sichtbare_laenge(text) <= limit:
         return [text]
     chunks: list[str] = []
     current: list[str] = []
     current_len = 0
     for para in text.split("\n\n"):
-        para_len = len(para) + 2
+        para_len = _sichtbare_laenge(para) + 2
         if current_len + para_len > limit and current:
             chunks.append("\n\n".join(current))
             current = []
