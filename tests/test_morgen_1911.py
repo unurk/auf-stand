@@ -3,7 +3,7 @@
 1) H1 „Bereit?" — Meta-Floskel statt Schlagzeile.
 2) Punkt „Medienförderung" ohne „Was ist neu:"/„Warum es zählt:".
 3) „Deine Themen" wiederholte Punkte (Airbnb/Kurzzeitvermietung, Anthropic/Nvidia).
-4) Kopfzeile „Die Presse · Copilot" — geprüft: gewollter Produktname.
+4) Kopfzeile: App-Name ist seit Backlog 5 „auf-stand" (Titel, PWA-Metas, Kopfzeile).
 """
 from copilot import i18n, main, qualitaet, render, state, synthesize, webview
 
@@ -174,12 +174,15 @@ def test_dossier_behaelt_entfernte_zeilen():
     assert "Airbnb" in s["dossier"]["Mietrecht und Wohnkosten"][0]["summary"]
 
 
-# ── 4) Kopfzeile „Die Presse · Copilot" ──────────────────────────────────────
+# ── 4) Kopfzeile: App-Name „auf-stand" ──────────────────────────────────────
 
-def test_kopfzeile_copilot_ist_gewollter_produktname():
-    """„Copilot" ist der Produktname (PWA-Manifest, Push, Podcast, Mail-Brand), kein
-    Überbleibsel. Der Test hält Kopfzeile und Brand-String konsistent."""
-    assert '<div class="wordmark-text">Die Presse</div>' in webview._PAGE_TEMPLATE
-    assert '<div class="copilot-pill">Copilot</div>' in webview._PAGE_TEMPLATE
-    assert i18n.t("de", "brand") == "Die Presse · Copilot"
-    assert i18n.t("de", "podcast_title").startswith("Die Presse · Copilot")
+def test_kopfzeile_und_app_name_sind_auf_stand():
+    """Im Browser-Titel, den PWA-Metas und der Kopfzeile steht „auf-stand", nicht mehr „Copilot"."""
+    t = webview._PAGE_TEMPLATE
+    assert '<div class="wordmark-text">Die Presse</div>' in t
+    assert '<div class="copilot-pill">auf-stand</div>' in t
+    assert '<meta name="apple-mobile-web-app-title" content="auf-stand">' in t
+    assert '<meta name="application-name" content="auf-stand">' in t
+    assert "<title>__TITLE__ · Die Presse · auf-stand</title>" in t
+    for marker in ('content="Copilot"', "· Copilot</title>", ">Copilot</div>"):
+        assert marker not in t
