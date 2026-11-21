@@ -50,7 +50,7 @@ self.addEventListener('fetch', function(e){
 self.addEventListener('push', function(e){
   var d = {};
   try { d = e.data.json(); } catch(err){}
-  e.waitUntil(self.registration.showNotification(d.title || 'Copilot', {
+  e.waitUntil(self.registration.showNotification(d.title || 'auf-stand', {
     body: d.body || '', icon: './icon-192.png', badge: './icon-192.png',
     data: { url: d.url || './index.html' }, tag: 'nyt-briefing'
   }));
