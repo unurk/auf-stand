@@ -24,6 +24,8 @@ copilot/
   qualitaet.py   Qualitäts-Gate nach der Synthese: leere Themen-Deltas raus,
                  Tracker-Abschnitt gedeckelt, Lesezeit-Budget gemessen
   profil.py      Wirkungs-Profil (Betroffenheit statt Interesse) → „Für dich konkret"
+  leserprofil.py Leserprofil aus 👍/👎 bzw. „Relevant"/„Weniger" (Telegram + Web-Zähler):
+                 Gewichte je Thema/Ressort/Stichwort mit Abklingen → ordnet das Material
   karte.py       Teilbare Bild-Karte zum wichtigsten Punkt (matplotlib)
   podcast.py     RSS-Feed der Audio-Ausgaben (Apple Podcasts, Spotify, CarPlay)
   synthesize.py  Prompt bauen + Synthese über Provider (anthropic | glm via OpenRouter)
@@ -108,7 +110,9 @@ Als Nächstes sinnvoll:
 ## Was bewusst NICHT gebaut wird
 
 - Kein Artikel-Feed, keine Endlos-Liste, kein „Mehr laden"
-- Keine Klick-Personalisierung; Themen-Tracker sind explizit gewählte Themen
+- Keine Klick-Personalisierung (kein Tracking von Klicks/Verweildauer); Themen-Tracker
+  sind explizit gewählte Themen. Erlaubt ist nur explizites Feedback („Relevant"/
+  „Weniger", 👍/👎) → `leserprofil.py`; Top-Nachrichten fallen dadurch nie weg.
 - Kein Dauerrauschen: Ausgaben/Pushes ausschließlich zu den vier festen
   Presse-Kuratierungszeiten (06/11/16/20). Die festen Zeitpunkte sind selbst der
   Anti-Doomscroll-Mechanismus — keine beliebigen Zusatz-Pushes dazwischen.

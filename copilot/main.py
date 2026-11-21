@@ -11,7 +11,7 @@ import yaml
 from dotenv import load_dotenv
 
 from . import (
-    deliver, epaper, i18n, karte, profil, qualitaet, render, state, synthesize,
+    deliver, epaper, i18n, karte, leserprofil, profil, qualitaet, render, state, synthesize,
     telegram, tts, vorausschau, webpush,
 )
 from .fetch import fetch_all, filter_recent
@@ -200,6 +200,23 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     print(f"{len(selection)} Artikel im Zeitfenster, davon {len(new_articles)} neu.")
 
     all_topics = config.get("topics", []) + current_state.get("custom_topics", [])
+    # Leserprofil aus Feedback: Web-Votes einsammeln (freier Zähler, best-effort),
+    # Gewichte mit Abklingen neu berechnen, Material danach ordnen. Ohne Feedback
+    # bleibt alles wie bisher (leeres Profil → Reihenfolge und Material unverändert).
+    if not dry_run:
+        try:
+            neu = leserprofil.sync_web_feedback(current_state, config)
+            if neu:
+                print(f"Leserprofil: {neu} neue Web-Bewertung(en) übernommen.")
+        except Exception as exc:  # Netz/Zähler darf die Ausgabe nie blockieren
+            print(f"Leserprofil: Web-Feedback nicht lesbar ({exc}) — weiter ohne.")
+    leser = leserprofil.aktualisiere_profil(current_state)
+    material, weggelassen = leserprofil.ordne_material(selection, leser, all_topics)
+    if leser.get("gewichte"):
+        print(
+            f"Leserprofil: {leser['votes']} Vote(s), {len(leser['gewichte'])} Merkmal(e); "
+            f"{len(weggelassen)} abgewählte Randmeldung(en) aus dem Material genommen."
+        )
     cutoff = (datetime.now() - timedelta(days=30)).date().isoformat()
     fb_hint = state.article_feedback_hint(current_state, cutoff)
     missing_hint = state.missing_feedback_hint(current_state, cutoff)
@@ -207,7 +224,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     budget_hint = qualitaet.budget_hinweis(state.letzte_lesezeiten(current_state), budget)
 
     prompt = synthesize.build_prompt(
-        selection,
+        material,
         all_topics,
         edition_config.get("label", edition),
         termine=config.get("termine", []),
@@ -224,6 +241,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
         budget_hint=budget_hint,
         edition=edition,
         bisher_heute=_bisher_heute(current_state, edition, order),
+        leserprofil_block=leserprofil.prompt_block(leser, lang),
     )
 
     if dry_run:
@@ -315,6 +333,11 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     # (der Rückkanal-Lauf lädt den State neu, darum hier sofort persistieren).
     state.save_edition_points(
         current_state, f"{datetime.now():%Y-%m-%d}", edition, article_headings
+    )
+    # Merkmale je Punkt (Thema/Ressort/Stichwort) — macht spätere Votes auswertbar.
+    leserprofil.merke_punkt_merkmale(
+        current_state, f"{datetime.now():%Y-%m-%d}", edition,
+        leserprofil.punkt_merkmale_aus_lagebild(lagebild, selection, all_topics),
     )
     state.save_state(current_state)
     telegram.send_telegram(

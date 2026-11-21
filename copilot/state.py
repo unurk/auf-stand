@@ -174,7 +174,14 @@ def save_edition_points(state: dict, datum: str, edition: str, headings: list[st
 def record_article_feedback(
     state: dict, datum: str, edition: str, article_idx: int, rating: str, chat_id: str
 ) -> None:
-    """Hält Artikel-Relevanz-Bewertung fest (rating: 'up' oder 'down')."""
+    """Hält Artikel-Relevanz-Bewertung fest (rating: 'up' oder 'down').
+
+    Mit den Merkmalen des Punkts (Thema/Ressort/Stichwort), damit das
+    Leserprofil den Vote auch dann auswerten kann, wenn die Punkt-Merkmale
+    später aus dem State fallen.
+    """
+    from .leserprofil import merkmale_fuer_vote
+
     now = datetime.now(timezone.utc)
     headings = state.get("edition_points", {}).get(f"{datum}|{edition}", [])
     heading = headings[article_idx] if 0 <= article_idx < len(headings) else ""
@@ -186,9 +193,16 @@ def record_article_feedback(
         "heading": heading,
         "rating": rating,
         "chat_id": chat_id,
+        "quelle": "telegram",
+        "merkmale": merkmale_fuer_vote(
+            state, {"date": datum, "edition": edition, "article_idx": article_idx,
+                    "heading": heading}
+        ),
         "ts": now.isoformat(),
     })
-    cutoff = now.date().toordinal() - 30
+    # 60 Tage: Das Leserprofil lässt Votes mit 14 Tagen Halbwertszeit abklingen —
+    # nach 60 Tagen zählt ein Vote ohnehin nur noch ~5 %.
+    cutoff = now.date().toordinal() - 60
     state["article_feedback"] = [
         e for e in entries
         if datetime.fromisoformat(e["date"]).toordinal() >= cutoff

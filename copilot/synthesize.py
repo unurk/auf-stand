@@ -116,6 +116,7 @@ def build_prompt(
     budget_hint: str = "",
     edition: str = "",
     bisher_heute: list[str] | None = None,
+    leserprofil_block: str = "",
 ) -> str:
     from .vorausschau import format_vorausschau
 
@@ -139,6 +140,8 @@ def build_prompt(
         block = prompt_block(profil, lang)
         if block:
             lines.append(block)
+    if leserprofil_block:
+        lines.append(leserprofil_block)
     if user_topic_prefs:
         pref_hint = (
             "\n\n---\n\n# Nutzerpräferenzen\n"
