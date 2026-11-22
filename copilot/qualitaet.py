@@ -689,3 +689,71 @@ def entferne_themen_doppelungen(markdown: str, heading: str = "Deine Themen") ->
     else:
         neu = lines[:start] + lines[ende:]
     return "\n".join(neu) + ("\n" if markdown.endswith("\n") else ""), entfernt
+
+
+# ── Rechtschreibung: Korrekturdurchgang für Titel und „Warum es zählt" ───────
+# Beobachtet am 22.11.: „hötere Belastungen", „Auslandsdelivrung", „könnte Kosten
+# … weitergereicht werden", „Klimakonferenz drohen zu scheitern". Korrigiert
+# werden nur die sichtbarsten Zeilen (H1, Punkt-Titel, „Warum es zählt") — und
+# eine Korrektur gilt nur, wenn sie klein ist und keine Zahl verändert.
+_WARUM_LABELS = ("**Warum es zählt:**", "**Why it matters:**")
+_QUELLE_SCHWANZ_RE = re.compile(r"(\s*(?:\([^()]*\)\.?\s*)?(?:\[→[^\]]*\]\([^)]*\)\s*)?)$")
+MIN_AEHNLICHKEIT = 0.8
+
+
+def korrektur_zeilen(markdown: str) -> list[tuple[int, str, str, str]]:
+    """(Zeilennummer, Präfix, Text, Schwanz) der zu prüfenden Zeilen.
+
+    Präfix = Markdown/Nummer/Emoji/Label, Schwanz = Quellenklammer und Link —
+    beides bleibt unangetastet, nur der Text dazwischen geht ans Modell.
+    """
+    result = []
+    for i, zeile in enumerate(markdown.splitlines()):
+        if zeile.startswith("# "):
+            m = re.match(r"^# [^\wÄÖÜäöüß„\"']*", zeile)
+        elif re.match(r"## \d", zeile):
+            m = re.match(r"^## \d️?⃣?\s*[^\wÄÖÜäöüß„\"'(«»]*", zeile)
+        elif zeile.startswith(_WARUM_LABELS):
+            m = re.match(r"^\*\*[^*]+\*\*\s*", zeile)
+        else:
+            continue
+        praefix = m.group(0)
+        rest = zeile[len(praefix):]
+        schwanz = _QUELLE_SCHWANZ_RE.search(rest).group(1)
+        text = rest[: len(rest) - len(schwanz)] if schwanz else rest
+        if text.strip():
+            result.append((i, praefix, text, schwanz))
+    return result
+
+
+def korrektur_zulaessig(alt: str, neu: str) -> bool:
+    """Nur kleine Korrekturen: gleiche Zahlen, gleiche Links, hohe Ähnlichkeit."""
+    from difflib import SequenceMatcher
+
+    if not isinstance(neu, str) or not neu.strip() or "\n" in neu:
+        return False
+    if re.findall(r"\d+", alt) != re.findall(r"\d+", neu):
+        return False
+    if re.findall(r"\]\(([^)]+)\)", alt) != re.findall(r"\]\(([^)]+)\)", neu):
+        return False
+    return SequenceMatcher(None, alt, neu).ratio() >= MIN_AEHNLICHKEIT
+
+
+def setze_korrekturen(markdown: str, zeilen: list, korrigiert: list) -> tuple[str, int]:
+    """Übernimmt zulässige Korrekturen. → (Markdown, Anzahl geänderter Zeilen)."""
+    if not isinstance(korrigiert, list) or len(korrigiert) != len(zeilen):
+        return markdown, 0
+    lines = markdown.splitlines()
+    n = 0
+    for (i, praefix, alt, schwanz), neu in zip(zeilen, korrigiert):
+        if not isinstance(neu, str):
+            continue
+        neu = neu.strip()
+        # Leerraum am Textende (vor der Quellenklammer) wie im Original
+        neu += alt[len(alt.rstrip()):]
+        if neu != alt and korrektur_zulaessig(alt, neu):
+            lines[i] = praefix + neu + schwanz
+            n += 1
+    if not n:
+        return markdown, 0
+    return "\n".join(lines) + ("\n" if markdown.endswith("\n") else ""), n

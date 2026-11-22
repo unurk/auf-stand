@@ -42,6 +42,8 @@ copilot/
                  Feedback-Rate → berichte/engagement.md
   vorausschau.py Termin-Vorausschau in der Morgen-Ausgabe
   i18n.py        Deutsche/englische Textbausteine (Presse- vs. NYT-Edition)
+  slot.py        Welche Ausgabe ein geplanter Lauf ist: aus dem Cron-Slot, nie aus der Uhrzeit;
+                 > 3 h verspätet → übersprungen
   main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte|engagement [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
@@ -127,3 +129,9 @@ Die Ausgaben laufen in GitHub Actions (`.github/workflows/lagebild.yml`). Verlä
 benennt die Ausgabe explizit über den `edition`-Workflow-Input. Die GitHub-eigenen
 `schedule`-Crons sind erwiesenermaßen unzuverlässig (verspätet/ausgelassen) und bleiben nur
 als Best-Effort-Fallback; der Block-Guard in `main.py` hält Doppelläufe idempotent.
+Ein geplanter Lauf bestimmt seine Ausgabe aus dem Cron-Ausdruck, der gefeuert hat
+(`github.event.schedule` → `python -m copilot.main slot --schedule …`, Tabelle in
+`copilot/slot.py`), **nie aus der Uhrzeit**. Startet er mehr als 3 h nach seinem Slot
+(Wiener Zeit), wird er übersprungen. Anlass: Am 21.11. lief ein verspäteter 20-Uhr-Cron um
+01:08 als Morgen-Ausgabe und sperrte die echte 06-Uhr-Ausgabe. Neue Crons im Workflow
+brauchen einen Eintrag in `slot.CRON_SLOTS` (ein Test prüft das).

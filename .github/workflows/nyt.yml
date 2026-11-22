@@ -57,22 +57,19 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          EDITION: ${{ github.event.inputs.edition }}
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
           mkdir -p data out out/nyt
-          EDITION="${{ github.event.inputs.edition }}"
+          # Ausgabe aus dem Cron-Slot, nie aus der Uhrzeit (Details: copilot/slot.py).
           case "$EDITION" in
             morgen|mittag|nachmittag|abend)
               python -m copilot.main "$EDITION" --config config.nyt.yaml ;;
             *)
-              HOUR=$(date -u +%H)
-              if [ "$HOUR" -le "08" ]; then
-                python -m copilot.main morgen --config config.nyt.yaml
-              elif [ "$HOUR" -le "13" ]; then
-                python -m copilot.main mittag --config config.nyt.yaml
-              elif [ "$HOUR" -le "17" ]; then
-                python -m copilot.main nachmittag --config config.nyt.yaml
+              if [ -n "$SCHEDULE" ]; then
+                python -m copilot.main slot --schedule "$SCHEDULE" --config config.nyt.yaml
               else
-                python -m copilot.main abend --config config.nyt.yaml
+                python -m copilot.main auto --config config.nyt.yaml
               fi ;;
           esac
 

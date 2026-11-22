@@ -194,6 +194,13 @@ mit dem Schlagwort des Themas, damit die Zuordnung klar ist, z. B.
   (nicht „store closures", sondern „Geschäftsschließungen"; nicht „earnings",
   sondern „Quartalszahlen"). Erlaubt sind nur Eigennamen, Werk- und Firmennamen
   sowie im Deutschen fest etablierte Lehnwörter (Deal, Job, Team, Software).
+- **Fehlerfreies Deutsch.** Lies jede Überschrift und jeden Satz vor der Ausgabe auf
+  Rechtschreibung, Grammatik und Zeichensetzung gegen. Typische Fehler, die nicht
+  vorkommen dürfen: Buchstabendreher („hötere" statt „höhere"), erfundene
+  Mischwörter („Auslandsdelivrung" statt „Auslandslieferung"), falsche Kongruenz
+  („Die Klimakonferenz drohen zu scheitern" statt „droht"; „könnte Kosten …
+  weitergereicht werden" statt „könnten"). Im Zweifel das einfachere, sichere Wort
+  und den kürzeren Satz wählen. Österreichische Standardsprache (Jänner, Matura).
 - **„Warum es zählt" nennt konkrete Folgen**, keine Meta-Sätze. Verboten sind
   Einleitungen wie „Für dein politisches Verständnis:", „Für dein Verständnis:",
   „Das ist relevant, weil …" oder „Wichtig ist das, weil …". Schreib direkt, was
