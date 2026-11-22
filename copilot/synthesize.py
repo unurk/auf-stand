@@ -331,6 +331,45 @@ def korrigiere_sprache(lagebild: str, woerter: list[str], config: dict) -> str:
     return lagebild if kandidat is None else kandidat
 
 
+def korrigiere_rechtschreibung(lagebild: str, config: dict, lang: str = "de") -> tuple[str, int]:
+    """Kurzer Korrekturdurchgang für H1, Punkt-Titel und „Warum es zählt". → (md, n)
+
+    Ein kleiner Aufruf über den schon konfigurierten Provider (nur diese paar
+    Zeilen, ~300 Tokens Antwort) — kein neuer Dienst. Das Modell bekommt die
+    Zeilen ohne Markdown, Quelle und Link und gibt eine JSON-Liste gleicher
+    Länge zurück. Übernommen wird je Zeile nur eine kleine Korrektur ohne
+    veränderte Zahlen (qualitaet.korrektur_zulaessig). Abschaltbar mit
+    `rechtschreib_check: false`; ohne Provider oder bei Fehlern: no-op.
+    """
+    import json as _json
+
+    from . import qualitaet
+
+    if lang != "de" or not config.get("rechtschreib_check", True) or not _provider_configured(config):
+        return lagebild, 0
+    zeilen = qualitaet.korrektur_zeilen(lagebild)
+    if not zeilen:
+        return lagebild, 0
+    texte = [text for _, _, text, _ in zeilen]
+    prompt = (
+        "Du bist Korrektor:in der „Presse“. Korrigiere in jeder der folgenden Zeilen "
+        "ausschließlich Rechtschreib-, Tipp- und Grammatikfehler (z. B. Kongruenz von "
+        "Subjekt und Verb). Ändere NICHT Inhalt, Wortwahl, Stil, Namen oder Zahlen; "
+        "fehlerfreie Zeilen bleiben exakt gleich. Österreichische Standardsprache.\n"
+        "Antworte ausschließlich mit einer JSON-Liste von Strings, gleiche Länge und "
+        "Reihenfolge wie die Eingabe, ohne Kommentar.\n\n"
+        + _json.dumps(texte, ensure_ascii=False)
+    )
+    try:
+        antwort = _complete(prompt, config, max_tokens=int(config.get("korrektur_max_tokens", 800)))
+        m = re.search(r"\[.*\]", antwort, re.DOTALL)
+        korrigiert = _json.loads(m.group(0)) if m else None
+    except Exception as exc:  # best-effort: nie an der Korrektur scheitern
+        print(f"Korrekturdurchgang übersprungen ({exc}).")
+        return lagebild, 0
+    return qualitaet.setze_korrekturen(lagebild, zeilen, korrigiert)
+
+
 def repariere_struktur(lagebild: str, punkte: list[int], config: dict, lang: str = "de") -> str:
     """Neuversuch per Schlussredaktion: fehlende „Was ist neu"/„Warum es zählt" ergänzen.
 

@@ -4,14 +4,14 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
 
 from . import (
-    deliver, epaper, i18n, karte, leserprofil, profil, qualitaet, render, state, synthesize,
+    deliver, epaper, i18n, karte, leserprofil, profil, qualitaet, render, slot, state, synthesize,
     telegram, tts, vorausschau, webpush,
 )
 from .fetch import fetch_all, filter_recent
@@ -122,6 +122,12 @@ def _bereinige_modell_output(lagebild: str, lang: str = "de", config: dict | Non
         rest = qualitaet.fehlende_struktur(lagebild, lang)
         if rest:
             print(f"⚠️ Qualitäts-Gate: Punkt(e) {rest} weiterhin unvollständig.")
+    # Rechtschreibung: kurzer Korrekturdurchgang für die sichtbarsten Zeilen —
+    # vor „Heute wichtig", damit die korrigierten Titel dort mit hineinkommen.
+    if config is not None:
+        lagebild, n = synthesize.korrigiere_rechtschreibung(lagebild, config, lang)
+        if n:
+            print(f"Qualitäts-Gate: {n} Zeile(n) orthografisch korrigiert.")
     lagebild, geaendert = qualitaet.synchronisiere_heute_wichtig(lagebild)
     if geaendert:
         print("Qualitäts-Gate: „Heute wichtig“ an die Punkte angeglichen.")
@@ -518,10 +524,14 @@ def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", nargs="?", default="auto",
-                        choices=["auto", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys", "engagement"])
+                        choices=["auto", "slot", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys", "engagement"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
+    )
+    parser.add_argument(
+        "--schedule", default="",
+        help="Für 'slot': der Cron-Ausdruck, der den Lauf ausgelöst hat (github.event.schedule)",
     )
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
@@ -538,24 +548,24 @@ def main() -> int:
         state.set_state_path(config.get("state_file"))
         # Ausgabeverzeichnis je Edition (config.nyt.yaml -> out/nyt/).
         render.set_out_dir(config.get("out_dir"))
+        if args.command == "slot":
+            # Geplanter Lauf: Ausgabe aus dem Cron-Slot, nie aus der Uhrzeit —
+            # ein verspäteter Abend-Cron darf nicht als Morgen-Ausgabe erscheinen.
+            edition, grund = slot.bestimme_ausgabe(args.schedule, config)
+            print(f"Slot-Bestimmung: {grund}")
+            if edition is None:
+                return 0
+            args.command = edition
         if args.command == "auto":
-            hour = datetime.now().hour
-            if hour <= 8:
-                args.command = "morgen"
-            elif hour <= 13:
-                args.command = "mittag"
-            elif hour <= 17:
-                args.command = "nachmittag"
-            else:
-                args.command = "abend"
-            print(f"Auto-Modus: {args.command} (Uhrzeit {hour:02d}:xx)")
+            args.command = slot.nach_uhrzeit(datetime.now(timezone.utc))
+            print(f"Auto-Modus: {args.command} (Wiener Uhrzeit)")
+        if args.command == "woche":
+            from . import quittung
+            return quittung.cmd_woche(config)
         if args.command == "feeds":
             return cmd_feeds(config)
         if args.command == "catchup":
             return cmd_catchup(config, args.dry_run)
-        if args.command == "woche":
-            from . import quittung
-            return quittung.cmd_woche(config)
         if args.command == "engagement":
             from . import engagement
             return engagement.cmd_engagement(config, state.load_state(), dry_run=args.dry_run)
