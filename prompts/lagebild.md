@@ -213,4 +213,4 @@ mit dem Schlagwort des Themas, damit die Zuordnung klar ist, z. B.
   entsprechend vorsichtig und lass Details weg, statt sie zu erraten.
 - Volltexte (falls im Abschnitt „Volltexte" geliefert) haben Vorrang vor Teasern.
 - Nenne am Ende jedes Punktes in Klammern das Ressort der Hauptquelle und — nur wenn im Material zur Hauptquelle ein „Autor:" angegeben ist — den Namen, in der Form: (Wirtschaft · Bericht: Max Mustermann). Ist kein Autor angegeben, schreibe nur (Wirtschaft). Erfinde niemals einen Namen.
-- Füge danach den Link zur Hauptquelle ein, in der Form: [→ Artikel](URL). Nur wenn ein Link im Material vorhanden ist.
+- Füge danach den Link zur Hauptquelle ein, in der Form: [→ Artikel](URL) — als letzte Zeile **jedes** Punktes, auch wenn der Punkt mehrere Meldungen zusammenfasst (dann die Hauptquelle) und auch nach „Was kommt" oder dem Reifegrad. Der Linktext ist immer „→ Artikel", nie die Quellenklammer. Nur wenn ein Link im Material vorhanden ist.

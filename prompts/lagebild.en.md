@@ -170,5 +170,7 @@ change. A line that in effect says "nothing has changed" is an error: drop it.
   only if an "Author:" is given for the main source in the material — the name, in the
   form: (Business · By: Jane Doe). If no author is given, write only (Business). Never
   invent a name.
-- Then add the link to the main source, in the form: [→ Article](URL). Only if a link is
-  present in the material.
+- Then add the link to the main source, in the form: [→ Article](URL) — as the last line of
+  **every** item, also when it merges several stories (use the main source) and also after
+  "What's next" or the status line. The link text is always "→ Article", never the source
+  parentheses. Only if a link is present in the material.
