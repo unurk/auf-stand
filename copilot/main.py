@@ -138,6 +138,15 @@ def _bereinige_modell_output(lagebild: str, lang: str = "de", config: dict | Non
     return lagebild
 
 
+def _sichere_quell_links(lagebild: str, articles: list, lang: str) -> str:
+    """Jeder Punkt mit Quell-Link „[→ Artikel](URL)" — gilt für Web, Telegram, Mail."""
+    lagebild, ergaenzt, umgebaut = qualitaet.sichere_quell_links(lagebild, articles, lang)
+    if ergaenzt or umgebaut:
+        print(f"Qualitäts-Gate: {ergaenzt} fehlende(n) Quell-Link(s) ergänzt, "
+              f"{umgebaut} Link(s) ins Quell-Format gebracht.")
+    return lagebild
+
+
 def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> int:
     editions = config.get("editions", {})
     if edition not in editions:
@@ -260,6 +269,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
 
     lagebild = synthesize.synthesize(prompt, config)
     lagebild = _bereinige_modell_output(lagebild, lang, config)
+    lagebild = _sichere_quell_links(lagebild, selection, lang)
     # Qualitäts-Gate VOR der Lesezeit-Rechnung: leere Themen-Deltas („hat sich
     # nichts geändert") raus, Abschnitt auf 3 Zeilen kappen. Der Prompt verbietet
     # das zwar, hielt es im Archiv aber nachweislich nicht ein.
@@ -515,6 +525,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
         return 0
     lagebild = synthesize.synthesize(prompt, config)
     lagebild = _bereinige_modell_output(lagebild, lang, config)
+    lagebild = _sichere_quell_links(lagebild, articles, lang)
     md_path, html_path = render.write_output(lagebild, "catchup", lang)
     print(f"Catch-up erzeugt:\n  {md_path}\n  {html_path}")
     return 0

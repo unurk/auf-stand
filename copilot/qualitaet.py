@@ -757,3 +757,85 @@ def setze_korrekturen(markdown: str, zeilen: list, korrigiert: list) -> tuple[st
     if not n:
         return markdown, 0
     return "\n".join(lines) + ("\n" if markdown.endswith("\n") else ""), n
+
+
+# ── Quell-Link je Punkt ──────────────────────────────────────────────────────
+# Beobachtet 20.–23.11.: Bei 8 von 33 Punkten fehlte „Weiterlesen bei der
+# Presse". Das Modell ließ die Zeile „[→ Artikel](URL)" schlicht weg (keiner
+# der Nachbearbeitungs-Schritte entfernt Links), oder es setzte den Link auf
+# die Quellenklammer („[Wirtschaft · Bericht: fed/APA](URL)"), die Web-Ansicht
+# und Telegram dann nicht als Quell-Link erkennen. Die URL steht aber immer im
+# Material — darum wird der Link hier deterministisch nachgetragen.
+_LINK_TEXT = {"de": "→ Artikel", "en": "→ Article"}
+_PFEIL_LINK_RE = re.compile(r"\[→[^\]]*\]\(([^)]+)\)")
+_NACKTER_LINK_RE = re.compile(r"^\s*\[([^\]→][^\]]*)\]\((https?://[^)\s]+)\)\s*\.?\s*$")
+MIN_TREFFER = 2
+
+
+def _stamm_menge(text: str) -> set[str]:
+    from .leserprofil import _STOPWOERTER, _WORT_RE, _stamm
+
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", " ", text or "")
+    return {
+        _stamm(w) for w in _WORT_RE.findall(text)
+        if w.lower() not in _STOPWOERTER and len(_stamm(w)) >= 4
+    }
+
+
+def passendster_artikel(titel: str, text: str, articles: list):
+    """Artikel aus dem Material, der am besten zum Punkt passt — oder None.
+
+    Treffer = gemeinsame Wortstämme; Treffer im Artikel-Titel zählen doppelt.
+    Verlangt werden mindestens MIN_TREFFER gemeinsame Stämme und einer davon im
+    Titel — lieber kein Link als ein falscher.
+    """
+    punkt = _stamm_menge(f"{titel} {text}")
+    bester, bester_score = None, 0
+    for a in articles or []:
+        if not getattr(a, "link", ""):
+            continue
+        im_titel = punkt & _stamm_menge(a.title)
+        im_teaser = (punkt & _stamm_menge(getattr(a, "teaser", ""))) - im_titel
+        if not im_titel or len(im_titel) + len(im_teaser) < MIN_TREFFER:
+            continue
+        score = 2 * len(im_titel) + len(im_teaser)
+        if score > bester_score:  # Gleichstand: erste Meldung (Feed-Reihenfolge)
+            bester, bester_score = a, score
+    return bester
+
+
+def sichere_quell_links(markdown: str, articles: list, lang: str = "de") -> tuple[str, int, int]:
+    """Jeder Punkt bekommt einen Quell-Link „[→ Artikel](URL)". → (md, ergänzt, umgebaut)
+
+    - Link vorhanden → unverändert.
+    - Nur ein nackter Link auf eigener Zeile („[Wirtschaft · Bericht: X](URL)")
+      → umgebaut zu „(Wirtschaft · Bericht: X) [→ Artikel](URL)".
+    - Gar kein Link → passendster Artikel aus dem Material; ohne eindeutigen
+      Treffer bleibt der Punkt ohne Link.
+    """
+    link_text = _LINK_TEXT.get(lang, _LINK_TEXT["de"])
+    lines = markdown.splitlines()
+    ergaenzt = umgebaut = 0
+    starts = [i for i, l in enumerate(lines) if re.match(r"## \d", l)]
+    # Rückwärts, damit eingefügte Zeilen die Indizes davor nicht verschieben.
+    for start in reversed(starts):
+        ende = next((j for j in range(start + 1, len(lines))
+                     if lines[j].startswith("## ") or lines[j].startswith("---")), len(lines))
+        block = lines[start + 1:ende]
+        if any(_PFEIL_LINK_RE.search(z) for z in block):
+            continue
+        nackt = next((k for k, z in enumerate(block) if _NACKTER_LINK_RE.match(z)), None)
+        if nackt is not None:
+            m = _NACKTER_LINK_RE.match(block[nackt])
+            lines[start + 1 + nackt] = f"({m.group(1).strip()}) [{link_text}]({m.group(2)})"
+            umgebaut += 1
+            continue
+        artikel = passendster_artikel(lines[start][3:], "\n".join(block), articles)
+        if artikel is None:
+            continue
+        letzte = max((k for k, z in enumerate(block) if z.strip()), default=-1)
+        lines.insert(start + 1 + letzte + 1, f"[{link_text}]({artikel.link})")
+        ergaenzt += 1
+    if not (ergaenzt or umgebaut):
+        return markdown, 0, 0
+    return "\n".join(lines) + ("\n" if markdown.endswith("\n") else ""), ergaenzt, umgebaut
