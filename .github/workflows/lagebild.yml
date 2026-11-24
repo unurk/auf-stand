@@ -140,25 +140,60 @@ jobs:
             done
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Keine Änderung an site/ — kein Commit, kein Deploy."
+            echo "Keine Änderung an site/ — kein Commit (Deploy entscheidet der Pages-Check)."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Pages nur hochladen/deployen, wenn site/ sich tatsächlich geändert hat.
-      # Sonst würden die vielen Wiederhol-Cron-Läufe (alle 30 Min) zig leere
-      # Deploys/Tag auslösen; bei unveränderter Seite bedient Pages weiter den
-      # letzten Stand.
+      # Pages deployen, wenn site/ sich geändert hat ODER die Live-Seite hinterherhinkt
+      # (Vergleich deploy.json ↔ HEAD, copilot/pages.py). So holt ein späterer Lauf
+      # einen gescheiterten Deploy nach — und bei aktuellem Stand gibt es keinen
+      # leeren Deploy alle 30 Minuten.
+      - name: Pages-Stand prüfen
+        id: pages
+        if: always() && github.ref == 'refs/heads/master' && steps.site.outcome == 'success'
+        env:
+          SITE_GEAENDERT: ${{ steps.site.outputs.changed }}
+        run: |
+          # Erst auf den neuesten master vorspulen: Sonst könnte ein Lauf mit älterem
+          # Checkout (z. B. NYT neben der Presse-Ausgabe) einen ÄLTEREN Stand deployen.
+          git pull --ff-only --quiet origin master || echo "Kein Fast-Forward möglich — prüfe lokalen Stand."
+          python -m copilot.main pages-check --site-geaendert "${SITE_GEAENDERT:-false}"
+
       - name: GitHub Pages hochladen
         uses: actions/upload-pages-artifact@v3
-        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
+        if: always() && steps.pages.outputs.deploy == 'true'
         with:
           path: site
 
       - name: GitHub Pages deployen
         id: pages-deployment
         uses: actions/deploy-pages@v4
-        if: always() && github.ref == 'refs/heads/master' && steps.site.outputs.changed == 'true'
+        if: always() && steps.pages.outputs.deploy == 'true'
         continue-on-error: true
+
+      # 24.11. (Lauf 45330313914): deploy-pages fand das 370 ms zuvor hochgeladene
+      # Artifact nicht („Found 0 artifact(s)") — die Artifact-Liste hinkte nach.
+      # Ein zweiter Versuch nach kurzer Pause trifft eine nachgezogene Liste.
+      - name: Pages-Deploy kurz abwarten
+        if: always() && steps.pages-deployment.outcome == 'failure'
+        run: sleep 45
+
+      - name: GitHub Pages deployen (2. Versuch)
+        id: pages-deployment-2
+        uses: actions/deploy-pages@v4
+        if: always() && steps.pages-deployment.outcome == 'failure'
+        continue-on-error: true
+
+      - name: Pages-Deploy-Fehler melden
+        if: always() && steps.pages-deployment.outcome == 'failure' && steps.pages-deployment-2.outcome != 'success'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          ALERT_CHAT_ID: ${{ vars.TELEGRAM_ALERT_CHAT_ID || '8962080832' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            --data-urlencode chat_id="$ALERT_CHAT_ID" \
+            --data-urlencode text="⚠️ Copilot: Website-Deploy (GitHub Pages) 2× gescheitert — die Seite zeigt noch den alten Stand. Der nächste Lauf deployt automatisch nach. Log: $RUN_URL"
 
       - name: State sichern
         uses: actions/cache/save@v4

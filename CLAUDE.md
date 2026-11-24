@@ -44,6 +44,8 @@ copilot/
   i18n.py        Deutsche/englische Textbausteine (Presse- vs. NYT-Edition)
   slot.py        Welche Ausgabe ein geplanter Lauf ist: aus dem Cron-Slot, nie aus der Uhrzeit;
                  > 3 h verspätet → übersprungen
+  pages.py       Pages-Deploy-Entscheidung: deploy.json (Tree-Hash von site/) live ↔ HEAD →
+                 Nachdeploy nach gescheitertem Deploy, sonst kein leerer Deploy
   main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte|engagement [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
