@@ -12,3 +12,6 @@ manual_input/*.md
 wohnmarkt/node_modules/
 wohnmarkt/.next/
 wohnmarkt/next-env.d.ts
+
+# Deploy-Marker (copilot/pages.py) — nur im Pages-Artifact, nie im Repo
+site/deploy.json
