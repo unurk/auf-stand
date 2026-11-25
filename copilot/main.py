@@ -10,8 +10,9 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
+from . import budget as budget_mod
 from . import (
-    deliver, epaper, i18n, karte, leserprofil, profil, qualitaet, render, slot, state, synthesize,
+    deliver, epaper, i18n, karte, leserprofil, profil, qualitaet, render, slot, state, synthesize, titelcheck,
     telegram, tts, vorausschau, webpush,
 )
 from .fetch import fetch_all, filter_recent
@@ -147,6 +148,20 @@ def _sichere_quell_links(lagebild: str, articles: list, lang: str) -> str:
     return lagebild
 
 
+def _pruefe_titel(lagebild: str, articles: list) -> str:
+    """Zahlen in H1/Punkt-Titeln müssen im Text oder Material stehen (titelcheck.py).
+
+    Läuft nach den Quell-Links (braucht sie für das Material) und baut danach
+    „Heute wichtig" aus den geprüften Titeln neu.
+    """
+    lagebild, korrekturen = titelcheck.pruefe_titel(lagebild, articles)
+    for k in korrekturen:
+        print(f"Qualitäts-Gate (Titel-Faktencheck): {k}")
+    if korrekturen:
+        lagebild, _ = qualitaet.synchronisiere_heute_wichtig(lagebild)
+    return lagebild
+
+
 def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> int:
     editions = config.get("editions", {})
     if edition not in editions:
@@ -270,6 +285,7 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     lagebild = synthesize.synthesize(prompt, config)
     lagebild = _bereinige_modell_output(lagebild, lang, config)
     lagebild = _sichere_quell_links(lagebild, selection, lang)
+    lagebild = _pruefe_titel(lagebild, selection)
     # Qualitäts-Gate VOR der Lesezeit-Rechnung: leere Themen-Deltas („hat sich
     # nichts geändert") raus, Abschnitt auf 3 Zeilen kappen. Der Prompt verbietet
     # das zwar, hielt es im Archiv aber nachweislich nicht ein.
@@ -289,10 +305,14 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     )
     if doppelt:
         print(f"Qualitäts-Gate: {doppelt} Themen-Zeile(n) doppelt zu Punkten — entfernt.")
-    # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
-    words = len(re.findall(r"\w+", lagebild))
+    # Lesezeit-Budget durchsetzen (bisher nur Warnung: 24.11. 135 s, 25.11. 120 s):
+    # stufenweise kürzen, Überschriften, Quell-Links und Punkt 1 bleiben.
     wps = float(i18n.t(lang, "words_per_sec"))
-    secs = max(60, round(words / wps / 15) * 15)  # Wörter/Sek je Sprache, auf 15s gerundet
+    lagebild, gekuerzt = budget_mod.kuerze_auf_budget(lagebild, budget, wps, lang)
+    if gekuerzt:
+        print(f"Qualitäts-Gate: auf {budget} s gekürzt — {'; '.join(gekuerzt)}.")
+    # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
+    secs = qualitaet.lesezeit_sekunden(lagebild, wps)
     warnung = qualitaet.pruefe_budget(lagebild, budget, wps)
     if warnung:
         print(warnung)
@@ -526,6 +546,7 @@ def cmd_catchup(config: dict, dry_run: bool) -> int:
     lagebild = synthesize.synthesize(prompt, config)
     lagebild = _bereinige_modell_output(lagebild, lang, config)
     lagebild = _sichere_quell_links(lagebild, articles, lang)
+    lagebild = _pruefe_titel(lagebild, articles)
     md_path, html_path = render.write_output(lagebild, "catchup", lang)
     print(f"Catch-up erzeugt:\n  {md_path}\n  {html_path}")
     return 0
