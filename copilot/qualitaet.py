@@ -111,17 +111,22 @@ def trim_tracker_section(
 
 
 def lesezeit_sekunden(markdown: str, woerter_pro_sekunde: float = 3.2) -> int:
-    """Lesezeit in Sekunden, auf 15 s gerundet (gleiche Formel wie main.py)."""
-    woerter = len(re.findall(r"\w+", markdown))
+    """Lesezeit in Sekunden, auf 15 s gerundet — die eine Formel für alle Stellen.
+
+    Link-Ziele zählen nicht: Eine Presse-URL brachte ~10 „Wörter" pro Punkt in
+    die Schätzung, die niemand liest (bei 5 Punkten rund 15 s Phantom-Lesezeit).
+    """
+    lesbar = re.sub(r"\]\([^)]*\)", "]", markdown)
+    lesbar = re.sub(r"https?://\S+", " ", lesbar)
+    woerter = len(re.findall(r"\w+", lesbar))
     return max(60, round(woerter / woerter_pro_sekunde / 15) * 15)
 
 
 def pruefe_budget(markdown: str, budget_sekunden: int, woerter_pro_sekunde: float = 3.2) -> str:
     """Warnhinweis, wenn die Ausgabe das Zeitbudget reißt — sonst ''.
 
-    Bewusst nur eine Warnung im Log und ein Kalibrierungs-Hinweis für den
-    nächsten Prompt: Kürzen würde Inhalt zerstören, den die Redaktion (das
-    Modell) bewusst gesetzt hat. Der Hebel liegt im nächsten Lauf.
+    Seit 25.11. kürzt budget.kuerze_auf_budget vorher; diese Warnung greift nur
+    noch, wenn selbst der letzte Ausweg (mindestens 3 Punkte) nicht reicht.
     """
     secs = lesezeit_sekunden(markdown, woerter_pro_sekunde)
     if secs <= budget_sekunden:

@@ -46,6 +46,8 @@ copilot/
                  > 3 h verspätet → übersprungen
   pages.py       Pages-Deploy-Entscheidung: deploy.json (Tree-Hash von site/) live ↔ HEAD →
                  Nachdeploy nach gescheitertem Deploy, sonst kein leerer Deploy
+  titelcheck.py  Titel-Faktencheck: Zahlen in H1/Punkt-Titeln müssen im Punkt-Text stehen
+  budget.py      Lesezeit-Budget (90 s) durchsetzen: stufenweise kürzen, Links/Punkt 1 bleiben
   main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte|engagement [--dry-run]
 prompts/
   lagebild.md    Der redaktionelle Kern-Prompt (das Herz des Produkts; .en.md für NYT)
