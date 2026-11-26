@@ -11,8 +11,9 @@ Regel (deterministisch, nach der Synthese):
   Zahlwort; Namen wie „COP31"/„A1" sind keine Zahlen). Sonst wird der Titel
   korrigiert — durch die Schlagzeile der Quell-Meldung, wenn deren Zahlen im
   Text stehen, ansonsten wird die ungedeckte Zahl samt Einheit gestrichen.
-- H1: Jede Zahl muss in einem Punkt vorkommen, sonst wird die H1 zum
-  (geprüften) Titel von Punkt 1.
+- H1 (Ausgaben-Schlagzeile): Jedes inhaltstragende Wort und jede Zahl muss in
+  den geprüften Punkt-Titeln oder -Texten stehen, sonst wird die H1 zum Titel von Punkt 1
+  (26.11.: „USA drosseln EU-Zölle" bei Punkt „USA planen neue Zölle").
 - „Heute wichtig" wird danach aus den Titeln neu gebaut (main._pruefe_titel).
 """
 from __future__ import annotations
@@ -98,11 +99,56 @@ def streiche_zahlen(titel: str, erlaubt: set[str]) -> str:
     return neu
 
 
+# ── Ausgaben-Schlagzeile (H1) gegen die Punkt-Titel ─────────────────────────
+# Vorfall 26.11.: H1 „USA drosseln EU-Zölle auf 15 Prozent, A1 streicht Stellen"
+# — Punkt 1 lautete „USA planen neue Zölle gegen EU und 13 Handelspartner".
+# Die 15 Prozent standen im Text (als eingehaltene Obergrenze), die Zahlen-
+# Prüfung ließ die H1 darum durch; falsch war die RICHTUNG („drosseln").
+# Regel: Die H1 darf nur Wörter und Zahlen enthalten, die in den (schon
+# geprüften) Punkt-Titeln oder Punkt-Texten stehen — auch die Verben, die die
+# Richtung tragen. Sonst wird sie der Titel von Punkt 1.
+_FUELLWOERTER = frozenset("""
+der die das den dem des ein eine einen einem einer eines und oder aber auch
+auf aus bei für gegen in im ins mit nach über um von vom vor zu zum zur an am
+als bis durch ohne seit unter wie weiter noch nun nur so sich sein ihre ihr
+beim wegen will soll muss kann wird werden
+""".split())
+_H1_WORT_RE = re.compile(r"[A-Za-zÄÖÜäöüß0-9]+")
+
+
+def _h1_woerter(text: str) -> list[str]:
+    return [w.lower() for w in _H1_WORT_RE.findall(text or "")
+            if w.lower() not in _FUELLWOERTER and not w.isdigit()]
+
+
+def _gleicher_stamm(a: str, b: str) -> bool:
+    """„Zölle"/„Zöllen", „streicht"/„streichen": gleicher Anfang ab 5 (bzw. 4) Zeichen."""
+    if a == b:
+        return True
+    n = min(len(a), len(b), 5)
+    return n >= 4 and a[:n] == b[:n]
+
+
+def h1_ungedeckt(kopf: str, punkte: list[str]) -> str:
+    """Grund, warum die H1 von den Punkten (Titel + Text) nicht gedeckt ist — '' wenn gedeckt."""
+    punkte = [_ohne_links(p) for p in punkte]
+    woerter = {w for p in punkte for w in _h1_woerter(p)}
+    fremd = [w for w in _h1_woerter(kopf)
+             if not any(_gleicher_stamm(w, t) for t in woerter)]
+    gedeckt = set().union(*(zahlen(p) for p in punkte)) if punkte else set()
+    fremde_zahlen = zahlen(kopf, False) - gedeckt
+    teile = []
+    if fremd:
+        teile.append(f"Wörter nicht in den Punkten ({', '.join(fremd)})")
+    if fremde_zahlen:
+        teile.append(f"Zahl(en) nicht in den Punkten ({', '.join(sorted(fremde_zahlen))})")
+    return "; ".join(teile)
+
+
 def pruefe_titel(markdown: str, articles: list) -> tuple[str, list[str]]:
     """Prüft Punkt-Titel und H1. → (Markdown, Liste der Korrekturen fürs Log)."""
     lines = markdown.splitlines()
     korrekturen: list[str] = []
-    alle_erlaubt: set[str] = set()
     punkt1_titel = None
     for n, (s, e) in enumerate(_punkte(lines)):
         block = "\n".join(lines[s + 1:e])
@@ -123,20 +169,17 @@ def pruefe_titel(markdown: str, articles: list) -> tuple[str, list[str]]:
                     f"„{titel}“ → „{neu}“"
                 )
                 titel = neu
-        alle_erlaubt |= erlaubt | zahlen(titel, False)
         if punkt1_titel is None:
             punkt1_titel = titel
     h1 = next((i for i, l in enumerate(lines) if l.startswith("# ")), None)
     if h1 is not None and punkt1_titel:
         prefix = re.match(r"^# [^\wÄÖÜäöüß„\"']*", lines[h1]).group(0)
         kopf = lines[h1][len(prefix):]
-        ungedeckt = zahlen(kopf, False) - alle_erlaubt
-        if ungedeckt:
+        punkte = ["\n".join([_titel_teile(lines[s])[1]] + lines[s + 1:e]) for s, e in _punkte(lines)]
+        grund = h1_ungedeckt(kopf, punkte)
+        if grund and kopf.strip() != punkt1_titel.strip():
             lines[h1] = prefix + punkt1_titel
-            korrekturen.append(
-                f"H1: Zahl(en) {', '.join(sorted(ungedeckt))} nicht im Text — "
-                f"„{kopf}“ → „{punkt1_titel}“"
-            )
+            korrekturen.append(f"H1: {grund} — „{kopf}“ → „{punkt1_titel}“")
     if not korrekturen:
         return markdown, []
     return "\n".join(lines) + ("\n" if markdown.endswith("\n") else ""), korrekturen
