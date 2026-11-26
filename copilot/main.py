@@ -311,6 +311,9 @@ def run_edition(edition: str, config: dict, dry_run: bool, keep_seen: bool) -> i
     lagebild, gekuerzt = budget_mod.kuerze_auf_budget(lagebild, budget, wps, lang)
     if gekuerzt:
         print(f"Qualitäts-Gate: auf {budget} s gekürzt — {'; '.join(gekuerzt)}.")
+        # Sicherheitsnetz: Die Kürzung darf keinen Titel ungedeckt zurücklassen
+        # (26.11.: Satz mit „100 Millionen" gestrichen, Titel blieb stehen).
+        lagebild = _pruefe_titel(lagebild, selection)
     # Lesezeit ehrlich machen: aus der tatsächlichen Wortzahl statt hartem "90".
     secs = qualitaet.lesezeit_sekunden(lagebild, wps)
     warnung = qualitaet.pruefe_budget(lagebild, budget, wps)

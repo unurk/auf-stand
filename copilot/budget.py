@@ -53,12 +53,58 @@ def _schwanz(text: str) -> tuple[str, str]:
     return (text[: len(text) - len(schwanz)] if schwanz else text), schwanz
 
 
-def _kuerze_zeile(zeile: str, label: str, saetze: int) -> str:
+def satzliste(text: str) -> list[str]:
+    """Text in Sätze zerlegt (gleiche Grenzen wie erster_satz)."""
+    result, rest = [], text.strip()
+    while rest:
+        satz = erster_satz(rest, 1)
+        result.append(satz.strip())
+        rest = rest[len(satz):].strip()
+    return result
+
+
+def _kuerze_zeile(zeile: str, label: str, saetze: int, pflicht: set[str] | None = None) -> str:
+    """Kürzt auf die ersten ``saetze`` Sätze — plus jeden Satz, der eine Zahl aus
+    ``pflicht`` trägt (Zahlen im Punkt-Titel, die sonst nirgends im Punkt stehen).
+
+    26.11.: „Wien muss 100 Millionen Euro … sparen" — die Kürzung strich den
+    Satz mit den 100 Mio., und der Titel stand ungedeckt da.
+    """
+    from .titelcheck import zahlen
+
     if not zeile.startswith(label):
         return zeile
     kern, schwanz = _schwanz(zeile[len(label):])
-    neu = erster_satz(kern.strip(), saetze)
+    alle = satzliste(kern)
+    behalten = alle[:saetze]
+    offen = set(pflicht or ()) - zahlen(" ".join(behalten))
+    for satz in alle[saetze:]:
+        if offen and zahlen(satz) & offen:
+            behalten.append(satz)
+            offen -= zahlen(satz)
+    neu = " ".join(behalten)
     return f"{label} {neu}{schwanz}" if neu else zeile
+
+
+def _titel_pflicht(lines: list[str], s: int, e: int, i: int) -> set[str]:
+    """Titel-Zahlen des Punkts, die außerhalb von Zeile ``i`` nicht gedeckt sind."""
+    from .titelcheck import _ohne_links, _titel_teile, zahlen
+
+    titel = zahlen(_titel_teile(lines[s])[1], False)  # ohne Keycap-Ziffer „4️⃣"
+    rest = "\n".join(l for j, l in enumerate(lines[s + 1:e], s + 1) if j != i)
+    return titel - zahlen(_ohne_links(rest))
+
+
+def _kuerze_punkte(md: str, label: str, saetze: int, ab_punkt: int = 2,
+                   bis_punkt: int | None = None) -> str:
+    lines = md.splitlines()
+    for n, (s, e) in enumerate(_bloecke(lines), 1):
+        if n < ab_punkt or (bis_punkt and n > bis_punkt):
+            continue
+        for i in range(s + 1, e):
+            if lines[i].startswith(label):
+                lines[i] = _kuerze_zeile(lines[i], label, saetze, _titel_pflicht(lines, s, e, i))
+    return "\n".join(lines)
 
 
 def _bloecke(lines: list[str]) -> list[tuple[int, int]]:
@@ -92,16 +138,6 @@ def _kappe_abschnitt(md: str, marker: str, max_zeilen: int) -> str:
         weg = set(bullets[max_zeilen:])
         neu = [l for i, l in enumerate(lines) if i not in weg]
     return "\n".join(neu)
-
-
-def _je_punkt(md: str, fn, ab_punkt: int = 2, bis_punkt: int | None = None) -> str:
-    lines = md.splitlines()
-    for n, (s, e) in enumerate(_bloecke(lines), 1):
-        if n < ab_punkt or (bis_punkt and n > bis_punkt):
-            continue
-        for i in range(s + 1, e):
-            lines[i] = fn(lines[i])
-    return "\n".join(lines)
 
 
 def _streiche_label(md: str, label: str, ab_punkt: int, bis_punkt: int | None = None) -> str:
@@ -145,16 +181,16 @@ def kuerze_auf_budget(markdown: str, budget: int, wps: float,
         ("Themen-Abschnitt auf 1 Zeile", lambda m: _kappe_abschnitt(m, themen, 1)),
         ("„Was kommt“ ab Punkt 2 gestrichen", lambda m: _streiche_label(m, lab["kommt"], 2)),
         ("„Was ist neu“ ab Punkt 2 auf 1 Satz",
-         lambda m: _je_punkt(m, lambda z: _kuerze_zeile(z, lab["neu"], 1))),
+         lambda m: _kuerze_punkte(m, lab["neu"], 1)),
         ("„Warum es zählt“ ab Punkt 2 auf 1 Satz",
-         lambda m: _je_punkt(m, lambda z: _kuerze_zeile(z, lab["warum"], 1))),
+         lambda m: _kuerze_punkte(m, lab["warum"], 1)),
         ("„Was kommt“ in Punkt 1 gestrichen", lambda m: _streiche_label(m, lab["kommt"], 1, 1)),
         ("„Was ist neu“ in Punkt 1 auf 2 Sätze",
-         lambda m: _je_punkt(m, lambda z: _kuerze_zeile(z, lab["neu"], 2), 1, 1)),
+         lambda m: _kuerze_punkte(m, lab["neu"], 2, 1, 1)),
         ("„Geprüft, nicht aufgenommen“ gestrichen", lambda m: _kappe_abschnitt(m, pruef, 0)),
         ("Themen-Abschnitt gestrichen", lambda m: _kappe_abschnitt(m, themen, 0)),
         ("„Was ist neu“ in Punkt 1 auf 1 Satz",
-         lambda m: _je_punkt(m, lambda z: _kuerze_zeile(z, lab["neu"], 1), 1, 1)),
+         lambda m: _kuerze_punkte(m, lab["neu"], 1, 1, 1)),
     ]
     schritte: list[str] = []
     md = markdown
