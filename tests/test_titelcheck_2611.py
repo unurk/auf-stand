@@ -9,7 +9,7 @@ PUNKTE = """
 **Warum es zählt:** Für die österreichische Exportwirtschaft bedeutet das eine neuerliche Belastung. (Wirtschaft)
 [→ Artikel](https://www.diepresse.com/41491374/usa-planen-neue-zoelle-gegen-eu-und-13-weitere-handelspartner)
 
-## 2️⃣ 📊 A1 investiert, streicht aber Personal
+## 2️⃣ 📊 Geplant: A1 investiert, streicht aber Personal
 **Was ist neu:** A1 Telekom Austria will bis 2030 insgesamt 300 Millionen Euro einsparen, davon rund ein Drittel durch Personalabbau.
 **Warum es zählt:** Der Abbau trifft Beschäftigte in Österreich direkt. (Wirtschaft)
 [→ Artikel](https://www.diepresse.com/41486219/a1-baut-um-500-millionen-euro)
@@ -30,7 +30,7 @@ def _ausgabe(h1: str) -> str:
     return (
         f"# ☀️ {h1}\n*Donnerstag, 26. November 2026 · Morgen-Ausgabe*\n\n**Heute wichtig:**\n"
         "1️⃣ USA planen neue Zölle gegen EU und 13 Handelspartner\n"
-        "2️⃣ A1 investiert, streicht aber Personal\n"
+        "2️⃣ Geplant: A1 investiert, streicht aber Personal\n"
         "3️⃣ OGH: Arbeitgeber müssen Internetkosten im Homeoffice zahlen\n"
         "4️⃣ Wien muss 100 Millionen Euro bei Mindestsicherung sparen\n\n---\n"
         + PUNKTE

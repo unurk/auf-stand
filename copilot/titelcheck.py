@@ -145,11 +145,50 @@ def h1_ungedeckt(kopf: str, punkte: list[str]) -> str:
     return "; ".join(teile)
 
 
+# ── Absicht ≠ Tatsache ──────────────────────────────────────────────────────
+# Vorfall 27.11.: Titel/H1 „Spritpreisbremse: Hattmannsdorfer beendet
+# Margeneingriff" — im Punkt „will … auslaufen lassen", Quelle „Hattmannsdorfer
+# für Auslaufen des Margeneingriffs". Regel: Beginnt der Punkt („Was ist neu",
+# erster Satz) mit einer Absicht/Planung und nicht mit einem Beschluss, muss
+# auch der Titel als Absicht erkennbar sein. Sonst Ersatz durch die Quell-
+# Schlagzeile, ohne Quelle „Geplant: " davor. Die H1 folgt (Rückfall auf
+# den geprüften Titel von Punkt 1, wenn sie die Absicht als vollzogen darstellt).
+_ABSICHT_TEXT_RE = re.compile(
+    # Bewusst ohne „soll"/„fordert": Die stehen oft neben einem vollzogenen Akt
+    # („Trump ernennt …, Clayton soll …", „Hacker erbeuteten … und fordern …").
+    r"(?<!zu )\b(will|wollen|möchte|möchten|plant|planen|beabsichtigt|beabsichtigen|erwägt|erwägen"
+    r"|strebt\b[^.]*?\ban|stellt\b[^.]*?\bin Aussicht|schlägt\b[^.]*?\bvor)\b", re.IGNORECASE)
+_VOLLZUG_TEXT_RE = re.compile(
+    r"\b(beschlossen|beschloss|beschließt|verabschiedet|entschied|entschieden|einigte"
+    r"|geeinigt|einigen sich|einigt sich|in Kraft|tritt\b[^.]*?\bin Kraft)\b", re.IGNORECASE)
+_ABSICHT_TITEL_RE = re.compile(
+    r"\b(will|wollen|möchte|plant|planen|geplant|Plan|Pläne|soll|sollen|erwägt|prüft"
+    r"|in Aussicht|kündigt|Ankündigung|Vorschlag|schlägt|fordert|Forderung|Entwurf|für|droht"
+    r"|drohen|könnte|könnten|Absicht|Vorstoß|Ziel|drängt|drängen|mahnt|in Sicht|strebt)\b|\?",
+    re.IGNORECASE)
+ABSICHT_PRAEFIX = "Geplant: "
+
+
+def ist_absicht(block: str) -> bool:
+    """Meldet der Punkt (erster Satz von „Was ist neu") eine Absicht statt eines Vollzugs?"""
+    m = re.search(r"\*\*(?:Was ist neu|What's new):\*\*\s*(.+)", block)
+    if not m:
+        return False
+    from .budget import erster_satz
+
+    satz = erster_satz(m.group(1).strip())
+    return bool(_ABSICHT_TEXT_RE.search(satz)) and not _VOLLZUG_TEXT_RE.search(satz)
+
+
+def titel_als_vollzug(titel: str) -> bool:
+    return not _ABSICHT_TITEL_RE.search(titel or "")
+
+
 def pruefe_titel(markdown: str, articles: list) -> tuple[str, list[str]]:
     """Prüft Punkt-Titel und H1. → (Markdown, Liste der Korrekturen fürs Log)."""
     lines = markdown.splitlines()
     korrekturen: list[str] = []
-    punkt1_titel = None
+    punkt1_titel, punkt1_absicht = None, False
     for n, (s, e) in enumerate(_punkte(lines)):
         block = "\n".join(lines[s + 1:e])
         quelle = _quelle(block, articles)
@@ -169,14 +208,30 @@ def pruefe_titel(markdown: str, articles: list) -> tuple[str, list[str]]:
                     f"„{titel}“ → „{neu}“"
                 )
                 titel = neu
+        absicht = ist_absicht(block)
+        if absicht and titel_als_vollzug(titel):
+            # Die Quell-Schlagzeile ist redaktionell geprüft: bei echten Treffern
+            # korrekt formuliert („Hattmannsdorfer für Auslaufen …"), bei einem
+            # Fehlalarm harmlos. „Geplant: " nur, wenn keine Quelle da ist.
+            kandidat = quelle.title.strip() if quelle else ""
+            if kandidat and zahlen(kandidat, False) <= erlaubt:
+                neu = kandidat
+            else:
+                neu = ABSICHT_PRAEFIX + titel
+            lines[s] = praefix + neu
+            korrekturen.append(
+                f"Punkt {n + 1}: Absicht im Text, Titel klingt vollzogen — „{titel}“ → „{neu}“")
+            titel = neu
         if punkt1_titel is None:
-            punkt1_titel = titel
+            punkt1_titel, punkt1_absicht = titel, absicht
     h1 = next((i for i, l in enumerate(lines) if l.startswith("# ")), None)
     if h1 is not None and punkt1_titel:
         prefix = re.match(r"^# [^\wÄÖÜäöüß„\"']*", lines[h1]).group(0)
         kopf = lines[h1][len(prefix):]
         punkte = ["\n".join([_titel_teile(lines[s])[1]] + lines[s + 1:e]) for s, e in _punkte(lines)]
         grund = h1_ungedeckt(kopf, punkte)
+        if not grund and punkt1_absicht and titel_als_vollzug(kopf):
+            grund = "Absicht in Punkt 1 als vollzogen dargestellt"
         if grund and kopf.strip() != punkt1_titel.strip():
             lines[h1] = prefix + punkt1_titel
             korrekturen.append(f"H1: {grund} — „{kopf}“ → „{punkt1_titel}“")
