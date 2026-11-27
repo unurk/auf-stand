@@ -8,8 +8,8 @@ Aufträge an Claude Code formuliert und die PRs gemergt. Ab 1.12. läuft das so:
 | Ausgaben erzeugen (4×/Tag) | GitHub Actions `lagebild.yml` — wie bisher | unverändert |
 | **Täglich prüfen** (06:40 Wien) | GitHub Actions `qualitaet.yml` → `copilot/pruefung.py` | keine; nur vorhandene Secrets |
 | Bei Befund melden | GitHub-Issue (Label `qualitaetscheck`) + Telegram-Alarm | keine |
-| **Befund beheben** | Claude Code — von Hand (Einzeiler unten) oder als geplante Session | Claude-Abo, kein neues Secret |
-| Mergen | Unur (ein Klick, wenn Checks grün) — oder Auto-Merge, siehe „Entscheidungen" | — |
+| **Befund beheben** | Claude Code — täglich 07:00 als geplante Session (oder von Hand per Einzeiler) | Claude-Abo, kein neues Secret |
+| Mergen | Claude per Auto-Merge nach der Regel unten, sonst Unur | — |
 
 ## Was der tägliche Check prüft
 
@@ -42,7 +42,9 @@ anderen Tag: Actions → „Qualitätscheck" → *Run workflow*.
 6. **Keine Secrets in Code oder config.yaml**, keine neuen Secrets, keine kostenpflichtigen Dienste.
 7. **Tests grün vor Merge** (`pytest -q`, CI-Check „test").
 8. Ein Issue → ein PR, frischer Branch von `master`, kurze PR-Beschreibung mit belegter Ursache.
-9. Issue erst schließen, wenn der Fix gemergt ist und die nächste Ausgabe den Befund nicht mehr zeigt.
+9. Issue nach dem Merge mit PR-Link schließen; zeigt die nächste Ausgabe den Befund erneut,
+   legt der Check ein neues Issue an.
+10. Mergen nur nach der Auto-Merge-Regel unten.
 
 ## Backlog (Stand 27.11.2026)
 
@@ -60,17 +62,38 @@ Offen aus der Bot-Zeit, nach Nutzen für die Stabilität sortiert:
 Nicht mehr bauen (siehe CLAUDE.md „Was bewusst NICHT gebaut wird"): Feed, Klick-Tracking,
 Zusatz-Pushes außerhalb 06/11/16/20 Uhr.
 
+## Tägliche Claude-Session (eingerichtet 27.11.2026, Entscheidung Unur)
+
+- **Name:** „auf-stand: Qualitäts-Issues abarbeiten"
+- **Zeit:** täglich 07:00 Wien (`CRON_TZ=Europe/Vienna 0 7 * * *`)
+- **Wo:** geplante Aufgabe im Claude-Code-Konto von Unur (claude.ai → Claude Code →
+  geplante Aufgaben); pausieren/löschen dort oder per Claude-Session.
+- **Kosten:** nur Kontingent des bestehenden Claude-Abos, kein neues Secret.
+
+Ablauf: Offene Issues mit Label `qualitaetscheck` holen. Hat der GitHub-Cron des
+Qualitätschecks (06:40) heute noch nicht geliefert, prüft die Session selbst
+(`python -m copilot.main pruefen`) und legt bei Befund das Issue an. Kein offenes Issue →
+nichts tun. Sonst je Issue: Ursache belegen, Fix + Regressionstest, PR, Auto-Merge nach
+der Regel unten, Issue mit PR-Link schließen.
+
+## Auto-Merge-Regel (Entscheidung Unur, 27.11.2026)
+
+Claude darf einen PR **selbst per Squash mergen**, wenn **alle** Bedingungen erfüllt sind:
+
+1. Alle Checks grün (CI „test" und lokal `pytest -q`).
+2. Keine neuen Secrets, keine Secrets/Tokens im Diff.
+3. Keine Kosten: keine neuen kostenpflichtigen Dienste oder zusätzlichen API-Aufrufe,
+   `requirements*.txt` unverändert.
+4. Der Diff passt zum Issue (nur der Fix, sein Test, ggf. Doku) — kein Beifang.
+5. **Keine Änderungen unter `.github/`** (Workflows) und nichts an Secrets/Variablen.
+
+Ist eine Bedingung nicht erfüllt, bleibt der PR offen; Claude schreibt ins Issue, welche
+Bedingung fehlt — dann entscheidet Unur. Ausnahme Workflow-Änderungen: immer Unur.
+
 ## Entscheidungen, die nur Unur treffen kann
 
-- **Tägliche Claude-Session statt Einzeiler** (empfohlen): Eine geplante Claude-Code-Session
-  (claude.ai → Claude Code → geplante Aufgaben; auf diesem Konto bereits genutzt) startet
-  täglich um ~07:00 mit dem Einzeiler oben. Kostet kein neues Secret, nur Kontingent des
-  bestehenden Claude-Abos. Einrichtung: Claude in einer Session bitten „richte die tägliche
-  Qualitäts-Session aus UEBERGABE.md ein".
-- **Auto-Merge**: Bisher hat der Bot gemergt. Ohne Bot braucht jeder PR einen Klick von Unur.
-  Wer auch das abgeben will, erlaubt der geplanten Session ausdrücklich, PRs mit grünen Checks
-  per Auto-Merge (squash) zu mergen. Das ist eine bewusste Vertrauensentscheidung —
-  standardmäßig mergt Claude **nicht** selbst.
+- **Geplante Session und Auto-Merge**: entschieden (siehe oben). Zurücknehmen: Aufgabe
+  pausieren bzw. diesen Abschnitt ändern.
 - **Claude in GitHub Actions** (claude-code-action) wäre möglich, weil `ANTHROPIC_API_KEY`
   schon als Secret existiert — verursacht aber **zusätzliche API-Kosten** pro Lauf. Darum
   nicht eingerichtet.
