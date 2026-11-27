@@ -1,5 +1,8 @@
 # Copilot — Die Presse als Hintergrund-Dienst (MVP)
 
+> **Betrieb ab 1.12.2026 ohne Bot:** Regeln, Backlog und Arbeitsablauf stehen in
+> [UEBERGABE.md](UEBERGABE.md) — vor jeder Session lesen.
+
 ## Was dieses Projekt ist
 
 Prototyp für ein neues Digitalprodukt der „Presse": Statt eines Artikel-Feeds bekommt
@@ -49,6 +52,7 @@ copilot/
   titelcheck.py  Titel-Faktencheck: Zahlen im Punkt-Text, Absicht nicht als Vollzug,
                  Schlagzeile nur aus Punkt-Titeln/-Texten (sonst Titel von Punkt 1)
   zeittreue.py   „ab Montag"/„ab morgen" müssen zum Datum im Punkt passen (sonst Datum)
+  pruefung.py    Täglicher Qualitätscheck der veröffentlichten Ausgabe (qualitaet.yml → Issue + Telegram)
   budget.py      Lesezeit-Budget (90 s) durchsetzen: stufenweise kürzen, Links/Punkt 1 bleiben
   main.py        CLI: morgen|mittag|nachmittag|abend|catchup|feeds|woche|rueckkanal|site|karte|engagement [--dry-run]
 prompts/

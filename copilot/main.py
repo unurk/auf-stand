@@ -564,7 +564,7 @@ def main() -> int:
     load_dotenv(BASE_DIR / ".env")
     parser = argparse.ArgumentParser(description="Copilot — Lagebild-Generator")
     parser.add_argument("command", nargs="?", default="auto",
-                        choices=["auto", "slot", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys", "engagement", "pages-check"])
+                        choices=["auto", "slot", "morgen", "mittag", "nachmittag", "abend", "catchup", "feeds", "woche", "rueckkanal", "site", "karte", "vapid-keys", "engagement", "pages-check", "pruefen"])
     parser.add_argument(
         "--config", default="config.yaml",
         help="Config-Datei (z. B. config.nyt.yaml für die englische NYT-Edition)",
@@ -577,6 +577,9 @@ def main() -> int:
         "--site-geaendert", choices=["true", "false"], default="false",
         help="Für 'pages-check': hat dieser Lauf site/ geändert?",
     )
+    parser.add_argument("--datum", default=None, help="Für 'pruefen': Datum YYYY-MM-DD (Default: heute, Wien)")
+    parser.add_argument("--ausgabe", default="morgen", help="Für 'pruefen': welche Ausgabe (Default: morgen)")
+    parser.add_argument("--bericht", default=None, help="Für 'pruefen': Datei für den Issue-Text bei Befund")
     parser.add_argument("--dry-run", action="store_true", help="Prompt bauen, kein API-Call")
     parser.add_argument(
         "--keep-seen", action="store_true",
@@ -620,6 +623,9 @@ def main() -> int:
             from . import webview
             webview.build_site(config)
             return 0
+        if args.command == "pruefen":
+            from . import pruefung
+            return pruefung.cmd_pruefen(config, args.datum, args.ausgabe, args.bericht)
         if args.command == "pages-check":
             from . import pages
             return pages.cmd_pages_check(config, args.site_geaendert == "true")
