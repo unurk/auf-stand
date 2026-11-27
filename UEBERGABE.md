@@ -9,6 +9,7 @@ Aufträge an Claude Code formuliert und die PRs gemergt. Ab 1.12. läuft das so:
 | **Täglich prüfen** (06:40 Wien) | GitHub Actions `qualitaet.yml` → `copilot/pruefung.py` | keine; nur vorhandene Secrets |
 | Bei Befund melden | GitHub-Issue (Label `qualitaetscheck`) + Telegram-Alarm | keine |
 | **Befund beheben** | Claude Code — täglich 07:00 als geplante Session (oder von Hand per Einzeiler) | Claude-Abo, kein neues Secret |
+| Weiterentwickeln | Claude Code — sonntags 09:00, eine belegte Verbesserung pro Woche | Claude-Abo, kein neues Secret |
 | Mergen | Claude per Auto-Merge nach der Regel unten, sonst Unur | — |
 
 ## Was der tägliche Check prüft
@@ -76,6 +77,39 @@ Qualitätschecks (06:40) heute noch nicht geliefert, prüft die Session selbst
 nichts tun. Sonst je Issue: Ursache belegen, Fix + Regressionstest, PR, Auto-Merge nach
 der Regel unten, Issue mit PR-Link schließen.
 
+## Wöchentliche Verbesserung (eingerichtet 27.11.2026, Entscheidung Unur)
+
+Unur gibt die App ganz ab; sie soll sich ohne ihn weiterentwickeln — in kleinen,
+belegten Schritten.
+
+- **Name:** „auf-stand: wöchentliche Verbesserung"
+- **Zeit:** sonntags 09:00 Wien (`CRON_TZ=Europe/Vienna 0 9 * * 0`)
+- **Kosten:** nur Kontingent des bestehenden Claude-Abos, kein neues Secret.
+
+Ablauf:
+
+1. `master` holen, diese Datei lesen.
+2. Signale der letzten 7 Tage auswerten:
+   - **Feedback** (stärker gewichtet — bei einem einzigen Leser ist jeder Daumen eine
+     Aussage, Zähler sind dünn): „Relevant"/„Weniger", 👍/👎, `/fehlt`-Meldungen und das
+     Leserprofil aus dem State. Der State liegt **nicht** im Repo, sondern im privaten
+     Actions-Artifact `state-backup` des Workflows „Lagebild" (neuestes laden).
+   - `berichte/engagement.md` (Öffnungen je Ausgabe, Feedback-Rate).
+   - Die Ausgaben der Woche in `site/archiv/` als Kontext.
+3. **Genau eine** kleine, belegte Verbesserung wählen, die Unur die App lieber öffnen
+   lässt (Inhalt, Auswahl, Lesbarkeit, Ton) — z. B. eine Prompt-Regel, ein Gewicht im
+   Leserprofil, eine Kürzungsstufe. Keine großen Umbauten, keine neuen Features
+   außerhalb dieser vier Felder, nichts unter `.github/`.
+4. Umsetzen mit Test, PR gegen `master`, Auto-Merge nach der Regel unten.
+5. Begründung und Ergebnis in `berichte/verbesserungen.md` protokollieren (gleicher PR).
+   **Das Repo ist öffentlich:** nur zusammengefasste Werte (Anzahl Votes, Themen,
+   Ressorts) — keine Chat-IDs, keine Push-Endpunkte, keine State-Auszüge.
+6. Kein belegter Anlass (z. B. kein Feedback in der Woche) → **nichts ändern**, nur
+   in der Session berichten.
+
+Ist auf dem Arbeits-Branch noch ein PR offen (etwa ein Qualitäts-Fix, der auf Unur wartet),
+setzt die Woche aus.
+
 ## Auto-Merge-Regel (Entscheidung Unur, 27.11.2026)
 
 Claude darf einen PR **selbst per Squash mergen**, wenn **alle** Bedingungen erfüllt sind:
@@ -84,11 +118,13 @@ Claude darf einen PR **selbst per Squash mergen**, wenn **alle** Bedingungen erf
 2. Keine neuen Secrets, keine Secrets/Tokens im Diff.
 3. Keine Kosten: keine neuen kostenpflichtigen Dienste oder zusätzlichen API-Aufrufe,
    `requirements*.txt` unverändert.
-4. Der Diff passt zum Issue (nur der Fix, sein Test, ggf. Doku) — kein Beifang.
+4. Der Diff passt zum Issue bzw. zur protokollierten Verbesserung (nur Fix/Änderung, Test,
+   ggf. Doku und Eintrag in `berichte/verbesserungen.md`) — kein Beifang.
 5. **Keine Änderungen unter `.github/`** (Workflows) und nichts an Secrets/Variablen.
 
-Ist eine Bedingung nicht erfüllt, bleibt der PR offen; Claude schreibt ins Issue, welche
-Bedingung fehlt — dann entscheidet Unur. Ausnahme Workflow-Änderungen: immer Unur.
+Ist eine Bedingung nicht erfüllt, bleibt der PR offen; Claude schreibt ins Issue bzw. in
+den PR, welche Bedingung fehlt — dann entscheidet Unur. Ausnahme Workflow-Änderungen:
+immer Unur.
 
 ## Entscheidungen, die nur Unur treffen kann
 
