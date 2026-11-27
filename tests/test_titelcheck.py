@@ -34,12 +34,13 @@ AUSGABE = """# ☀️ A1 investiert 500 Millionen in die Zukunft
 def test_a1_fall_zahl_aus_titel_ohne_deckung_im_text():
     out, korrekturen = titelcheck.pruefe_titel(AUSGABE, [QUELLE])
     # Die Quell-Schlagzeile hat dieselbe ungedeckte 500 — taugt nicht als Ersatz
-    assert "## 1️⃣ 📊 A1 investiert, streicht aber Personal" in out
+    # Zahl gestrichen; „will … einsparen" im Text = Absicht → „Geplant: " (27.11.-Regel)
+    assert "## 1️⃣ 📊 Geplant: A1 investiert, streicht aber Personal" in out
     punkte = out[out.index("## 1"):]
     assert "500" not in punkte.split("[→ Artikel]")[0]
     assert any("Punkt 1" in k and "500" in k for k in korrekturen)
     # H1 behauptete die 500 ebenfalls → wird zum geprüften Titel von Punkt 1
-    assert out.startswith("# ☀️ A1 investiert, streicht aber Personal\n")
+    assert out.startswith("# ☀️ Geplant: A1 investiert, streicht aber Personal\n")
     # Gedeckte Titel bleiben unverändert („1.000" im Titel = „1000" im Text)
     assert "## 2️⃣ ✈️ Lufthansa streicht 1.000 Stellen zusätzlich" in out
     # Link-URL (mit „500" im Slug) bleibt unangetastet
@@ -48,7 +49,7 @@ def test_a1_fall_zahl_aus_titel_ohne_deckung_im_text():
 
 def test_heute_wichtig_folgt_dem_geprueften_titel():
     out = main._pruefe_titel(AUSGABE, [QUELLE])
-    assert "1️⃣ A1 investiert, streicht aber Personal\n" in out
+    assert "1️⃣ Geplant: A1 investiert, streicht aber Personal\n" in out
     assert "1️⃣ A1 investiert 500" not in out
 
 

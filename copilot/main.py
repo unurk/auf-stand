@@ -148,12 +148,17 @@ def _sichere_quell_links(lagebild: str, articles: list, lang: str) -> str:
     return lagebild
 
 
-def _pruefe_titel(lagebild: str, articles: list) -> str:
-    """Zahlen in H1/Punkt-Titeln müssen im Text oder Material stehen (titelcheck.py).
+def _pruefe_titel(lagebild: str, articles: list, heute=None) -> str:
+    """Titel-Faktencheck (Zahlen, Absicht, Schlagzeile) und Zeittreue (Wochentage).
 
     Läuft nach den Quell-Links (braucht sie für das Material) und baut danach
     „Heute wichtig" aus den geprüften Titeln neu.
     """
+    from . import zeittreue
+
+    lagebild, wochentage = zeittreue.pruefe_wochentage(lagebild, heute or datetime.now().date())
+    for k in wochentage:
+        print(f"Qualitäts-Gate (Zeittreue): {k}")
     lagebild, korrekturen = titelcheck.pruefe_titel(lagebild, articles)
     for k in korrekturen:
         print(f"Qualitäts-Gate (Titel-Faktencheck): {k}")
